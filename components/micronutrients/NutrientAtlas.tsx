@@ -112,6 +112,11 @@ export function NutrientAtlas() {
   };
 
   useEffect(() => {
+    // Mobile is a reading surface: selection changes by tap, not by the
+    // scroll position. This keeps the featured detail from changing while a
+    // reader is trying to read a nutrient card.
+    if (window.matchMedia("(max-width: 900px)").matches) return;
+
     const cardGrid = cardGridRef.current;
     if (!cardGrid) return;
 
@@ -201,7 +206,7 @@ export function NutrientAtlas() {
       </div>
 
       <div className="atlas-layout">
-        <NutrientDetail nutrient={activeNutrient} />
+        <NutrientDetail key={activeNutrient.slug} nutrient={activeNutrient} />
         <div className="atlas-card-grid" ref={cardGridRef}>
           {visibleNutrients.map((nutrient) => {
             const index = nutrients.findIndex((item) => item.slug === nutrient.slug);
