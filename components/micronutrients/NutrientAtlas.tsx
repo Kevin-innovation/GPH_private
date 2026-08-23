@@ -99,9 +99,15 @@ function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
 export function NutrientAtlas() {
   const [filter, setFilter] = useState<Filter>("all");
   const [activeSlug, setActiveSlug] = useState(nutrients[0].slug);
+  const activeSlugRef = useRef(nutrients[0].slug);
   const cardGridRef = useRef<HTMLDivElement>(null);
   const visibleNutrients = filter === "all" ? nutrients : nutrients.filter((nutrient) => nutrient.category === filter);
   const activeNutrient = nutrients.find((nutrient) => nutrient.slug === activeSlug) ?? nutrients[0];
+
+  const selectNutrient = (nextSlug: string) => {
+    activeSlugRef.current = nextSlug;
+    setActiveSlug((currentSlug) => (currentSlug === nextSlug ? currentSlug : nextSlug));
+  };
 
   useEffect(() => {
     const cardGrid = cardGridRef.current;
@@ -130,7 +136,21 @@ export function NutrientAtlas() {
           : closest;
       });
       const nextSlug = closestCard.getAttribute("data-nutrient-slug");
-      if (nextSlug) setActiveSlug((currentSlug) => (currentSlug === nextSlug ? currentSlug : nextSlug));
+      if (!nextSlug || nextSlug === activeSlugRef.current) return;
+
+      const currentCard = cards.find((card) => card.dataset.nutrientSlug === activeSlugRef.current);
+      const currentRect = currentCard?.getBoundingClientRect();
+      const closestRect = closestCard.getBoundingClientRect();
+      const nextDistance = Math.abs(closestRect.top + closestRect.height / 2 - anchor);
+      const currentDistance = currentRect
+        ? Math.abs(currentRect.top + currentRect.height / 2 - anchor)
+        : Number.POSITIVE_INFINITY;
+
+      // Keep the active card stable while the current card is still close to
+      // the reading anchor. This prevents tiny scroll deltas and content
+      // reflow from flipping the detail panel back and forth at card edges.
+      if (currentCard && currentDistance - nextDistance < 24) return;
+      selectNutrient(nextSlug);
     };
 
     const requestSync = () => {
@@ -151,7 +171,7 @@ export function NutrientAtlas() {
     setFilter(nextFilter);
     if (nextFilter !== "all" && activeNutrient.category !== nextFilter) {
       const firstMatch = nutrients.find((nutrient) => nutrient.category === nextFilter);
-      if (firstMatch) setActiveSlug(firstMatch.slug);
+      if (firstMatch) selectNutrient(firstMatch.slug);
     }
   };
 
@@ -191,7 +211,7 @@ export function NutrientAtlas() {
                 type="button"
                 aria-pressed={isActive}
                 data-nutrient-slug={nutrient.slug}
-                onClick={() => setActiveSlug(nutrient.slug)}
+                onClick={() => selectNutrient(nutrient.slug)}
               >
                 <span className="atlas-card-index">0{index + 1}</span>
                 <div className="atlas-card-visual">

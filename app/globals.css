@@ -2784,7 +2784,14 @@ details .lens-step {
   .atlas-detail-body {
     position: relative;
     z-index: 1;
+    min-height: 800px;
     padding: 20px 0 36px;
     background: var(--color-cloud);
+  }
+
+  /* Scroll-linked reveal transforms fight the active-card observer on a
+     narrow viewport and make fine scrolling feel like a series of jolts. */
+  .atlas-card {
+    animation: none !important;
   }
 }
