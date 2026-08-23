@@ -2742,3 +2742,49 @@ details .lens-step {
   .workflow-list { margin-block: 24px 20px; }
   .image-caption { margin-top: 16px; }
 }
+
+/* Final mobile scroll corrections: editorial sidebars become normal flow so
+   they cannot sit on top of the rows they introduce. The nutrient image is
+   the only pinned part of the mobile atlas; its text remains in the flow and
+   updates as the selected card changes. */
+@media (max-width: 900px) {
+  .solutions-intro,
+  .case-studies > div:first-child {
+    position: static;
+    top: auto;
+  }
+
+  .atlas-layout {
+    display: block;
+  }
+
+  .atlas-detail {
+    display: contents;
+  }
+
+  .atlas-detail-sticky-visual {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 20;
+    padding: 12px 0 16px;
+    border-top: 1px solid var(--color-navy);
+    border-bottom: 1px solid var(--color-hairline);
+    background: var(--color-cloud);
+  }
+
+  .atlas-detail-topline {
+    padding-bottom: 10px;
+  }
+
+  .atlas-detail-visual {
+    width: min(100%, 220px);
+    margin: 16px auto 0;
+  }
+
+  .atlas-detail-body {
+    position: relative;
+    z-index: 1;
+    padding: 20px 0 36px;
+    background: var(--color-cloud);
+  }
+}

@@ -52,42 +52,46 @@ function NutrientVisual({ nutrient, className }: { nutrient: Nutrient; className
 function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
   return (
     <aside className="atlas-detail" aria-live="polite">
-      <div className="atlas-detail-topline">
-        <span>Selected nutrient</span>
-        <span>{nutrient.category === "vitamin" ? "Vitamin" : "Mineral"}</span>
-      </div>
-      <div className="atlas-detail-visual">
-        <NutrientVisual nutrient={nutrient} className="atlas-detail-image" />
-      </div>
-      <div className="atlas-detail-title">
-        <NutrientIcon nutrient={nutrient} />
-        <div>
-          <span className="atlas-detail-type">{nutrient.category}</span>
-          <h3>{nutrient.name}</h3>
+      <div className="atlas-detail-sticky-visual">
+        <div className="atlas-detail-topline">
+          <span>Selected nutrient</span>
+          <span>{nutrient.category === "vitamin" ? "Vitamin" : "Mineral"}</span>
+        </div>
+        <div className="atlas-detail-visual">
+          <NutrientVisual nutrient={nutrient} className="atlas-detail-image" />
         </div>
       </div>
-      <p className="atlas-detail-summary">{nutrient.summary}</p>
-      <div className="atlas-detail-facts">
-        <div>
-          <span>In the body</span>
-          <p>{nutrient.whatItDoes}</p>
+      <div className="atlas-detail-body">
+        <div className="atlas-detail-title">
+          <NutrientIcon nutrient={nutrient} />
+          <div>
+            <span className="atlas-detail-type">{nutrient.category}</span>
+            <h3>{nutrient.name}</h3>
+          </div>
         </div>
-        <div>
-          <span>Food sources</span>
-          <p>{nutrient.foodSources}</p>
+        <p className="atlas-detail-summary">{nutrient.summary}</p>
+        <div className="atlas-detail-facts">
+          <div>
+            <span>In the body</span>
+            <p>{nutrient.whatItDoes}</p>
+          </div>
+          <div>
+            <span>Food sources</span>
+            <p>{nutrient.foodSources}</p>
+          </div>
+          <div>
+            <span>Public-health lens</span>
+            <p>{nutrient.globalLens}</p>
+          </div>
+          <div className="atlas-detail-safety">
+            <span>Safety context</span>
+            <p>{nutrient.safetyNote}</p>
+          </div>
         </div>
-        <div>
-          <span>Public-health lens</span>
-          <p>{nutrient.globalLens}</p>
-        </div>
-        <div className="atlas-detail-safety">
-          <span>Safety context</span>
-          <p>{nutrient.safetyNote}</p>
-        </div>
+        <a href={nutrient.sourceUrl} target="_blank" rel="noreferrer">
+          Read the {nutrient.source} fact sheet <span aria-hidden="true">↗</span>
+        </a>
       </div>
-      <a href={nutrient.sourceUrl} target="_blank" rel="noreferrer">
-        Read the {nutrient.source} fact sheet <span aria-hidden="true">↗</span>
-      </a>
     </aside>
   );
 }
