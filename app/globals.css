@@ -187,6 +187,7 @@ p + p { margin-top: 1.15em; }
 .atlas-detail-body > a span { display: inline-block; margin-left: 4px; transition: transform 170ms ease; }
 .atlas-detail-body > a:hover span, .atlas-detail-body > a:focus-visible span { transform: translate(2px, -2px); }
 .atlas-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.atlas-mobile-list { display: none; }
 .atlas-card { position: relative; display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; column-gap: 16px; min-height: 174px; align-items: start; border: 1px solid var(--color-hairline); border-radius: 0; background: var(--color-white); color: var(--color-ink); padding: 18px; text-align: left; transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease; }
 .atlas-card:hover, .atlas-card:focus-visible { border-color: var(--color-teal-text); transform: translateY(-3px); }
 .atlas-card.is-active { border-color: var(--color-teal-text); background: #edf7f5; }
@@ -3057,5 +3058,228 @@ details .lens-step {
 
   .atlas-detail {
     animation: atlas-detail-swap 220ms ease-out both;
+  }
+}
+
+/* Final mobile interaction: each nutrient owns its own expanded explanation.
+   This keeps the thing being read and the thing being selected in one place. */
+@media (max-width: 900px) {
+  .atlas-layout {
+    display: none;
+  }
+
+  .atlas-mobile-list {
+    display: block;
+    border-top: 1px solid var(--color-navy);
+  }
+
+  .atlas-mobile-item {
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  .atlas-mobile-item.is-active {
+    background: var(--color-white);
+    border-bottom-color: var(--color-teal-text);
+  }
+
+  .atlas-mobile-trigger {
+    display: grid;
+    grid-template-columns: 36px 56px minmax(0, 1fr) 24px;
+    gap: 10px;
+    width: 100%;
+    min-height: 88px;
+    align-items: start;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink);
+    padding: 15px 0;
+    text-align: left;
+  }
+
+  .atlas-mobile-trigger:hover,
+  .atlas-mobile-trigger:focus-visible {
+    background: var(--color-cloud);
+  }
+
+  .atlas-mobile-item.is-active .atlas-mobile-trigger {
+    background: var(--color-white);
+  }
+
+  .atlas-mobile-index {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    padding-top: 3px;
+    color: var(--color-gold-text);
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .atlas-mobile-thumb {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    width: 56px;
+    height: 56px;
+    overflow: hidden;
+    border: 1px solid var(--color-hairline);
+    border-radius: 50%;
+  }
+
+  .atlas-mobile-thumb-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .atlas-mobile-trigger-copy {
+    grid-column: 3;
+    grid-row: 1 / span 3;
+    min-width: 0;
+  }
+
+  .atlas-mobile-trigger-copy .atlas-card-type {
+    margin: 0 0 3px;
+    font-size: 0.59rem;
+  }
+
+  .atlas-mobile-trigger-copy strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--color-navy);
+    font-size: 1.08rem;
+    font-weight: 500;
+  }
+
+  .atlas-mobile-trigger-copy .atlas-card-summary {
+    display: block;
+    max-width: none;
+    color: rgba(23, 37, 46, 0.68);
+    font-size: 0.8rem;
+    line-height: 1.42;
+  }
+
+  .atlas-mobile-trigger-arrow {
+    grid-column: 4;
+    grid-row: 1 / span 3;
+    align-self: center;
+    justify-self: end;
+    color: var(--color-teal-text);
+    font-size: 1.35rem;
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  .atlas-mobile-detail {
+    border-top: 1px solid var(--color-hairline);
+    padding: 18px 0 24px;
+  }
+
+  .atlas-mobile-detail-head {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    padding-bottom: 18px;
+  }
+
+  .atlas-mobile-detail-visual {
+    width: 104px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 1px solid var(--color-hairline);
+    border-radius: 50%;
+  }
+
+  .atlas-mobile-detail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .atlas-mobile-detail-copy {
+    min-width: 0;
+    padding-top: 2px;
+  }
+
+  .atlas-mobile-detail-copy .atlas-detail-title {
+    gap: 9px;
+    padding: 0 0 8px;
+  }
+
+  .atlas-mobile-detail-copy .atlas-detail-title .atlas-icon {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    font-size: 0.72rem;
+  }
+
+  .atlas-mobile-detail-copy .atlas-detail-type {
+    margin-bottom: 3px;
+    font-size: 0.58rem;
+  }
+
+  .atlas-mobile-detail-copy .atlas-detail-title h3 {
+    font-size: clamp(1.3rem, 6.7vw, 1.65rem);
+    line-height: 1.06;
+  }
+
+  .atlas-mobile-detail-copy .atlas-detail-summary {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.4;
+  }
+
+  .atlas-mobile-facts > div {
+    border-top: 1px solid var(--color-hairline);
+    padding: 14px 0;
+  }
+
+  .atlas-mobile-facts > div span {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--color-teal-text);
+    font-size: 0.66rem;
+    font-weight: 700;
+  }
+
+  .atlas-mobile-facts > div p {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .atlas-mobile-facts .atlas-detail-safety {
+    border-top-color: var(--color-gold);
+  }
+
+  .atlas-mobile-facts .atlas-detail-safety span {
+    color: var(--color-gold-text);
+  }
+
+  .atlas-mobile-detail > a {
+    display: inline-block;
+    margin-top: 4px;
+    color: var(--color-teal-text);
+    font-size: 0.76rem;
+    font-weight: 500;
+  }
+
+  .atlas-mobile-detail > a span {
+    display: inline-block;
+    margin-left: 4px;
+  }
+
+  .atlas-layout .atlas-detail {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
+  @keyframes atlas-mobile-detail-in {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .atlas-mobile-detail {
+    animation: atlas-mobile-detail-in 200ms ease-out both;
   }
 }

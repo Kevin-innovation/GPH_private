@@ -98,6 +98,92 @@ function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
   );
 }
 
+function MobileNutrientList({
+  nutrients: visibleNutrients,
+  activeSlug,
+  onSelect,
+}: {
+  nutrients: Nutrient[];
+  activeSlug: string;
+  onSelect: (slug: string) => void;
+}) {
+  return (
+    <div className="atlas-mobile-list" aria-label="Nutrients to explore">
+      {visibleNutrients.map((nutrient) => {
+        const index = nutrients.findIndex((item) => item.slug === nutrient.slug);
+        const isActive = nutrient.slug === activeSlug;
+        const detailId = `mobile-nutrient-detail-${nutrient.slug}`;
+
+        return (
+          <article className={`atlas-mobile-item${isActive ? " is-active" : ""}`} key={nutrient.slug}>
+            <button
+              className="atlas-mobile-trigger"
+              type="button"
+              aria-expanded={isActive}
+              aria-controls={detailId}
+              onClick={() => onSelect(nutrient.slug)}
+            >
+              <span className="atlas-mobile-index">0{index + 1}</span>
+              <div className="atlas-mobile-thumb">
+                <NutrientVisual nutrient={nutrient} className="atlas-mobile-thumb-image" />
+              </div>
+              <div className="atlas-mobile-trigger-copy">
+                <span className="atlas-card-type">{nutrient.category}</span>
+                <strong>{nutrient.name}</strong>
+                <span className="atlas-card-summary">{nutrient.summary}</span>
+              </div>
+              <span className="atlas-mobile-trigger-arrow" aria-hidden="true">
+                {isActive ? "−" : "+"}
+              </span>
+            </button>
+
+            {isActive ? (
+              <div className="atlas-mobile-detail" id={detailId} aria-live="polite">
+                <div className="atlas-mobile-detail-head">
+                  <div className="atlas-mobile-detail-visual">
+                    <NutrientVisual nutrient={nutrient} className="atlas-mobile-detail-image" />
+                  </div>
+                  <div className="atlas-mobile-detail-copy">
+                    <div className="atlas-detail-title">
+                      <NutrientIcon nutrient={nutrient} />
+                      <div>
+                        <span className="atlas-detail-type">{nutrient.category}</span>
+                        <h3>{nutrient.name}</h3>
+                      </div>
+                    </div>
+                    <p className="atlas-detail-summary">{nutrient.summary}</p>
+                  </div>
+                </div>
+                <div className="atlas-mobile-facts">
+                  <div>
+                    <span>In the body</span>
+                    <p>{nutrient.whatItDoes}</p>
+                  </div>
+                  <div>
+                    <span>Food sources</span>
+                    <p>{nutrient.foodSources}</p>
+                  </div>
+                  <div>
+                    <span>Public-health lens</span>
+                    <p>{nutrient.globalLens}</p>
+                  </div>
+                  <div className="atlas-detail-safety">
+                    <span>Safety context</span>
+                    <p>{nutrient.safetyNote}</p>
+                  </div>
+                </div>
+                <a href={nutrient.sourceUrl} target="_blank" rel="noreferrer">
+                  Read the {nutrient.source} fact sheet <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            ) : null}
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
 export function NutrientAtlas() {
   const [filter, setFilter] = useState<Filter>("all");
   const [activeSlug, setActiveSlug] = useState(nutrients[0].slug);
@@ -233,6 +319,11 @@ export function NutrientAtlas() {
           })}
         </div>
       </div>
+      <MobileNutrientList
+        nutrients={visibleNutrients}
+        activeSlug={activeNutrient.slug}
+        onSelect={selectNutrient}
+      />
     </div>
   );
 }
