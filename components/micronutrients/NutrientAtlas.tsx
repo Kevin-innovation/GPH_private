@@ -60,16 +60,18 @@ function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
         <div className="atlas-detail-visual">
           <NutrientVisual nutrient={nutrient} className="atlas-detail-image" />
         </div>
+        <div className="atlas-detail-sticky-copy">
+          <div className="atlas-detail-title">
+            <NutrientIcon nutrient={nutrient} />
+            <div>
+              <span className="atlas-detail-type">{nutrient.category}</span>
+              <h3>{nutrient.name}</h3>
+            </div>
+          </div>
+          <p className="atlas-detail-summary">{nutrient.summary}</p>
+        </div>
       </div>
       <div className="atlas-detail-body">
-        <div className="atlas-detail-title">
-          <NutrientIcon nutrient={nutrient} />
-          <div>
-            <span className="atlas-detail-type">{nutrient.category}</span>
-            <h3>{nutrient.name}</h3>
-          </div>
-        </div>
-        <p className="atlas-detail-summary">{nutrient.summary}</p>
         <div className="atlas-detail-facts">
           <div>
             <span>In the body</span>

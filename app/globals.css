@@ -183,6 +183,9 @@ p + p { margin-top: 1.15em; }
 .atlas-detail > a { display: inline-block; margin-top: 22px; color: var(--color-teal-text); font-size: 0.84rem; font-weight: 500; }
 .atlas-detail > a span { display: inline-block; margin-left: 4px; transition: transform 170ms ease; }
 .atlas-detail > a:hover span, .atlas-detail > a:focus-visible span { transform: translate(2px, -2px); }
+.atlas-detail-body > a { display: inline-block; margin-top: 22px; color: var(--color-teal-text); font-size: 0.84rem; font-weight: 500; }
+.atlas-detail-body > a span { display: inline-block; margin-left: 4px; transition: transform 170ms ease; }
+.atlas-detail-body > a:hover span, .atlas-detail-body > a:focus-visible span { transform: translate(2px, -2px); }
 .atlas-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .atlas-card { position: relative; display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; column-gap: 16px; min-height: 174px; align-items: start; border: 1px solid var(--color-hairline); border-radius: 0; background: var(--color-white); color: var(--color-ink); padding: 18px; text-align: left; transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease; }
 .atlas-card:hover, .atlas-card:focus-visible { border-color: var(--color-teal-text); transform: translateY(-3px); }
@@ -2777,14 +2780,51 @@ details .lens-step {
   }
 
   .atlas-detail-visual {
-    width: min(100%, 220px);
-    margin: 16px auto 0;
+    width: min(100%, 160px);
+    margin: 12px auto 0;
+  }
+
+  .atlas-detail-sticky-visual {
+    min-height: 380px;
+    padding: 10px 0 14px;
+  }
+
+  .atlas-detail-sticky-copy {
+    padding-top: 12px;
+  }
+
+  .atlas-detail-title {
+    gap: 12px;
+    padding: 0 0 8px;
+  }
+
+  .atlas-detail-title .atlas-icon {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+    font-size: 0.82rem;
+  }
+
+  .atlas-detail-type {
+    margin-bottom: 4px;
+    font-size: 0.62rem;
+  }
+
+  .atlas-detail-title h3 {
+    font-size: clamp(1.55rem, 7.5vw, 2rem);
+  }
+
+  .atlas-detail-summary {
+    max-width: none;
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.35;
   }
 
   .atlas-detail-body {
     position: relative;
     z-index: 1;
-    min-height: 800px;
+    min-height: 620px;
     padding: 20px 0 36px;
     background: var(--color-cloud);
   }
@@ -2793,5 +2833,32 @@ details .lens-step {
      narrow viewport and make fine scrolling feel like a series of jolts. */
   .atlas-card {
     animation: none !important;
+  }
+}
+
+/* On small screens the page is a reading surface, not a scroll-driven demo.
+   Keep the designed static transforms (the phone fan, for example), but remove
+   view-timeline animations that can repaint between tiny touch-scroll deltas. */
+@media (max-width: 900px) {
+  .lens-step,
+  .lens-step .step-number,
+  .app-phone,
+  .solution-row .row-index,
+  .solution-row h4,
+  .atlas-card {
+    animation: none !important;
+    animation-timeline: auto !important;
+    animation-range: normal !important;
+  }
+
+  .solution-row .row-index,
+  .solution-row h4 {
+    opacity: 1 !important;
+    will-change: auto;
+  }
+
+  .solution-row::after {
+    animation: none !important;
+    transform: scaleX(0);
   }
 }
