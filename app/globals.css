@@ -2884,6 +2884,9 @@ details .lens-step {
 
   .atlas-detail-sticky-visual {
     display: grid;
+    position: static;
+    top: auto;
+    z-index: auto;
     grid-template-columns: 112px minmax(0, 1fr);
     grid-template-rows: auto 1fr;
     grid-template-areas:
