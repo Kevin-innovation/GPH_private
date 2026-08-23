@@ -1,0 +1,2656 @@
+@import "tailwindcss";
+
+/* Brand tokens. Accent values below are contrast-measured: the raw brand teal
+   (#159a91) and green (#75b85a) fail WCAG AA as text, so the -text variants
+   carry every typographic use. See docs/TASK.md 6.5. */
+:root { --color-white: #ffffff; --color-cloud: #f5f8f7; --color-ink: #17252e; --color-navy: #12314b; --color-hairline: rgba(18, 49, 75, 0.14); --color-teal: #159a91; --color-teal-text: #117e76; --color-green: #75b85a; --color-green-text: #4b7e36; --color-gold: #f2b84b; --color-gold-text: #99670b; --color-gold-wash: #fdf3de; --header-height: 72px; }
+@theme inline { --color-background: var(--color-cloud); --color-foreground: var(--color-ink); --font-sans: var(--font-inter), Inter, "Helvetica Neue", Arial, sans-serif; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; font-family: var(--font-sans); }
+body { margin: 0; overflow-x: clip; background: var(--color-cloud); color: var(--color-ink); font-family: inherit; font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+button, a, summary, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, summary { cursor: pointer; }
+img { display: block; max-width: 100%; }
+h1, h2, h3, h4, p { margin-top: 0; }
+/* break-word is a floor, not the plan: the mobile scale below is sized so the
+   longest word in any heading still fits the 320px container. */
+h1, h2, h3, h4 { color: var(--color-navy); font-weight: 300; letter-spacing: -0.03em; line-height: 1.12; overflow-wrap: break-word; }
+h1, h2 { font-weight: 500; }
+h1 { font-size: clamp(2.9rem, 4.6vw, 4.35rem); max-width: 15ch; }
+h2 { font-size: clamp(2.1rem, 3.2vw, 3.1rem); max-width: 18ch; }
+h3 { font-size: clamp(1.4rem, 1.9vw, 1.85rem); letter-spacing: -0.022em; }
+h4 { font-size: 1.12rem; letter-spacing: -0.015em; }
+p { max-width: 66ch; }
+/* Tailwind preflight zeroes every margin, so paragraph rhythm is declared once here. */
+p + p { margin-top: 1.15em; }
+.page-width { width: min(1280px, calc(100% - 64px)); margin: 0 auto; }
+.section { scroll-margin-top: calc(var(--header-height) + 24px); padding: 104px 0; }
+.section-white { background: var(--color-white); }
+.section-cloud { background: var(--color-cloud); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skip-link { position: fixed; z-index: 30; top: -48px; left: 16px; background: var(--color-gold); color: var(--color-navy); padding: 10px 14px; font-weight: 600; transition: top 180ms ease; }
+.skip-link:focus { top: 12px; }
+.site-header { position: sticky; z-index: 20; top: 0; background: var(--color-cloud); border-bottom: 1px solid var(--color-hairline); }
+.header-inner { width: min(1440px, calc(100% - 48px)); min-height: var(--header-height); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.brand-lockup, .footer-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; line-height: 1.05; }
+.brand-lockup img, .footer-brand img { flex: 0 0 auto; }
+.brand-lockup strong, .brand-lockup span span { display: block; font-size: 0.85rem; font-weight: 500; letter-spacing: -0.02em; }
+.brand-lockup strong { color: var(--color-navy); }
+.brand-lockup span span { color: var(--color-teal-text); }
+.desktop-nav { display: flex; align-items: center; gap: clamp(10px, 1.6vw, 22px); font-size: 0.88rem; }
+/* Nav links need a visible affordance, not just a colour swap on hover: the rule
+   slides in from the left so the target reads as interactive the moment it is
+   pointed at or focused. */
+.desktop-nav a { position: relative; padding: 9px 4px; text-decoration: none; }
+.desktop-nav a::after { content: ""; position: absolute; left: 4px; right: 4px; bottom: 2px; height: 1.5px; background: var(--color-teal-text); transform: scaleX(0); transform-origin: left; transition: transform 200ms ease; }
+.desktop-nav a:hover, .desktop-nav a:focus-visible { color: var(--color-teal-text); }
+.desktop-nav a:hover::after, .desktop-nav a:focus-visible::after { transform: scaleX(1); }
+.nav-cta { margin-left: 10px; border-radius: 8px; padding: 12px 18px; background: var(--color-navy); color: var(--color-white); font-weight: 500; transition: background-color 170ms ease, transform 110ms ease; }
+.nav-cta::after { display: none; }
+.nav-cta:hover, .nav-cta:focus-visible { background: var(--color-teal-text); color: var(--color-white) !important; }
+.nav-cta:active { transform: translateY(1px); }
+.menu-toggle, .mobile-nav { display: none; }
+.hero-section {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid var(--color-hairline);
+  background:
+    radial-gradient(ellipse at 80% 40%, rgba(21, 154, 145, 0.16), transparent 29%),
+    radial-gradient(ellipse at 70% 76%, rgba(242, 184, 75, 0.15), transparent 24%),
+    linear-gradient(105deg, var(--color-cloud) 0%, #f5faf8 56%, #eef7f4 100%);
+}
+.hero-section::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 80px;
+  right: -9vw;
+  width: min(72vw, 1020px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(17, 126, 118, 0.14);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 48%, rgba(21, 154, 145, 0.13), transparent 38%),
+    radial-gradient(circle at 70% 25%, rgba(242, 184, 75, 0.14), transparent 28%),
+    radial-gradient(circle at 64% 76%, rgba(117, 184, 90, 0.08), transparent 25%);
+  pointer-events: none;
+}
+.hero-section::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 7%;
+  bottom: 8%;
+  width: 180px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 184, 75, 0.13), transparent 68%);
+  filter: blur(4px);
+  pointer-events: none;
+}
+/* Deliberately shorter than the viewport: the brief bans the oversized SaaS hero,
+   so the first fold ends mid-illustration and invites the scroll. */
+.hero-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(320px, 6fr); align-items: center; gap: clamp(24px, 4vw, 56px); padding-top: 56px; padding-bottom: 64px; }
+.hero-copy { position: relative; z-index: 1; }
+.hero-copy h1, .hero-heading h1 { margin-bottom: 26px; font-weight: 500; letter-spacing: -0.045em; line-height: 1.04; }
+.hero-supporting { max-width: 64ch; font-size: clamp(1.05rem, 1.35vw, 1.24rem); line-height: 1.55; }
+.hero-art-wrap { position: relative; align-self: center; margin-right: -8%; }
+/* The visual is allowed to sit behind the right side of the statement rather than
+   living in a card-like column. The source is an alpha-transparent photographic
+   cutout, so the object itself—not a photo-shaped container—sits on the hero field. */
+.hero-art { width: 100%; aspect-ratio: 5 / 4; height: auto; object-fit: cover; object-position: 100% 56%; mix-blend-mode: multiply; -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 15%), linear-gradient(to bottom, transparent 0%, #000 13%, #000 85%, transparent 100%); mask-image: linear-gradient(to right, transparent 0%, #000 15%), linear-gradient(to bottom, transparent 0%, #000 13%, #000 85%, transparent 100%); -webkit-mask-composite: source-in; mask-composite: intersect; }
+.eyebrow { margin-bottom: 16px; color: var(--color-teal-text); font-size: 0.77rem; font-weight: 600; letter-spacing: 0.02em; line-height: 1.3; }
+.button-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 34px 0 28px; }
+/* Interactive controls carry an 8px radius and a real press state — a deliberate
+   amendment to the Carbon radius-0 rule, scoped to controls only. Structural
+   surfaces (sections, rules, list rows) stay square, which is what keeps the
+   page editorial rather than app-like. */
+.button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid transparent; border-radius: 8px; padding: 13px 22px; font-size: 0.92rem; font-weight: 500; letter-spacing: -0.01em; text-decoration: none; transition: background-color 170ms ease, color 170ms ease, border-color 170ms ease, transform 110ms ease; }
+.button-primary { background: var(--color-navy); color: var(--color-white); border-color: var(--color-navy); }
+.button-primary:hover, .button-primary:focus-visible { background: var(--color-teal-text); border-color: var(--color-teal-text); }
+.button-secondary { background: var(--color-white); color: var(--color-navy); border-color: rgba(18, 49, 75, 0.3); }
+.button-secondary:hover, .button-secondary:focus-visible { border-color: var(--color-navy); background: var(--color-cloud); }
+.button:active { transform: translateY(1px); }
+/* "Coming soon" is a status, not a control. A pill with a gold dot says that
+   honestly; a greyed-out rectangle just reads as a broken button. */
+.status-pill { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; border: 1px solid rgba(18, 49, 75, 0.24); border-radius: 999px; padding: 11px 20px; color: var(--color-navy); font-size: 0.88rem; font-weight: 500; }
+.status-pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--color-gold); flex: 0 0 auto; }
+.hero-note { position: relative; display: grid; grid-template-columns: 8px minmax(0, 1fr); gap: 12px; max-width: 520px; margin-top: 2px; padding: 15px 0; border-top: 1px solid rgba(17, 126, 118, 0.26); border-bottom: 1px solid var(--color-hairline); color: var(--color-teal-text); font-size: 0.9rem; }
+.hero-note::before { content: ""; width: 7px; height: 7px; margin-top: 0.48em; border-radius: 50%; background: var(--color-gold); box-shadow: 0 0 0 5px rgba(242, 184, 75, 0.12); }
+.section-heading { max-width: 720px; }
+.section-heading h2 { margin-bottom: 20px; }
+.section-intro, .lead-copy { font-size: clamp(1.1rem, 1.6vw, 1.35rem); line-height: 1.55; }
+.mission-grid, .split-grid, .app-grid, .sources-grid, .contact-grid { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(48px, 8vw, 144px); }
+#about {
+  background:
+    radial-gradient(circle at 88% 20%, rgba(21, 154, 145, 0.06), transparent 24%),
+    radial-gradient(circle at 10% 82%, rgba(242, 184, 75, 0.055), transparent 22%),
+    var(--color-white);
+}
+.mission-grid h2 { max-width: 490px; margin-bottom: 0; }
+.mission-copy > p + p { margin-top: 28px; }
+/* With the two preview paragraphs cut, this row now carries the section, so it
+   gets the weight the prose used to take up. */
+.determinants { display: flex; flex-wrap: wrap; margin: 44px 0 30px; border-top: 1px solid var(--color-navy); border-bottom: 1px solid var(--color-hairline); }
+.determinants span { flex: 1 1 30%; display: flex; align-items: baseline; gap: 11px; padding: 17px 16px 17px 0; color: var(--color-teal-text); font-size: 1.06rem; font-weight: 500; text-transform: capitalize; }
+.determinants b { color: var(--color-gold-text); font-size: 0.82rem; font-weight: 700; }
+.mission-coda { color: var(--color-navy); font-size: 1.12rem; letter-spacing: -0.015em; }
+.split-grid { align-items: start; }
+.split-intro { position: sticky; top: calc(var(--header-height) + 32px); }
+.split-intro h2 { margin-bottom: 32px; }
+.split-intro > p { max-width: 480px; }
+.micronutrient-shell { overflow: clip; }
+.micronutrient-intro { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(48px, 8vw, 144px); align-items: end; margin-bottom: 68px; }
+.micronutrient-intro h2 { max-width: 620px; margin-bottom: 0; }
+.micronutrient-intro-copy > p { max-width: 600px; margin-bottom: 0; font-size: clamp(1.05rem, 1.4vw, 1.2rem); line-height: 1.55; }
+.micronutrient-intro-copy .side-note { max-width: 520px; margin-top: 28px; }
+.nutrient-atlas { margin-top: 12px; }
+.atlas-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 28px; padding: 18px 0; border-top: 1px solid var(--color-navy); border-bottom: 1px solid var(--color-hairline); }
+.atlas-toolbar > div:first-child { display: grid; gap: 5px; }
+.atlas-toolbar-label { color: var(--color-teal-text); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.atlas-toolbar strong { color: var(--color-navy); font-size: 1.05rem; font-weight: 500; }
+.atlas-filters { display: flex; gap: 8px; }
+.atlas-filters button { min-height: 44px; border: 1px solid var(--color-hairline); border-radius: 999px; background: transparent; color: rgba(23, 37, 46, 0.68); padding: 9px 16px; font-size: 0.78rem; font-weight: 600; transition: border-color 170ms ease, background-color 170ms ease, color 170ms ease; }
+.atlas-filters button:hover, .atlas-filters button:focus-visible { border-color: var(--color-teal-text); color: var(--color-teal-text); }
+.atlas-filters button.is-active { border-color: var(--color-navy); background: var(--color-navy); color: var(--color-white); }
+.atlas-layout { display: grid; grid-template-columns: minmax(300px, 0.78fr) minmax(0, 1.22fr); gap: clamp(40px, 7vw, 112px); align-items: start; padding-top: 32px; }
+.atlas-detail { position: sticky; top: calc(var(--header-height) + 28px); align-self: start; padding: 18px 0 0; border-top: 1px solid var(--color-navy); }
+.atlas-detail-topline { display: flex; justify-content: space-between; gap: 16px; padding-bottom: 18px; border-bottom: 1px solid var(--color-hairline); color: var(--color-teal-text); font-size: 0.74rem; font-weight: 700; }
+.atlas-detail-visual { width: min(100%, 280px); aspect-ratio: 1; overflow: hidden; margin: 24px auto 2px; border: 1px solid var(--color-hairline); border-radius: 50%; }
+.atlas-detail-image { width: 100%; height: 100%; object-fit: cover; }
+.atlas-detail-title { display: flex; align-items: center; gap: 18px; padding: 28px 0 18px; }
+.atlas-detail-title .atlas-icon { width: 64px; height: 64px; flex-basis: 64px; font-size: 1rem; }
+.atlas-detail-type, .atlas-card-type { display: block; margin-bottom: 7px; color: var(--color-gold-text); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+.atlas-detail-title h3 { margin: 0; color: var(--color-navy); font-size: clamp(2.3rem, 4.2vw, 3.8rem); font-weight: 300; }
+.atlas-detail-summary { max-width: 34ch; margin: 0 0 24px; color: rgba(23, 37, 46, 0.75); font-size: 1.05rem; line-height: 1.55; }
+.atlas-icon { position: relative; display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border: 1px solid currentColor; border-radius: 50%; color: var(--color-teal-text); font-size: 0.8rem; font-weight: 700; letter-spacing: -0.04em; }
+.atlas-icon::before { content: ""; position: absolute; inset: 5px; border: 1px solid currentColor; border-radius: inherit; opacity: 0.28; }
+.atlas-icon-vitamin-a, .atlas-icon-vitamin-d { color: var(--color-gold-text); }
+.atlas-icon-vitamin-a { border-radius: 16px 50% 50% 50%; }
+.atlas-icon-vitamin-b12, .atlas-icon-folate { color: var(--color-green-text); }
+.atlas-icon-iron, .atlas-icon-iodine { color: var(--color-teal-text); border-radius: 14px; }
+.atlas-icon-zinc, .atlas-icon-magnesium { color: var(--color-navy); border-radius: 12px 50% 12px 50%; }
+.atlas-detail-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+.atlas-detail-facts > div { padding: 18px 0; border-top: 1px solid var(--color-hairline); }
+.atlas-detail-facts > div:nth-child(3), .atlas-detail-facts > div:nth-child(4) { grid-column: 1 / -1; }
+.atlas-detail-facts span { display: block; margin-bottom: 7px; color: var(--color-teal-text); font-size: 0.72rem; font-weight: 700; }
+.atlas-detail-facts p { margin: 0; font-size: 0.87rem; line-height: 1.55; }
+.atlas-detail-safety { border-top-color: var(--color-gold) !important; }
+.atlas-detail-safety span { color: var(--color-gold-text); }
+.atlas-detail > a { display: inline-block; margin-top: 22px; color: var(--color-teal-text); font-size: 0.84rem; font-weight: 500; }
+.atlas-detail > a span { display: inline-block; margin-left: 4px; transition: transform 170ms ease; }
+.atlas-detail > a:hover span, .atlas-detail > a:focus-visible span { transform: translate(2px, -2px); }
+.atlas-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.atlas-card { position: relative; display: grid; grid-template-columns: 78px minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; column-gap: 16px; min-height: 174px; align-items: start; border: 1px solid var(--color-hairline); border-radius: 0; background: var(--color-white); color: var(--color-ink); padding: 18px; text-align: left; transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease; }
+.atlas-card:hover, .atlas-card:focus-visible { border-color: var(--color-teal-text); transform: translateY(-3px); }
+.atlas-card.is-active { border-color: var(--color-teal-text); background: #edf7f5; }
+.atlas-card-index { position: absolute; top: 16px; right: 16px; color: var(--color-gold-text); font-size: 0.7rem; font-weight: 700; }
+.atlas-card-visual { grid-column: 1; grid-row: 1 / span 3; width: 78px; height: 78px; overflow: hidden; border: 1px solid var(--color-hairline); border-radius: 50%; }
+.atlas-card-image { width: 100%; height: 100%; object-fit: cover; transition: transform 280ms ease; }
+.atlas-card:hover .atlas-card-image, .atlas-card:focus-visible .atlas-card-image { transform: scale(1.045); }
+.atlas-card-type { grid-column: 2 / -1; grid-row: 1; margin: 2px 0 6px; }
+.atlas-card strong { grid-column: 2; grid-row: 2; margin-bottom: 8px; color: var(--color-navy); font-size: clamp(1.15rem, 1.8vw, 1.45rem); font-weight: 400; letter-spacing: -0.03em; }
+.atlas-card-summary { grid-column: 2 / -1; grid-row: 3; max-width: 28ch; color: rgba(23, 37, 46, 0.68); font-size: 0.8rem; line-height: 1.42; }
+.atlas-card-arrow { grid-column: 3; grid-row: 2; align-self: center; color: var(--color-teal-text); font-size: 1.2rem; }
+@keyframes atlas-card-reveal { from { opacity: 0.4; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@supports (animation-timeline: view()) { .atlas-card { animation: atlas-card-reveal linear both; animation-timeline: view(); animation-range: entry 0% cover 30%; } }
+.side-note { display: flex; gap: 12px; max-width: 400px; margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--color-hairline); }
+.side-note p { margin: 0; font-size: 0.9rem; }
+.note-marker { color: var(--color-gold-text); font-size: 0.78rem; font-weight: 700; }
+.list-header { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--color-navy); color: var(--color-teal-text); font-size: 0.78rem; font-weight: 600; }
+.nutrient-row, .case-row { border-bottom: 1px solid var(--color-hairline); }
+.nutrient-row summary { display: grid; grid-template-columns: minmax(140px, 0.75fr) 1fr 18px; align-items: center; gap: 16px; list-style: none; padding: 20px 0; }
+.nutrient-row summary::-webkit-details-marker, .case-row summary::-webkit-details-marker { display: none; }
+.nutrient-name { color: var(--color-navy); font-size: clamp(1.15rem, 1.8vw, 1.45rem); }
+.row-index { display: inline-block; min-width: 30px; margin-right: 12px; color: var(--color-gold-text); font-size: 0.72rem; font-weight: 700; vertical-align: middle; }
+.nutrient-summary { color: rgba(23, 37, 46, 0.76); font-size: 0.9rem; }
+.summary-mark { color: var(--color-teal-text); font-size: 1.35rem; font-weight: 300; text-align: right; }
+details[open] .summary-mark { transform: rotate(45deg); }
+.nutrient-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 0 48px 28px 42px; }
+.nutrient-detail p { margin-bottom: 0; font-size: 0.9rem; }
+.nutrient-detail .eyebrow { margin-bottom: 6px; font-size: 0.7rem; }
+.nutrient-detail > a, .case-detail > a { grid-column: 1 / -1; color: var(--color-teal-text); font-size: 0.88rem; font-weight: 500; }
+.nutrient-story { display: grid; grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.15fr); gap: clamp(40px, 8vw, 128px); align-items: start; }
+.nutrient-story-panel { position: sticky; top: calc(var(--header-height) + 32px); align-self: start; }
+.nutrient-panel { padding-top: 16px; border-top: 1px solid var(--color-navy); }
+.nutrient-panel-topline, .nutrient-story-header { display: flex; justify-content: space-between; gap: 18px; color: var(--color-teal-text); font-size: 0.76rem; font-weight: 600; }
+.nutrient-panel-topline { padding-bottom: 16px; border-bottom: 1px solid var(--color-hairline); }
+.nutrient-panel-heading { padding: 34px 0 28px; border-bottom: 1px solid var(--color-hairline); }
+.nutrient-panel-name { display: flex; align-items: center; gap: 16px; }
+.nutrient-icon { position: relative; display: grid; width: 52px; height: 52px; flex: 0 0 52px; place-items: center; border: 1px solid currentColor; border-radius: 50%; color: var(--color-teal-text); font-size: 0.85rem; font-weight: 700; letter-spacing: -0.04em; }
+.nutrient-icon::before { content: ""; position: absolute; inset: 5px; border: 1px solid currentColor; border-radius: inherit; opacity: 0.28; }
+.nutrient-icon-vitamin-a, .nutrient-icon-vitamin-d { color: var(--color-gold-text); }
+.nutrient-icon-vitamin-a { border-radius: 16px 50% 50% 50%; }
+.nutrient-icon-vitamin-b12, .nutrient-icon-folate { color: var(--color-green-text); }
+.nutrient-icon-iron, .nutrient-icon-iodine { color: var(--color-teal-text); border-radius: 14px; }
+.nutrient-icon-zinc, .nutrient-icon-magnesium { color: var(--color-navy); border-radius: 12px 50% 12px 50%; }
+.nutrient-category { display: inline-block; margin-bottom: 10px; color: var(--color-gold-text); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.nutrient-panel-heading h3 { margin: 0 0 12px; color: var(--color-navy); font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 300; }
+.nutrient-panel-heading p { max-width: 34ch; margin: 0; color: rgba(23, 37, 46, 0.76); font-size: 1.04rem; line-height: 1.5; }
+.nutrient-axis { display: flex; align-items: center; gap: 9px; padding: 16px 0 2px; color: var(--color-teal-text); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.nutrient-axis i { display: block; width: 20px; border-top: 1px solid var(--color-teal); opacity: 0.55; }
+.nutrient-panel-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+.nutrient-panel-facts > div { padding: 20px 0; border-bottom: 1px solid var(--color-hairline); }
+.nutrient-panel-facts > div:last-child { grid-column: 1 / -1; }
+.nutrient-panel .eyebrow { margin-bottom: 7px; font-size: 0.7rem; }
+.nutrient-panel p { margin: 0; font-size: 0.88rem; line-height: 1.55; }
+.nutrient-panel-safety { margin-top: 22px; padding-top: 16px; border-top: 1.5px solid var(--color-gold); }
+.nutrient-panel-safety .eyebrow { color: var(--color-gold-text); }
+.nutrient-panel > a { display: inline-block; margin-top: 24px; color: var(--color-teal-text); font-size: 0.86rem; font-weight: 500; }
+.nutrient-panel > a span { display: inline-block; margin-left: 5px; transition: transform 170ms ease; }
+.nutrient-panel > a:hover span, .nutrient-panel > a:focus-visible span { transform: translate(2px, -2px); }
+.nutrient-story-note { display: flex; gap: 12px; max-width: 400px; margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--color-hairline); }
+.nutrient-story-note p { margin: 0; font-size: 0.86rem; }
+.nutrient-story-steps { min-width: 0; }
+.nutrient-story-header { padding-bottom: 14px; border-bottom: 1px solid var(--color-navy); }
+.nutrient-step-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 16px 0 18px; border-bottom: 1px solid var(--color-hairline); }
+.nutrient-step-nav button { display: flex; align-items: center; gap: 7px; min-width: 0; border: 0; border-bottom: 1px solid transparent; background: transparent; color: rgba(23, 37, 46, 0.56); padding: 7px 4px; text-align: left; transition: color 170ms ease, border-color 170ms ease; }
+.nutrient-step-nav button:hover, .nutrient-step-nav button:focus-visible, .nutrient-step-nav button.is-active { color: var(--color-navy); }
+.nutrient-step-nav button.is-active { border-bottom-color: var(--color-teal-text); }
+.nutrient-step-nav button > span:first-child { color: var(--color-gold-text); font-size: 0.68rem; font-weight: 700; }
+.nutrient-step-nav strong { min-width: 0; overflow: hidden; font-size: 0.74rem; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.nutrient-step-nav i { margin-left: auto; color: var(--color-teal-text); font-size: 0.5rem; font-style: normal; }
+.nutrient-story-track { position: relative; border-bottom: 1px solid var(--color-hairline); }
+.nutrient-story-track::before, .nutrient-story-track::after { content: ""; position: absolute; top: 0; left: 28px; z-index: 0; height: 100%; border-left: 1px solid var(--color-hairline); pointer-events: none; }
+.nutrient-story-track::after { height: var(--story-progress, 0%); border-left: 2px solid var(--color-teal); transition: height 300ms ease; }
+.nutrient-story-step { display: grid; grid-template-columns: 56px minmax(0, 1fr) 20px; gap: 20px; align-items: center; min-height: clamp(220px, 33vh, 330px); border-bottom: 1px solid var(--color-hairline); color: rgba(23, 37, 46, 0.38); opacity: 0.62; transition: color 220ms ease, opacity 220ms ease, padding 220ms ease; }
+.nutrient-story-step:last-child { border-bottom: 0; }
+.nutrient-story-step.is-active { color: var(--color-navy); opacity: 1; }
+.nutrient-story-step > * { position: relative; z-index: 1; }
+.nutrient-story-step > span:first-child { display: grid; width: 56px; height: 56px; place-items: center; align-self: center; background: var(--color-cloud); color: var(--color-gold-text); font-size: 1.1rem; font-weight: 800; letter-spacing: 0.02em; }
+.nutrient-step-copy { min-width: 0; }
+.nutrient-step-label { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; color: var(--color-teal-text); font-size: 0.64rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.nutrient-step-label .nutrient-icon { width: 28px; height: 28px; flex-basis: 28px; font-size: 0.58rem; }
+.nutrient-step-label .nutrient-icon::before { inset: 3px; }
+.nutrient-story-step h3 { margin: 0 0 8px; color: inherit; font-size: clamp(1.75rem, 3vw, 2.6rem); font-weight: 300; }
+.nutrient-story-step p { max-width: 32ch; margin: 0; color: inherit; font-size: clamp(0.95rem, 1.35vw, 1.1rem); line-height: 1.55; }
+.step-arrow { align-self: center; padding: 0; color: var(--color-teal-text) !important; font-size: 1.25rem !important; font-weight: 300 !important; }
+/* No tinted callout box — that shape is the tell of a docs template. This reuses
+   the page's own editorial note pattern (rule above, labelled marker, plain text),
+   with a gold rule carrying the warning signal and a gold label carrying the word,
+   so meaning never rests on colour alone. */
+.safety-note { padding-top: 13px; border-top: 1.5px solid var(--color-gold); color: var(--color-ink); }
+.safety-note .eyebrow { margin-bottom: 6px; color: var(--color-gold-text); }
+.global-intro { display: flex; justify-content: space-between; padding-bottom: 58px; border-bottom: 1px solid var(--color-hairline); }
+.global-section {
+  background:
+    linear-gradient(100deg, rgba(21, 154, 145, 0.025), transparent 24%, transparent 76%, rgba(242, 184, 75, 0.04)),
+    var(--color-white);
+}
+.global-intro .section-heading { max-width: 820px; }
+/* Left-aligned with the section eyebrow: a centred chain reads as an accident
+   because it lines up with nothing else on the page. */
+.lens-chain { max-width: 900px; margin: 64px auto 96px; }
+.lens-step { display: grid; grid-template-columns: 64px 1fr; gap: 22px; align-items: start; }
+.step-number { display: flex; width: 64px; justify-content: center; color: var(--color-gold-text); font-size: 1.5rem; font-weight: 800; letter-spacing: 0.02em; padding-top: 1px; }
+.lens-step h3 { margin-bottom: 12px; }
+.lens-step p { max-width: 650px; }
+.solutions-wrap { display: grid; grid-template-columns: 4fr 8fr; gap: clamp(40px, 7vw, 120px); padding: 64px 0; border-top: 1px solid var(--color-hairline); border-bottom: 1px solid var(--color-hairline); }
+.solutions-intro { position: sticky; top: calc(var(--header-height) + 32px); align-self: start; }
+.solutions-intro h3 { max-width: 14ch; margin-bottom: 18px; }
+.solutions-intro p { max-width: 42ch; }
+.solution-row { display: grid; grid-template-columns: 32px 0.7fr 1fr; gap: 12px; min-width: 0; padding: 14px 0; border-bottom: 1px solid var(--color-hairline); }
+.solution-row > * { min-width: 0; }
+.solution-row h4, .solution-row p { margin: 0; }
+.solution-row p { font-size: 0.86rem; }
+.case-studies { display: grid; grid-template-columns: 4fr 8fr; gap: clamp(40px, 7vw, 120px); padding-top: 84px; }
+.case-studies > div:first-child { position: sticky; top: calc(var(--header-height) + 32px); align-self: start; }
+.case-studies h3 { max-width: 14ch; }
+.case-row summary { display: grid; grid-template-columns: 32px 1fr 20px; gap: 12px; padding: 18px 0; color: var(--color-navy); font-size: 1.2rem; }
+.case-detail { padding: 0 32px 24px 44px; }
+.case-detail p { margin-bottom: 10px; font-size: 0.9rem; }
+.case-detail b { color: var(--color-navy); font-weight: 600; }
+.app-grid { align-items: center; }
+.app-copy h2 { max-width: 620px; }
+.app-copy > p { max-width: 620px; }
+.workflow-list { margin: 44px 0 30px; border-top: 1px solid var(--color-hairline); }
+.workflow-row { display: grid; grid-template-columns: 32px minmax(0, 1.05fr) minmax(0, 1.35fr); gap: 14px; align-items: baseline; min-width: 0; padding: 14px 0; border-bottom: 1px solid var(--color-hairline); }
+.workflow-row > * { min-width: 0; }
+.workflow-row span { color: var(--color-gold-text); font-size: 0.74rem; font-weight: 700; }
+.workflow-row h3, .workflow-row p { margin: 0; }
+.workflow-row h3 { font-size: 1.12rem; font-weight: 400; letter-spacing: -0.02em; }
+.workflow-row p { font-size: 0.86rem; }
+.feature-line { display: flex; flex-wrap: wrap; gap: 9px 20px; margin-bottom: 28px; padding: 15px 0 16px; border-top: 1px solid rgba(75, 126, 54, 0.34); border-bottom: 1px solid var(--color-hairline); font-size: 0.8rem; }
+.feature-line span:first-child { width: 100%; color: var(--color-green-text); font-weight: 600; }
+.feature-line span:not(:first-child) { display: inline-flex; align-items: center; gap: 7px; color: rgba(23, 37, 46, 0.76); }
+.feature-line span:not(:first-child)::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--color-green); }
+.app-disclaimer { max-width: 60ch; margin-bottom: 26px; color: rgba(23, 37, 46, 0.76); font-size: 0.8rem; }
+.app-art-wrap { padding-left: 20px; }
+.app-preview-slide { width: 100%; height: auto; mix-blend-mode: multiply; }
+.prototype-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 14px; max-width: 560px; margin: 0 auto; }
+.prototype-device { width: 100%; aspect-ratio: 9 / 19.5; min-width: 0; padding: 6px; border: 1px solid var(--color-navy); border-radius: 31px; background: var(--color-navy); }
+.prototype-device-meal { transform: translateY(-18px); }
+.prototype-device-lens { transform: translateY(8px); }
+.prototype-screen { position: relative; display: flex; min-height: 100%; flex-direction: column; overflow: hidden; border-radius: 25px; background: #f8fbfa; padding: 12px 11px 11px; color: var(--color-ink); }
+.prototype-screen::before { content: ""; position: absolute; top: 6px; left: 50%; width: 40px; height: 4px; border-radius: 999px; background: #cbd9da; transform: translateX(-50%); }
+.prototype-statusbar { display: flex; justify-content: space-between; margin-bottom: 20px; color: #789096; font-size: 0.42rem; font-weight: 700; letter-spacing: 0.03em; }
+.prototype-heading { margin-bottom: 12px; }
+.prototype-kicker { display: block; margin-bottom: 3px; color: var(--color-teal-text); font-size: 0.44rem; font-weight: 700; letter-spacing: 0.05em; }
+.prototype-heading h3 { margin: 0 0 4px; color: var(--color-navy); font-size: clamp(0.9rem, 1.7vw, 1.3rem); font-weight: 600; letter-spacing: -0.04em; }
+.prototype-heading p { margin: 0; color: #71848a; font-size: 0.48rem; line-height: 1.35; }
+.score-ring { position: relative; display: grid; width: 74%; aspect-ratio: 1; place-items: center; margin: 2px auto 14px; border-radius: 50%; background: conic-gradient(var(--color-teal) 0 82%, #dbe5e5 82% 100%); }
+.score-ring::before { content: ""; position: absolute; width: 19%; aspect-ratio: 1; border-radius: 50%; background: #f8fbfa; }
+.score-ring > div { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; }
+.score-ring strong { color: var(--color-navy); font-size: clamp(1.5rem, 3.4vw, 2.3rem); font-weight: 600; line-height: 1; }
+.score-ring span { margin-top: 4px; color: #7b8c91; font-size: 0.42rem; }
+.prototype-section-label { margin: 7px 0 8px; color: var(--color-navy); font-size: 0.5rem; font-weight: 700; }
+.balance-list { display: grid; gap: 8px; }
+.balance-list > div { display: grid; grid-template-columns: 0.8fr 1.4fr; align-items: center; gap: 8px; color: #60767b; font-size: 0.45rem; }
+.balance-list i { display: block; height: 5px; overflow: hidden; border-radius: 999px; background: #dce6e7; }
+.balance-list b { display: block; height: 100%; border-radius: inherit; background: var(--color-gold); }
+.balance-list b.is-green { background: var(--color-green); }
+.balance-list b.is-teal { background: var(--color-teal); }
+.prototype-primary-action, .prototype-save-action { min-height: 28px; margin-top: auto; border: 0; border-radius: 999px; background: var(--color-navy); color: var(--color-white); font-size: 0.48rem; font-weight: 700; }
+.prototype-search { display: flex; align-items: center; gap: 6px; margin: 5px 0 18px; padding: 8px 9px; border-radius: 999px; background: #e5eeee; color: #82959a; font-size: 0.48rem; }
+.prototype-search span:first-child { color: var(--color-navy); font-size: 0.85rem; line-height: 0.7; }
+.food-list { display: grid; gap: 12px; }
+.food-list > div { display: grid; grid-template-columns: 24px 1fr 12px; align-items: center; gap: 6px; }
+.food-dot { display: grid; width: 22px; height: 22px; place-items: center; border-radius: 50%; font-size: 0.62rem; }
+.food-dot-green { background: #d5ebd6; color: #4c9a56; }
+.food-dot-gold { background: #f9e4b6; color: #e7af32; }
+.food-dot-brown { background: #e3d1bf; color: #8b5d3b; }
+.food-dot-blue { background: #d3e9ef; color: #4b9db1; }
+.food-list b, .food-list small { display: block; }
+.food-list b { color: var(--color-navy); font-size: 0.52rem; }
+.food-list small { margin-top: 2px; color: #819296; font-size: 0.42rem; }
+.food-list em { color: var(--color-teal-text); font-size: 0.74rem; font-style: normal; }
+.prototype-save-action { background: var(--color-teal); }
+.lens-hero-panel { display: flex; align-items: center; gap: 8px; margin: 11px 0 20px; padding: 10px 8px; border-radius: 14px; background: #dff0ed; }
+.lens-hero-panel > div { display: grid; gap: 3px; }
+.lens-hero-panel strong { color: var(--color-navy); font-size: 0.47rem; }
+.lens-hero-panel span:not(.lens-orbit) { color: #6b8588; font-size: 0.4rem; line-height: 1.3; }
+.lens-orbit { position: relative; display: block; width: 30px; height: 30px; flex: 0 0 30px; border: 2px solid var(--color-teal); border-radius: 50%; }
+.lens-orbit::before, .lens-orbit::after { content: ""; position: absolute; inset: 5px -2px; border-top: 1px solid var(--color-teal); border-bottom: 1px solid var(--color-teal); border-radius: 50%; }
+.lens-orbit::after { inset: -2px 5px; border-top: 0; border-bottom: 0; border-right: 1px solid var(--color-teal); border-left: 1px solid var(--color-teal); }
+.source-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+.source-chips span { display: grid; min-height: 35px; place-items: center; border-radius: 10px; background: #ece2d3; color: #697775; font-size: 0.42rem; }
+.source-chips span:nth-child(2) { background: #dfeeda; }
+.source-chips span:nth-child(3) { background: #f4ddd1; }
+.prototype-safety { display: grid; gap: 4px; margin-top: 20px; padding: 9px 8px; border-radius: 12px; background: #fbf0cd; }
+.prototype-safety strong { color: var(--color-gold-text); font-size: 0.46rem; }
+.prototype-safety span { color: #8a7b58; font-size: 0.4rem; line-height: 1.3; }
+.lens-footer-label { margin-top: auto; color: var(--color-teal-text); font-size: 0.39rem; font-weight: 700; text-align: center; }
+.image-caption { margin: 24px 0 0; color: var(--color-teal-text); font-size: 0.75rem; text-align: center; }
+.sources-grid { align-items: start; }
+.source-list { border-top: 1px solid var(--color-navy); }
+.source-row { display: grid; grid-template-columns: 32px 1fr 1.6fr; gap: 12px; align-items: baseline; padding: 15px 0; border-bottom: 1px solid var(--color-hairline); font-size: 0.9rem; }
+.source-organization { color: rgba(23, 37, 46, 0.7); }
+.source-row a { color: var(--color-teal-text); }
+.review-date { margin: 18px 0 0; color: rgba(23, 37, 46, 0.7); font-size: 0.8rem; }
+.contact-grid { align-items: start; }
+.contact-intro h2 { max-width: 520px; }
+.contact-email { padding-top: 18px; border-top: 1px solid var(--color-hairline); color: var(--color-teal-text); font-weight: 500; }
+.contact-form { padding-top: 4px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.contact-form label { display: block; margin-bottom: 20px; color: var(--color-navy); font-size: 0.84rem; font-weight: 500; }
+.contact-form input:not([type="checkbox"]), .contact-form select, .contact-form textarea { display: block; width: 100%; margin-top: 7px; border: 1px solid var(--color-hairline); border-radius: 0; background: var(--color-white); color: var(--color-ink); padding: 12px 13px; outline: 0; }
+.contact-form textarea { resize: vertical; min-height: 136px; }
+.contact-form input:not([type="checkbox"]):focus, .contact-form select:focus, .contact-form textarea:focus { border-color: var(--color-teal-text); outline: 2px solid rgba(17, 126, 118, 0.2); outline-offset: 2px; }
+.contact-form [aria-invalid="true"] { border-color: #9b2c2c !important; }
+.consent-label { display: flex !important; gap: 10px; align-items: flex-start; font-size: 0.78rem !important; font-weight: 400 !important; }
+.consent-label input { flex: 0 0 auto; width: 18px; height: 18px; margin-top: 2px; accent-color: var(--color-navy); }
+.field-error, .form-error { display: block; margin-top: 6px; color: #8e2626; font-size: 0.75rem; }
+.form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
+.form-actions .button { border: 0; }
+.form-note { margin: 0; color: rgba(23, 37, 46, 0.7); font-size: 0.76rem; }
+.honeypot { position: absolute !important; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+.form-success { max-width: 600px; padding-left: 24px; border-left: 2px solid var(--color-teal); }
+.form-success h3 { font-weight: 400; }
+.form-success .form-note { margin: 18px 0; }
+.text-button { border: 0; background: transparent; color: var(--color-teal-text); padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+.site-footer { background: var(--color-navy); color: rgba(255, 255, 255, 0.78); padding: 72px 0 24px; }
+.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: clamp(40px, 8vw, 144px); }
+.footer-brand { color: var(--color-white); font-size: 0.95rem; }
+.footer-mission p { max-width: 42ch; margin-top: 24px; font-size: 0.86rem; }
+.footer-email { display: inline-block; margin-top: 20px; color: var(--color-white); font-size: 0.86rem; }
+.footer-pending { color: rgba(255, 255, 255, 0.5); font-size: 0.8rem !important; }
+.footer-social { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px !important; }
+.footer-links { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 0.84rem; }
+.footer-links .eyebrow { color: var(--color-gold); margin-bottom: 8px; }
+.footer-links a:hover, .footer-links a:focus-visible { color: var(--color-white); }
+.footer-links p { margin-top: 14px; font-size: 0.76rem; }
+.footer-bottom { display: flex; justify-content: space-between; gap: 20px; margin-top: 72px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.58); font-size: 0.73rem; }
+:focus-visible { outline: 2px solid var(--color-teal-text); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }
+@media (max-width: 900px) { :root { --header-height: 68px; } .page-width { width: min(100% - 40px, 720px); } .desktop-nav { display: none; } .menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border: 1px solid var(--color-hairline); background: transparent; color: var(--color-navy); } .menu-lines { display: grid; gap: 4px; } .menu-lines i { display: block; width: 20px; height: 1px; background: currentColor; } .mobile-nav { position: fixed; inset: var(--header-height) 0 0; display: block; overflow-y: auto; background: var(--color-cloud); padding: 24px 20px 48px; } .mobile-nav nav { display: flex; flex-direction: column; max-width: 720px; margin: 0 auto; } .mobile-nav a { padding: 18px 0; border-bottom: 1px solid var(--color-hairline); font-size: 1.4rem; text-decoration: none; } .mobile-nav .mobile-cta { margin-top: 24px; padding: 14px 18px; background: var(--color-navy); color: var(--color-white); font-size: 1rem; text-align: center; } .hero-grid, .mission-grid, .split-grid, .app-grid, .sources-grid, .contact-grid { grid-template-columns: 1fr; gap: 56px; } .hero-grid { min-height: auto; padding-top: 60px; } .hero-art-wrap { grid-row: 1; margin-right: 0; } .hero-copy { grid-row: 2; } .hero-art { aspect-ratio: 16 / 11; object-position: 100% 50%; -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 10%, #000 88%, transparent 100%); mask-image: linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%), linear-gradient(to bottom, transparent 0%, #000 10%, #000 88%, transparent 100%); } .split-intro { position: static; } .micronutrient-intro { grid-template-columns: 1fr; gap: 24px; margin-bottom: 48px; } .nutrient-story { grid-template-columns: 1fr; gap: 38px; } .nutrient-story-panel { position: static; } .nutrient-panel-heading { padding-top: 26px; } .nutrient-story-note { margin-top: 24px; } .nutrient-story-steps { display: grid; } .nutrient-story-header { order: 1; } .nutrient-step-nav { order: 2; } .nutrient-story-track { order: 3; } .nutrient-story-step { min-height: 190px; } .solutions-wrap, .case-studies { grid-template-columns: 1fr; gap: 40px; } .app-art-wrap { padding: 0; } .prototype-gallery { max-width: 520px; } .footer-grid { grid-template-columns: 1fr 1fr; } .footer-mission { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .page-width { width: min(100% - 32px, 480px); } .header-inner { width: calc(100% - 32px); } .section { padding: 72px 0; } h1 { font-size: clamp(2.05rem, 10.5vw, 2.9rem); } h2 { font-size: clamp(1.8rem, 9vw, 2.5rem); } .button-row, .button-row .button { width: 100%; } .nutrient-panel-facts { grid-template-columns: 1fr; } .nutrient-panel-facts > div:last-child { grid-column: auto; } .nutrient-step-nav { display: flex; overflow-x: auto; gap: 8px; margin-right: -16px; padding-right: 16px; scrollbar-width: none; } .nutrient-step-nav::-webkit-scrollbar { display: none; } .nutrient-step-nav button { flex: 0 0 auto; min-width: 92px; } .nutrient-story-step { grid-template-columns: 30px minmax(0, 1fr) 18px; gap: 10px; min-height: 170px; } .nutrient-story-step h3 { font-size: 1.7rem; } .nutrient-story-step p { font-size: 0.94rem; } .nutrient-row summary { grid-template-columns: 1fr 18px; gap: 8px; } .nutrient-summary { grid-column: 1 / -1; grid-row: 2; padding-left: 42px; } .nutrient-detail { grid-template-columns: 1fr; padding: 0 0 24px 42px; } .nutrient-detail > a { grid-column: auto; } .solution-row { grid-template-columns: 30px 1fr; } .solution-row p { grid-column: 2; } .workflow-row { grid-template-columns: 30px 1fr; } .workflow-row p { grid-column: 2; } .source-row { grid-template-columns: 30px 1fr; } .source-row a { grid-column: 2; } .form-grid { grid-template-columns: 1fr; gap: 0; } .footer-grid { grid-template-columns: 1fr; gap: 40px; } .footer-mission { grid-column: auto; } .footer-bottom { flex-direction: column; margin-top: 48px; } }
+
+@media (max-width: 560px) {
+  .nutrient-story-track::before,
+  .nutrient-story-track::after { left: 22px; }
+  .nutrient-story-step { grid-template-columns: 44px minmax(0, 1fr) 18px; gap: 12px; }
+  .nutrient-story-step > span:first-child { width: 44px; height: 44px; font-size: 0.95rem; }
+}
+
+/* Nutrient atlas responsive layout: keep the detail view calm and stack cards before they become cramped. */
+@media (max-width: 900px) {
+  .atlas-layout { grid-template-columns: 1fr; gap: 36px; }
+  .atlas-detail { position: static; }
+  .atlas-detail-visual { width: min(100%, 240px); }
+}
+
+@media (max-width: 560px) {
+  .atlas-toolbar { align-items: flex-start; flex-direction: column; gap: 18px; }
+  .atlas-filters { width: 100%; }
+  .atlas-filters button { flex: 1; padding-inline: 10px; }
+  .atlas-card-grid { grid-template-columns: 1fr; }
+  .atlas-card { min-height: 156px; grid-template-columns: 68px minmax(0, 1fr) auto; column-gap: 12px; padding: 14px; }
+  .atlas-card-visual { width: 68px; height: 68px; }
+  .atlas-detail-visual { width: min(100%, 220px); }
+  .atlas-detail-title .atlas-icon { width: 56px; height: 56px; flex-basis: 56px; }
+  .atlas-detail-facts { grid-template-columns: 1fr; }
+}
+
+/* Give the hero statement a full editorial line on desktop, while keeping the
+   supporting copy and artwork balanced beneath it. */
+@media (min-width: 901px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(320px, 0.85fr); grid-template-rows: auto auto auto auto auto; }
+  .hero-copy { display: contents; }
+  .hero-copy .eyebrow { grid-column: 1 / -1; grid-row: 1; }
+  .hero-copy h1 { grid-column: 1 / -1; grid-row: 2; max-width: none; margin-bottom: 26px; white-space: nowrap; }
+  .hero-supporting { grid-column: 1; grid-row: 3; }
+  .hero-copy .button-row { grid-column: 1; grid-row: 4; }
+  .hero-copy .hero-note { grid-column: 1; grid-row: 5; }
+  .hero-art-wrap { grid-column: 2; grid-row: 3 / span 3; }
+}
+
+@media (max-width: 900px) {
+  .hero-copy { display: block; }
+  .hero-copy h1 { max-width: 15ch; white-space: normal; }
+}
+
+/* The complete atlas should occupy the same vertical rhythm as its selected
+   detail panel; otherwise the card grid ends early and leaves a dead half-page. */
+@media (min-width: 901px) {
+  .atlas-layout { align-items: stretch; }
+  .atlas-detail { height: 100%; }
+  .atlas-detail-facts > div:nth-child(3),
+  .atlas-detail-facts > div:nth-child(4) { grid-column: auto; }
+  .atlas-card-grid { align-self: stretch; height: 100%; grid-auto-rows: minmax(174px, 1fr); }
+  .atlas-card { height: 100%; }
+}
+
+@media (max-width: 900px) {
+  .atlas-layout { align-items: start; }
+  .atlas-card-grid { align-self: auto; height: auto; grid-auto-rows: auto; }
+  .atlas-card { height: auto; }
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 0.42; box-shadow: 0 0 0 0 rgba(242, 184, 75, 0); }
+  50% { opacity: 1; box-shadow: 0 0 0 5px rgba(242, 184, 75, 0.16); }
+}
+
+.status-pill::before { animation: status-pulse 1.8s ease-in-out infinite; }
+
+/* Keep the one-line hero headline without letting the image create artificial
+   grid rows and a large void between the headline and its supporting copy. */
+@media (min-width: 901px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(320px, 0.85fr); grid-template-rows: auto auto; align-items: center; row-gap: 32px; }
+  .hero-heading { grid-column: 1 / -1; grid-row: 1; min-width: 0; }
+  .hero-heading h1 { max-width: none; margin-bottom: 0; white-space: nowrap; }
+  .hero-copy { display: block; grid-column: 1; grid-row: 2; min-width: 0; }
+  .hero-art-wrap { grid-column: 2; grid-row: 2; align-self: center; }
+}
+
+@media (max-width: 900px) {
+  .hero-heading { grid-column: 1; grid-row: 1; }
+  .hero-heading h1 { max-width: 15ch; white-space: normal; }
+  .hero-copy { grid-column: 1; grid-row: 2; }
+  .hero-art-wrap { grid-column: 1; grid-row: 3; }
+}
+
+/* Scrollytelling atlas: the detail stays pinned while the nutrient steps move
+   through the opposite column, matching the sticky-scroll pattern used by
+   editorial landing pages. */
+@media (min-width: 901px) {
+  .atlas-layout { grid-template-columns: minmax(360px, 0.82fr) minmax(0, 1.18fr); align-items: start; }
+  .atlas-detail { position: sticky; top: calc(var(--header-height) + 28px); height: auto; }
+  .atlas-card-grid { position: relative; grid-template-columns: 1fr; gap: 18px; align-self: start; height: auto; padding-left: 28px; }
+  .atlas-card-grid::before { content: ""; position: absolute; top: 0; bottom: 0; left: 10px; width: 1px; background: var(--color-hairline); }
+  .atlas-card { min-height: clamp(210px, 30vh, 280px); height: auto; padding: 24px; }
+  .atlas-card-visual { width: 104px; height: 104px; }
+}
+
+@media (max-width: 900px) {
+  .atlas-detail { position: static; height: auto; }
+  .atlas-card-grid { grid-template-columns: 1fr; align-self: auto; height: auto; padding-left: 0; }
+  .atlas-card-grid::before { display: none; }
+  .atlas-card { min-height: 156px; height: auto; }
+}
+
+/* Final atlas card reset: content-sized editorial rows, not stretched panels. */
+@media (min-width: 901px) {
+  .atlas-card-grid { grid-auto-rows: auto; }
+  .atlas-card {
+    grid-template-columns: 128px minmax(0, 1fr) 36px;
+    grid-auto-rows: auto;
+    min-height: 168px;
+    height: auto;
+    border: 0;
+    border-bottom: 1px solid var(--color-hairline);
+    border-radius: 0;
+    background: transparent;
+    padding: 22px 0;
+    transform: none;
+  }
+  .atlas-card:hover, .atlas-card:focus-visible { border-color: var(--color-teal-text); background: transparent; transform: none; }
+  .atlas-card.is-active { border-bottom-color: var(--color-teal-text); background: transparent; }
+  .atlas-card-visual { width: 104px; height: 104px; align-self: start; }
+  .atlas-card-summary { max-width: none; }
+}
+
+@media (max-width: 900px) {
+  .atlas-card { grid-template-columns: 88px minmax(0, 1fr) 32px; min-height: 0; padding: 18px 0; }
+  .atlas-card-visual { width: 76px; height: 76px; }
+  .atlas-card-summary { max-width: none; }
+}
+
+@media (max-width: 560px) {
+  .atlas-card { grid-template-columns: 68px minmax(0, 1fr) 28px; padding: 16px 0; }
+  .atlas-card-visual { width: 68px; height: 68px; }
+}
+
+@media (min-width: 901px) {
+  .atlas-detail { max-width: 600px; min-height: 0; }
+  .atlas-detail-visual { width: min(100%, 220px); margin-top: 16px; }
+  .atlas-detail-title { gap: 14px; padding: 18px 0 12px; }
+  .atlas-detail-title .atlas-icon { width: 52px; height: 52px; flex-basis: 52px; font-size: 0.86rem; }
+  .atlas-detail-title h3 { font-size: clamp(2rem, 3.5vw, 3rem); }
+  .atlas-detail-summary { margin-bottom: 12px; font-size: 0.92rem; line-height: 1.45; }
+  .atlas-detail-facts { gap: 0 18px; }
+  .atlas-detail-facts > div { padding: 12px 0; }
+  .atlas-detail-facts span { margin-bottom: 4px; font-size: 0.66rem; }
+  .atlas-detail-facts p { font-size: 0.78rem; line-height: 1.4; }
+.atlas-detail > a { margin-top: 12px; font-size: 0.76rem; }
+}
+
+/* The atlas owns the page scroll. Do not clip its sticky detail panel at the
+   section boundary, or the selected Fe/I/Zn/Mg view disappears near the end. */
+.micronutrient-shell { overflow: visible; }
+
+@media (min-width: 901px) {
+  .atlas-layout, .atlas-card-grid, .atlas-card { min-width: 0; }
+  .atlas-card strong, .atlas-card-type, .atlas-card-summary { min-width: 0; overflow-wrap: anywhere; }
+  .atlas-card-summary { max-width: none; }
+}
+
+/* Atlas focus state: make the scroll-selected nutrient unmistakable while
+   keeping the editorial rows calm when they are not active. The layout rail
+   gives the sticky detail column a deliberate surface instead of a dead white
+   strip after its content ends. */
+@media (min-width: 901px) {
+  .atlas-layout {
+    position: relative;
+  }
+
+  .atlas-layout::before {
+    content: "";
+    grid-column: 1;
+    grid-row: 1;
+    align-self: stretch;
+    margin-top: -32px;
+    margin-bottom: -32px;
+    background: radial-gradient(ellipse at 48% 18%, rgba(224, 246, 241, 0.58), rgba(245, 251, 249, 0.22) 48%, rgba(255, 255, 255, 0) 76%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .atlas-detail {
+    grid-column: 1;
+    grid-row: 1;
+    z-index: 1;
+    min-height: calc(100svh - var(--header-height) - 56px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .atlas-detail > a {
+    margin-top: auto;
+    padding-top: 28px;
+  }
+
+  .atlas-card-grid {
+    grid-column: 2;
+    grid-row: 1;
+    padding-left: 0;
+  }
+
+  .atlas-card-grid::before {
+    display: none;
+  }
+
+  .atlas-card {
+    transition: border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease, color 220ms ease;
+  }
+
+  .atlas-card.is-active {
+    border-bottom-color: var(--color-hairline);
+    border-radius: 20px;
+    margin-inline: -14px;
+    padding-inline: 14px;
+    background: linear-gradient(105deg, rgba(225, 246, 241, 0.96), rgba(239, 250, 247, 0.72) 72%, rgba(255, 255, 255, 0.22));
+    box-shadow: 0 0 0 1px rgba(19, 139, 131, 0.18), 0 16px 32px rgba(15, 89, 84, 0.1);
+  }
+
+  .atlas-card.is-active .atlas-card-visual {
+    border-color: var(--color-teal-text);
+    box-shadow: 0 0 0 5px rgba(19, 139, 131, 0.12);
+  }
+
+  .atlas-card.is-active .atlas-card-index,
+  .atlas-card.is-active .atlas-card-type {
+    color: var(--color-teal-text);
+  }
+
+  .atlas-card.is-active .atlas-card-arrow {
+    color: var(--color-navy);
+    font-weight: 700;
+    transform: translateX(5px);
+  }
+}
+
+@media (max-width: 900px) {
+  .atlas-card.is-active {
+    border-bottom-color: var(--color-teal-text);
+    border-radius: 16px;
+    margin-inline: -14px;
+    padding-inline: 14px;
+    background: #edf7f5;
+    box-shadow: 0 0 0 1px rgba(19, 139, 131, 0.18), 0 10px 24px rgba(15, 89, 84, 0.08);
+  }
+}
+
+/* Shared editorial rhythm for the action lists. */
+.solutions-wrap, .case-studies {
+  --list-title-size: clamp(1.05rem, 1.25vw, 1.25rem);
+  --list-body-size: clamp(0.88rem, 1vw, 1rem);
+  --list-row-padding: 18px;
+  column-gap: clamp(48px, 6vw, 96px);
+}
+.solutions-wrap { padding: 48px 0; }
+.case-studies { padding-top: 56px; }
+.solutions-intro h3, .case-studies h3 { max-width: 16ch; margin: 0 0 22px; font-size: clamp(1.8rem, 2.7vw, 2.5rem); line-height: 1.08; }
+.solutions-intro h3, .case-studies > div:first-child h3 { font-weight: 500; letter-spacing: -0.04em; }
+.solutions-intro > p { max-width: 38ch; margin: 0; font-size: var(--list-body-size); line-height: 1.55; }
+.solutions-intro .eyebrow, .case-studies > div:first-child .eyebrow { margin-bottom: 18px; }
+.solution-row { grid-template-columns: 40px minmax(210px, 0.9fr) minmax(0, 1.1fr); gap: 18px; min-height: 78px; align-items: center; padding: var(--list-row-padding) 0; }
+.solution-row h4, .case-row summary { color: var(--color-navy); font-size: var(--list-title-size); font-weight: 400; letter-spacing: -0.025em; line-height: 1.3; }
+.solution-row p { color: var(--color-ink); font-size: var(--list-body-size); line-height: 1.45; }
+.case-row summary { grid-template-columns: 40px minmax(0, 1fr) 20px; gap: 18px; min-height: 78px; padding: var(--list-row-padding) 0; }
+.case-detail {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(20px, 3vw, 44px);
+  align-items: start;
+  padding: 0 32px 22px 58px;
+  font-size: var(--list-body-size);
+}
+/* No card, no gradient, no rounded corners — the brief bans all three, and a
+   tinted rounded panel is the clearest "generated" tell on the page. This is the
+   same vertical stepped-rule language the LensChain uses, so the two read as one
+   system rather than two unrelated widgets. */
+.case-pathway { padding-top: 2px; }
+.case-pathway-label {
+  display: block;
+  margin: 0 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-navy);
+  color: var(--color-teal-text);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.case-pathway-track {
+  position: relative;
+  display: grid;
+  gap: 26px;
+  margin: 0;
+  padding: 0 0 0 34px;
+  list-style: none;
+}
+/* One continuous rule threading the three beats. */
+.case-pathway-track::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  bottom: 14px;
+  left: 10px;
+  width: 1px;
+  background: var(--color-hairline);
+}
+.case-pathway-step { position: relative; display: grid; gap: 3px; }
+.case-pathway-dot {
+  position: absolute;
+  top: 1px;
+  left: -34px;
+  width: 21px;
+  color: var(--color-gold-text);
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  background: var(--color-white);
+}
+.case-pathway-step b {
+  color: var(--color-navy);
+  font-size: 0.94rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.case-pathway-step small {
+  color: rgba(23, 37, 46, 0.66);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+.case-detail-copy { min-width: 0; }
+.case-detail-copy p { margin: 0 0 12px; font-size: var(--list-body-size); line-height: 1.55; }
+.case-detail-copy p:last-of-type { margin-bottom: 18px; }
+.case-detail-copy > a {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--color-teal-text);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .solution-row { grid-template-columns: 32px minmax(0, 1fr); gap: 12px; }
+  .solution-row .row-index { grid-column: 1; grid-row: 1 / span 2; }
+  .solution-row h4 { grid-column: 2; grid-row: 1; }
+  .solution-row p { grid-column: 2; grid-row: 2; }
+  .case-row summary { grid-template-columns: 32px minmax(0, 1fr) 20px; gap: 12px; }
+  .case-detail {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding-left: 44px;
+  }
+}
+
+@media (max-width: 560px) {
+  .solutions-wrap, .case-studies { column-gap: 0; }
+  .solution-row { grid-template-columns: 30px minmax(0, 1fr); gap: 10px; min-height: 0; }
+  .solution-row .row-index { grid-column: 1; grid-row: 1 / span 2; }
+  .solution-row h4 { grid-column: 2; grid-row: 1; }
+  .solution-row p { grid-column: 2; grid-row: 2; }
+  .case-row summary { grid-template-columns: 30px minmax(0, 1fr) 18px; gap: 10px; min-height: 0; }
+  .case-detail { padding-left: 40px; }
+      }
+
+@media (min-width: 901px) {
+  .contact-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(48px, 7vw, 112px); }
+  .contact-intro h2 { max-width: none; }
+  .contact-title-line { white-space: nowrap; }
+}
+
+@media (min-width: 901px) {
+  .solution-row p {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    font-size: clamp(0.84rem, 0.95vw, 0.98rem);
+    font-weight: 400;
+    letter-spacing: -0.012em;
+  }
+}
+
+/* This short statement reads as one editorial unit on desktop. Let it wrap
+   again below the desktop breakpoint so the heading never creates horizontal
+   overflow on narrower screens. */
+@media (min-width: 901px) {
+  .global-intro .section-heading h2 {
+    max-width: 100%;
+    white-space: normal;
+    text-wrap: balance;
+    font-size: clamp(2.4rem, 4.5vw, 4rem);
+  }
+}
+
+@media (min-width: 1200px) {
+  .global-intro .section-heading { max-width: 100%; }
+  .global-intro .section-heading h2 { white-space: nowrap; text-wrap: initial; }
+}
+
+/* Hero lens diagram: a restrained, data-led alternative to stock-like AI
+   illustration. The three nodes make the site's Body / Food / Systems model
+   visible immediately; pointer and page scroll only move transforms. */
+.hero-lens {
+  --lens-scroll: 0;
+  position: relative;
+  width: min(100%, 620px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  color: var(--color-navy);
+  isolation: isolate;
+  transform: translate3d(calc(var(--lens-shift-x, 0px) * 0.18), calc(var(--lens-shift-y, 0px) * 0.18), 0);
+  transition: transform 300ms ease;
+}
+.hero-lens::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  z-index: -2;
+  border: 1px solid rgba(17, 126, 118, 0.26);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 48%, rgba(223, 240, 237, 0.82), rgba(245, 248, 247, 0) 62%);
+  transform: rotate(calc(var(--lens-scroll) * 6deg));
+}
+.hero-lens::after {
+  content: "";
+  position: absolute;
+  inset: 20%;
+  z-index: -1;
+  border-radius: 50%;
+  background-image: radial-gradient(rgba(18, 49, 75, 0.16) 1px, transparent 1px);
+  background-size: 14px 14px;
+  opacity: 0.42;
+  mask-image: radial-gradient(circle, #000 0 52%, transparent 72%);
+  transform: translateY(calc(var(--lens-scroll) * 12px));
+}
+.hero-lens-grid { position: absolute; inset: 14%; border: 1px solid rgba(18, 49, 75, 0.12); border-radius: 50%; overflow: hidden; }
+.hero-lens-grid::before, .hero-lens-grid::after { content: ""; position: absolute; background: rgba(18, 49, 75, 0.1); }
+.hero-lens-grid::before { top: 50%; left: 4%; right: 4%; height: 1px; }
+.hero-lens-grid::after { top: 4%; bottom: 4%; left: 50%; width: 1px; }
+.hero-lens-ring { position: absolute; border: 1px solid rgba(17, 126, 118, 0.42); border-radius: 50%; transform: translate3d(var(--lens-shift-x, 0px), var(--lens-shift-y, 0px), 0); transition: transform 400ms ease; }
+.hero-lens-ring-outer { inset: 11%; border-style: dashed; opacity: 0.72; transform: rotate(calc(var(--lens-scroll) * -9deg)); }
+.hero-lens-ring-middle { inset: 25%; border-color: rgba(153, 103, 11, 0.5); transform: translate3d(calc(var(--lens-shift-x, 0px) * -0.3), calc(var(--lens-shift-y, 0px) * -0.3), 0); }
+.hero-lens-ring-inner { inset: 36%; border-color: var(--color-teal-text); background: rgba(255, 255, 255, 0.34); box-shadow: 0 0 0 12px rgba(223, 240, 237, 0.36); }
+.hero-lens-crosshair { position: absolute; inset: 46%; border: 1px solid rgba(17, 126, 118, 0.7); border-radius: 50%; }
+.hero-lens-crosshair::before, .hero-lens-crosshair::after { content: ""; position: absolute; background: var(--color-teal-text); }
+.hero-lens-crosshair::before { top: 50%; left: -55%; width: 210%; height: 1px; opacity: 0.42; }
+.hero-lens-crosshair::after { left: 50%; top: -55%; height: 210%; width: 1px; opacity: 0.42; }
+.hero-lens-center { position: absolute; inset: 39%; display: grid; place-content: center; gap: 5px; text-align: center; }
+.hero-lens-center span, .hero-lens-data, .hero-lens-node span { color: var(--color-teal-text); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em; }
+.hero-lens-center strong { color: var(--color-navy); font-size: clamp(1.65rem, 3.3vw, 2.8rem); font-weight: 300; letter-spacing: -0.06em; line-height: 0.88; }
+.hero-lens-center small { color: rgba(23, 37, 46, 0.64); font-size: 0.57rem; letter-spacing: 0.02em; white-space: nowrap; }
+.hero-lens-node { position: absolute; display: grid; gap: 2px; min-width: 106px; padding: 11px 12px; border-top: 1px solid var(--color-teal-text); background: rgba(245, 248, 247, 0.82); backdrop-filter: blur(6px); }
+.hero-lens-node strong { color: var(--color-navy); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.08em; }
+.hero-lens-node small { color: rgba(23, 37, 46, 0.6); font-size: 0.68rem; }
+.hero-lens-node-body { top: 17%; left: 4%; transform: translate3d(calc(var(--lens-shift-x, 0px) * 0.5), calc(var(--lens-shift-y, 0px) * 0.5), 0); }
+.hero-lens-node-food { top: 10%; right: 3%; border-top-color: var(--color-gold-text); transform: translate3d(calc(var(--lens-shift-x, 0px) * -0.4), calc(var(--lens-shift-y, 0px) * -0.4), 0); }
+.hero-lens-node-systems { right: 2%; bottom: 16%; border-top-color: var(--color-green-text); transform: translate3d(calc(var(--lens-shift-x, 0px) * 0.25), calc(var(--lens-shift-y, 0px) * 0.25), 0); }
+.hero-lens-data { position: absolute; display: flex; align-items: center; gap: 8px; color: rgba(23, 37, 46, 0.64); font-size: 0.66rem; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+.hero-lens-data i { width: 5px; height: 5px; border-radius: 50%; background: var(--color-gold); }
+.hero-lens-data-top { left: 18%; top: 3%; }
+.hero-lens-data-bottom { left: 15%; bottom: 5%; color: var(--color-teal-text); }
+
+@media (max-width: 900px) {
+  .hero-lens { width: min(100%, 540px); margin-top: -10px; }
+  .hero-lens-node-body { left: 0; }
+  .hero-lens-node-food { right: 0; }
+  .hero-lens-node-systems { right: 0; }
+}
+
+@media (max-width: 560px) {
+  .hero-lens { width: min(100%, 400px); }
+  .hero-lens-node { min-width: 84px; padding: 8px 9px; }
+  .hero-lens-node strong { font-size: 0.66rem; }
+  .hero-lens-node small, .hero-lens-data { font-size: 0.56rem; }
+  .hero-lens-data-top { left: 9%; }
+  .hero-lens-data-bottom { left: 8%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-lens, .hero-lens-ring, .hero-lens-node { transform: none !important; transition: none !important; }
+}
+
+/* Flowing hero lens: the visual language is intentionally organic. It borrows
+   the useful parts of spotlight/parallax interfaces—layered depth, a soft
+   pointer response, and scroll-led drift—without turning the hero into a grid
+   of framed cards or a diagram made from rigid connector lines. */
+.hero-lens-flow {
+  overflow: visible;
+  width: min(100%, 640px);
+  color: var(--color-navy);
+}
+.hero-art-wrap:has(.hero-lens-flow) { margin-right: 0; min-width: 0; }
+.hero-lens-flow::before {
+  inset: 4%;
+  border: 0;
+  background:
+    radial-gradient(circle at 52% 48%, rgba(223, 240, 237, 0.95) 0 23%, rgba(223, 240, 237, 0.42) 42%, rgba(245, 248, 247, 0) 70%),
+    radial-gradient(circle at 50% 50%, rgba(242, 184, 75, 0.08), transparent 62%);
+  transform: translateY(calc(var(--lens-scroll) * 8px));
+  transition: transform 700ms ease;
+}
+.hero-lens-flow::after {
+  inset: 18%;
+  background-image: radial-gradient(rgba(18, 49, 75, 0.2) 1px, transparent 1px);
+  background-size: 16px 16px;
+  opacity: 0.26;
+  mask-image: radial-gradient(ellipse, #000 0 42%, transparent 70%);
+  transform: translate3d(calc(var(--lens-shift-x, 0px) * -0.16), calc(var(--lens-shift-y, 0px) * -0.16 + var(--lens-scroll) * 8px), 0);
+  transition: transform 500ms ease;
+}
+.hero-lens-spotlight {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: 48%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.78) 0 8%, rgba(125, 210, 199, 0.16) 30%, rgba(125, 210, 199, 0) 72%);
+  pointer-events: none;
+  transform: translate3d(calc(-50% + var(--lens-spot-x, 0px)), calc(-50% + var(--lens-spot-y, 0px)), 0);
+  transition: transform 500ms ease;
+}
+.hero-lens-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero-lens-orbit-outer {
+  width: 92%;
+  height: 72%;
+  border: 1px solid rgba(17, 126, 118, 0.3);
+  border-left-color: transparent;
+  border-bottom-color: rgba(17, 126, 118, 0.14);
+  transform: translate(-50%, -50%) rotate(calc(-13deg + var(--lens-scroll) * 7deg));
+}
+.hero-lens-orbit-middle {
+  width: 76%;
+  height: 56%;
+  border: 1px dashed rgba(153, 103, 11, 0.4);
+  border-right-color: transparent;
+  transform: translate(-50%, -50%) rotate(calc(26deg - var(--lens-scroll) * 10deg)) translateY(calc(var(--lens-scroll) * 10px));
+}
+.hero-lens-orbit-inner {
+  width: 54%;
+  height: 40%;
+  border: 1px solid rgba(17, 126, 118, 0.52);
+  background: rgba(255, 255, 255, 0.26);
+  box-shadow: 0 0 0 18px rgba(223, 240, 237, 0.24), 0 24px 56px rgba(17, 126, 118, 0.08);
+  transform: translate(-50%, -50%) rotate(calc(-18deg + var(--lens-scroll) * 4deg));
+}
+.hero-lens-dots {
+  position: absolute;
+  z-index: 3;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-teal-text);
+  box-shadow: 0 0 0 5px rgba(17, 126, 118, 0.1), 0 0 18px rgba(17, 126, 118, 0.24);
+  transform: translate3d(calc(var(--lens-shift-x, 0px) * 0.32), calc(var(--lens-shift-y, 0px) * 0.32), 0);
+  transition: transform 450ms ease;
+}
+.hero-lens-dots-one { top: 22%; left: 27%; }
+.hero-lens-dots-two { top: 29%; right: 20%; background: var(--color-gold); box-shadow: 0 0 0 5px rgba(242, 184, 75, 0.13), 0 0 18px rgba(242, 184, 75, 0.24); }
+.hero-lens-dots-three { right: 26%; bottom: 22%; background: var(--color-green-text); box-shadow: 0 0 0 5px rgba(95, 164, 75, 0.12), 0 0 18px rgba(95, 164, 75, 0.2); }
+.hero-lens-flow .hero-lens-center {
+  inset: 31%;
+  z-index: 4;
+  border: 1px solid rgba(17, 126, 118, 0.72);
+  border-radius: 50%;
+  background: rgba(247, 250, 249, 0.58);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65), 0 18px 44px rgba(18, 49, 75, 0.08);
+  transform: translate3d(calc(var(--lens-shift-x, 0px) * -0.25), calc(var(--lens-shift-y, 0px) * -0.25), 0);
+  transition: transform 500ms ease;
+}
+.hero-lens-flow .hero-lens-center span {
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+}
+.hero-lens-flow .hero-lens-center strong {
+  font-size: clamp(1.9rem, 4vw, 3.1rem);
+  letter-spacing: -0.07em;
+  line-height: 0.86;
+}
+.hero-lens-flow .hero-lens-center small {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 0.56rem;
+}
+.hero-lens-flow .hero-lens-center small i,
+.hero-lens-meta-top i {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-gold);
+}
+.hero-lens-tag {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+  transform: translate3d(calc(var(--lens-shift-x, 0px) * 0.42), calc(var(--lens-shift-y, 0px) * 0.42), 0);
+  transition: transform 450ms ease;
+}
+.hero-lens-tag > i {
+  display: block;
+  width: 9px;
+  height: 9px;
+  margin-top: 7px;
+  flex: 0 0 auto;
+  border: 1px solid var(--color-teal-text);
+  border-radius: 50%;
+  background: var(--color-cloud);
+  box-shadow: 0 0 0 4px rgba(17, 126, 118, 0.1);
+}
+.hero-lens-tag > div { display: grid; gap: 2px; }
+.hero-lens-tag span {
+  color: var(--color-gold-text);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.hero-lens-tag strong {
+  color: var(--color-navy);
+  font-size: clamp(0.78rem, 1vw, 0.9rem);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1.1;
+}
+.hero-lens-tag small {
+  color: rgba(23, 37, 46, 0.6);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+}
+.hero-lens-tag::after {
+  content: "";
+  position: absolute;
+  width: 74px;
+  height: 34px;
+  border-top: 1px solid rgba(17, 126, 118, 0.32);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-lens-tag-body { top: 21%; left: 2%; }
+.hero-lens-tag-body > i { border-color: var(--color-teal-text); }
+.hero-lens-tag-body::after { top: 12px; right: -68px; transform: rotate(22deg); }
+.hero-lens-tag-food { top: 13%; right: 2%; }
+.hero-lens-tag-food > i { border-color: var(--color-gold-text); box-shadow: 0 0 0 4px rgba(242, 184, 75, 0.12); }
+.hero-lens-tag-food::after { top: 14px; left: -68px; transform: rotate(-19deg); border-color: rgba(153, 103, 11, 0.34); }
+.hero-lens-tag-systems { right: 0; bottom: 20%; }
+.hero-lens-tag-systems > i { border-color: var(--color-green-text); box-shadow: 0 0 0 4px rgba(95, 164, 75, 0.11); }
+.hero-lens-tag-systems::after { top: -14px; left: -68px; transform: rotate(20deg); border-color: rgba(95, 164, 75, 0.34); }
+.hero-lens-meta {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(23, 37, 46, 0.62);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.hero-lens-meta-top { top: 2%; left: 17%; }
+.hero-lens-meta-bottom { bottom: 5%; left: 13%; color: var(--color-teal-text); }
+
+@media (max-width: 900px) {
+  .hero-lens-flow { width: min(100%, 540px); margin-top: -10px; }
+  .hero-lens-tag-body { left: 0; }
+  .hero-lens-tag-food { right: 0; }
+  .hero-lens-tag-systems { right: 0; }
+}
+
+@media (max-width: 560px) {
+  .hero-lens-flow { width: min(100%, 400px); }
+  .hero-lens-flow .hero-lens-center { inset: 30%; }
+  .hero-lens-tag { gap: 6px; }
+  .hero-lens-tag strong { font-size: 0.66rem; }
+  .hero-lens-tag small, .hero-lens-meta { font-size: 0.56rem; }
+  .hero-lens-tag-body { top: 18%; left: 0; }
+  .hero-lens-tag-food { top: 10%; right: 0; }
+  .hero-lens-tag-systems { right: 0; bottom: 17%; }
+  .hero-lens-tag::after { width: 42px; }
+  .hero-lens-tag-body::after { right: -37px; }
+  .hero-lens-tag-food::after, .hero-lens-tag-systems::after { left: -37px; }
+  .hero-lens-meta-top { left: 8%; }
+  .hero-lens-meta-bottom { left: 7%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-lens-flow,
+  .hero-lens-flow::before,
+  .hero-lens-flow::after,
+  .hero-lens-flow .hero-lens-spotlight,
+  .hero-lens-flow .hero-lens-orbit,
+  .hero-lens-flow .hero-lens-center,
+  .hero-lens-flow .hero-lens-tag,
+  .hero-lens-flow .hero-lens-dots { transform: none !important; transition: none !important; }
+}
+
+/* The hero's message is a journey, not a decorative orbital diagram: one
+   nutrient is read at the body, food, and systems levels. The route is the
+   only connector, so the eye has a clear beginning, middle, and end. */
+.hero-lens-flow {
+  aspect-ratio: 1.16 / 1;
+}
+.hero-lens-flow::before {
+  inset: 8% 4%;
+  border-radius: 48% 52% 46% 54% / 45% 42% 58% 55%;
+  background:
+    radial-gradient(ellipse at 48% 48%, rgba(223, 240, 237, 0.88) 0 23%, rgba(223, 240, 237, 0.3) 47%, transparent 72%),
+    radial-gradient(ellipse at 70% 31%, rgba(242, 184, 75, 0.09), transparent 38%);
+  transform: translate3d(0, calc(var(--lens-scroll) * 8px), 0) rotate(calc(var(--lens-scroll) * 1.5deg));
+}
+.hero-lens-flow::after { opacity: 0.12; }
+.hero-lens-journey {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.hero-lens-journey-kicker,
+.hero-lens-journey-foot {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: rgba(23, 37, 46, 0.68);
+  font-size: 0.63rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.hero-lens-journey-kicker { top: 3%; left: 19%; }
+.hero-lens-journey-kicker i,
+.hero-lens-journey-foot i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-gold);
+}
+.hero-lens-route {
+  position: absolute;
+  inset: 11% 1% 8%;
+  z-index: 1;
+  width: 98%;
+  height: 82%;
+  overflow: visible;
+  transform: translate3d(calc(var(--lens-shift-x, 0px) * -0.16), calc(var(--lens-shift-y, 0px) * -0.16 + var(--lens-scroll) * 8px), 0);
+  transition: transform 700ms ease;
+}
+.hero-lens-route-shadow {
+  stroke: rgba(125, 210, 199, 0.2);
+  stroke-width: 18;
+  stroke-linecap: round;
+  filter: blur(9px);
+}
+.hero-lens-route-line {
+  stroke: var(--color-teal-text);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: none;
+  animation: none;
+}
+.hero-lens-route-flow {
+  stroke: rgba(17, 126, 118, 0.9);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.12 0.88;
+  stroke-dashoffset: 1;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 3px rgba(17, 126, 118, 0.28));
+  animation: lens-route-flow 3.6s linear infinite;
+}
+.hero-lens-route-node {
+  stroke-width: 2;
+  fill: var(--color-cloud);
+}
+.hero-lens-route-node-body { stroke: var(--color-teal-text); }
+.hero-lens-route-node-food { stroke: var(--color-gold-text); fill: var(--color-gold-wash); }
+.hero-lens-route-node-systems { stroke: var(--color-green-text); fill: #eef5eb; }
+@keyframes lens-route-drift {
+  to { stroke-dashoffset: -1; }
+}
+@keyframes lens-route-flow {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: -1; }
+}
+.hero-lens-journey-core {
+  position: absolute;
+  top: 42%;
+  left: 42%;
+  z-index: 4;
+  display: grid;
+  place-content: center;
+  width: 25%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(17, 126, 118, 0.66);
+  border-radius: 50%;
+  background: rgba(247, 250, 249, 0.68);
+  box-shadow: 0 16px 42px rgba(18, 49, 75, 0.07), inset 0 0 0 9px rgba(223, 240, 237, 0.38);
+  text-align: center;
+  transform: translate3d(calc(var(--lens-shift-x, 0px) * -0.22), calc(var(--lens-shift-y, 0px) * -0.22), 0);
+  transition: transform 500ms ease;
+}
+.hero-lens-journey-core span {
+  color: var(--color-teal-text);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.hero-lens-journey-core strong {
+  color: var(--color-navy);
+  font-size: clamp(1.35rem, 3vw, 2.3rem);
+  font-weight: 300;
+  letter-spacing: -0.07em;
+  line-height: 0.94;
+}
+.hero-lens-journey-core small {
+  color: rgba(23, 37, 46, 0.62);
+  font-size: 0.55rem;
+  letter-spacing: 0.02em;
+}
+.hero-lens-stage {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  transform: translate3d(calc(var(--lens-shift-x, 0px) * 0.42), calc(var(--lens-shift-y, 0px) * 0.42), 0);
+  transition: transform 450ms ease;
+}
+.hero-lens-stage-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(17, 126, 118, 0.48);
+  border-radius: 50%;
+  background: rgba(223, 240, 237, 0.82);
+  color: var(--color-teal-text);
+  box-shadow: 0 0 0 7px rgba(21, 154, 145, 0.06), 0 0 24px rgba(21, 154, 145, 0.13);
+}
+.hero-lens-stage-icon svg { width: 25px; height: 25px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.hero-lens-stage > div:last-child { display: grid; gap: 2px; }
+.hero-lens-stage span {
+  color: var(--color-gold-text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.hero-lens-stage strong {
+  color: var(--color-navy);
+  font-size: clamp(0.86rem, 1.15vw, 1.04rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.1;
+}
+.hero-lens-stage small {
+  color: rgba(23, 37, 46, 0.62);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+.hero-lens-stage-body { top: 47%; left: 1%; }
+.hero-lens-stage-food { top: 10%; left: 42%; }
+.hero-lens-stage-food .hero-lens-stage-icon { border-color: rgba(153, 103, 11, 0.5); color: var(--color-gold-text); background: rgba(253, 243, 222, 0.88); box-shadow: 0 0 0 7px rgba(242, 184, 75, 0.07), 0 0 24px rgba(242, 184, 75, 0.15); }
+.hero-lens-stage-systems { top: 34%; right: 0; }
+.hero-lens-stage-systems .hero-lens-stage-icon { border-color: rgba(75, 126, 54, 0.5); color: var(--color-green-text); background: rgba(238, 245, 235, 0.88); box-shadow: 0 0 0 7px rgba(117, 184, 90, 0.07), 0 0 24px rgba(117, 184, 90, 0.14); }
+.hero-lens-journey-foot { bottom: 4%; left: 22%; color: var(--color-teal-text); }
+
+@media (max-width: 900px) {
+  .hero-lens-flow { aspect-ratio: 1.08 / 1; }
+  .hero-lens-stage-body { left: 0; }
+  .hero-lens-stage-systems { right: 0; }
+}
+@media (max-width: 560px) {
+  .hero-lens-flow { aspect-ratio: 0.96 / 1; }
+  .hero-lens-journey-kicker { top: 2%; left: 13%; font-size: 0.55rem; }
+  .hero-lens-route { inset: 12% -2% 9%; width: 104%; height: 79%; }
+  .hero-lens-journey-core { top: 42%; left: 38%; width: 31%; }
+  .hero-lens-journey-core strong { font-size: 1.35rem; }
+  .hero-lens-journey-core small { font-size: 0.48rem; }
+  .hero-lens-stage { gap: 6px; }
+  .hero-lens-stage-icon { width: 32px; height: 32px; }
+  .hero-lens-stage-icon svg { width: 19px; height: 19px; }
+  .hero-lens-stage strong { font-size: 0.68rem; }
+  .hero-lens-stage small { font-size: 0.53rem; }
+  .hero-lens-stage-body { top: 47%; }
+  .hero-lens-stage-food { top: 10%; left: 37%; }
+  .hero-lens-stage-systems { top: 35%; }
+  .hero-lens-journey-foot { bottom: 3%; left: 15%; gap: 6px; font-size: 0.52rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-lens-route,
+  .hero-lens-route-line,
+  .hero-lens-route-flow,
+  .hero-lens-journey-core,
+  .hero-lens-stage { transform: none !important; animation: none !important; transition: none !important; }
+}
+
+/* Final flow alignment: the route passes through the three icons only. Every
+   label sits in its own text block below the route, so no connector can cross
+   a word and FOOD reads as the middle step rather than a floating annotation. */
+.hero-lens-journey-kicker {
+  top: 4.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.hero-lens-route {
+  inset: 25% 2% 47%;
+  width: 96%;
+  height: 28%;
+}
+.hero-lens-journey-core {
+  top: 12%;
+  left: calc(50% - 110px);
+  width: 220px;
+  height: 96px;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: translate3d(calc(var(--lens-shift-x, 0px) * -0.22), calc(var(--lens-shift-y, 0px) * -0.22), 0);
+}
+.hero-lens-journey-core strong {
+  display: grid;
+  gap: 0;
+  color: var(--color-navy);
+  font-size: clamp(1.85rem, 4vw, 2.7rem);
+  font-weight: 300;
+  letter-spacing: -0.055em;
+  line-height: 0.92;
+}
+.hero-lens-journey-core strong b { font-weight: inherit; }
+.hero-lens-stage {
+  display: grid;
+  justify-items: center;
+  width: 170px;
+  gap: 8px;
+  text-align: center;
+}
+.hero-lens-stage > div:last-child { justify-items: center; text-align: center; }
+.hero-lens-stage small { white-space: normal; }
+.hero-lens-stage-body { top: 34%; left: 0; }
+.hero-lens-stage-food { top: 34%; left: calc(50% - 85px); }
+.hero-lens-stage-systems { top: 34%; right: 0; }
+.hero-lens-journey-foot {
+  top: 70%;
+  bottom: auto;
+  left: 24%;
+}
+
+/* Keep the route and its three anchors geometrically locked. The only motion
+   in this diagram is the deliberate 01 -> 02 -> 03 traveling highlight. */
+.hero-lens-route,
+.hero-lens-journey-core,
+.hero-lens-stage {
+  transform: none;
+  transition: none;
+}
+
+@media (max-width: 900px) {
+  .hero-lens-stage { width: 150px; }
+  .hero-lens-stage-food { left: calc(50% - 75px); }
+}
+@media (max-width: 560px) {
+  .hero-lens-journey-kicker { top: 4%; left: 50%; }
+  .hero-lens-route { inset: 26% 0 47%; width: 100%; height: 26%; }
+  .hero-lens-journey-core { top: 11%; left: calc(50% - 85px); width: 170px; height: 76px; }
+  .hero-lens-journey-core strong { font-size: 1.62rem; }
+  .hero-lens-stage { width: 112px; gap: 6px; }
+  .hero-lens-stage-body { left: -3px; }
+  .hero-lens-stage-food { left: calc(50% - 56px); }
+  .hero-lens-stage-systems { right: -3px; }
+  .hero-lens-stage small { max-width: 112px; }
+  .hero-lens-journey-foot { top: 76%; bottom: auto; left: 13%; }
+}
+
+/* Sources are grouped by institution, so the number and organization name
+   span their linked rows instead of pretending every link is a new source. */
+.source-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.source-col-index { width: 32px; }
+.source-col-organization { width: 36%; }
+.source-table tr { border-bottom: 1px solid var(--color-hairline); }
+.source-table th,
+.source-table td {
+  padding: 15px 0;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+.source-table td { padding-left: clamp(24px, 3vw, 44px); }
+.source-table .row-index {
+  display: table-cell;
+  min-width: 0;
+  margin-right: 0;
+  color: var(--color-gold-text);
+  font-weight: 600;
+}
+.source-table .source-organization {
+  padding-right: 18px;
+  color: rgba(23, 37, 46, 0.7);
+  overflow-wrap: anywhere;
+  font-size: clamp(0.78rem, 1.05vw, 0.9rem);
+}
+.source-table td a { color: var(--color-teal-text); }
+.source-table td a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  text-decoration: none;
+}
+.source-table td a::after {
+  content: "↗";
+  flex: 0 0 auto;
+  color: var(--color-teal-text);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+@media (max-width: 560px) {
+  .source-col-index { width: 30px; }
+  .source-col-organization { width: 34%; }
+  .source-table th,
+  .source-table td { padding: 13px 0; font-size: 0.78rem; }
+  .source-table td { padding-left: 14px; }
+  .source-table .source-organization { padding-right: 10px; }
+}
+
+@media (min-width: 901px) {
+  .source-table .source-organization { white-space: nowrap; overflow-wrap: normal; }
+
+  .source-table .row-index {
+    font-size: clamp(1rem, 1.25vw, 1.2rem);
+    font-weight: 700;
+  }
+
+  .source-table .source-organization {
+    font-size: clamp(0.98rem, 1.2vw, 1.14rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Keep the selected nutrient visible while the atlas list advances. The
+   previous flex/min-height combination stretched the detail column and left
+   an empty lower-left panel after the list ended. */
+@media (min-width: 901px) {
+  .atlas-detail {
+    position: sticky;
+    top: calc(var(--header-height) + 28px);
+    align-self: start;
+    min-height: 0;
+    height: auto;
+    display: block;
+  }
+
+  .atlas-detail > a {
+    margin-top: 26px;
+    padding-top: 0;
+    display: inline-flex;
+  }
+}
+
+/* Keep the atlas detail in the viewport without stretching its column. The
+   list should provide the page height; the selected detail should not leave a
+   large empty panel after the list has advanced. */
+@media (min-width: 901px) {
+  .micronutrient-shell {
+    overflow: visible;
+  }
+
+  .atlas-layout {
+    align-items: start;
+  }
+
+  .atlas-layout::before {
+    display: none;
+  }
+
+  .atlas-detail {
+    position: sticky;
+    top: calc(var(--header-height) + 28px);
+    align-self: start;
+    min-height: 0;
+    height: auto;
+    display: block;
+  }
+
+  .atlas-detail > a {
+    display: inline-flex;
+    margin-top: 26px;
+    padding-top: 0;
+  }
+
+  .atlas-card-grid {
+    align-self: start;
+    height: auto;
+    padding-left: 0;
+  }
+
+  .atlas-card-grid::before {
+    display: none;
+  }
+}
+
+/* Final editorial pass: keep the information architecture crisp at desktop
+   widths, while making the visual flow explicit instead of decorative. */
+@media (min-width: 901px) {
+  .source-table {
+    table-layout: auto;
+  }
+
+  .source-col-index { width: 54px; }
+  .source-col-organization { width: 32%; }
+
+  .source-table th,
+  .source-table td {
+    padding-left: 0;
+  }
+
+  /* Target the columns, never the sibling position: rows that continue a rowspan
+     group have the link cell as their FIRST child, so `* + *` skipped them and
+     knocked every group-leading link 43px out of alignment. */
+  .source-table th + th,
+  .source-table td {
+    padding-left: clamp(40px, 5vw, 84px);
+  }
+
+  .source-table td a {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 10px;
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .source-table td a::after {
+    margin-left: 2px;
+  }
+
+  .source-table .source-organization {
+    font-size: clamp(.84rem, 1.05vw, 1rem);
+    font-weight: 600;
+  }
+
+  .solutions-wrap,
+  .case-studies {
+    column-gap: clamp(56px, 7vw, 112px);
+  }
+
+  .solutions-intro h3,
+  .case-studies > div:first-child h3 {
+    font-weight: 700;
+    letter-spacing: -0.045em;
+  }
+
+  /* Two registers, clearly separated: the title column is the statement, the
+     right column is the gloss. A 24px gutter let them read as one run-on block,
+     so the gutter widens and the gloss drops to a lighter tone (4.8:1, still AA). */
+  .solution-row {
+    grid-template-columns: 48px minmax(220px, .82fr) minmax(0, 1.18fr);
+    gap: clamp(36px, 4.5vw, 76px);
+  }
+
+  .solution-row h4 {
+    font-weight: 600;
+  }
+
+  .solution-row p {
+    font-weight: 400;
+    color: rgba(23, 37, 46, .66);
+  }
+
+  .case-row summary {
+    grid-template-columns: 48px minmax(0, 1fr) 22px;
+    gap: 24px;
+  }
+
+  .case-row summary > span:nth-child(2) {
+    font-weight: 600;
+  }
+
+  .case-detail {
+    grid-template-columns: minmax(250px, .65fr) minmax(0, 1.35fr);
+  }
+
+  /* Journey: the claim leads; the explanatory sentence stays quieter. */
+  .lens-step {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .lens-step .step-number {
+    font-size: clamp(1.5rem, 2vw, 2rem);
+    font-weight: 700;
+  }
+
+  /* Emphasised, not shouted. Weight 700 at -0.045em collided the letterforms and
+     rendered the claim louder than the section h2 above it — an inverted
+     hierarchy. Weight 500 reads as emphasis against the system's 300 display
+     while staying subordinate to the heading. */
+  .lens-step h3 {
+    max-width: 26ch;
+    font-size: clamp(1.65rem, 2.35vw, 2.3rem);
+    font-weight: 500;
+    line-height: 1.18;
+    letter-spacing: -0.018em;
+  }
+
+  .lens-step p {
+    max-width: 72ch;
+    font-weight: 400;
+    color: rgba(23, 37, 46, .76);
+  }
+
+  .lens-connector {
+    display: grid;
+    justify-items: center;
+    gap: 0;
+    width: 56px;
+    margin: 0;
+    padding: 18px 0 16px;
+  }
+
+  .lens-connector-line {
+    display: block;
+    width: 2px;
+    height: 54px;
+    background: var(--color-teal-text);
+  }
+
+  .lens-connector-arrow {
+    display: block;
+    color: var(--color-teal-text);
+    font-size: 1.5rem;
+    line-height: .8;
+    font-weight: 400;
+  }
+}
+
+/* Make the route animation legible: a moving pulse travels along the line,
+   rather than leaving a static decorative stroke behind the three stages. */
+.hero-lens-route-flow {
+  stroke-dasharray: .06 .94;
+  stroke-dashoffset: 0;
+  animation: lens-route-flow 4.8s linear infinite;
+}
+
+.hero-lens-route-traveler {
+  fill: var(--color-gold-text);
+  stroke: #fff;
+  stroke-width: 2;
+  filter: drop-shadow(0 3px 6px rgba(23, 37, 46, .16));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-lens-route-flow {
+    animation: none;
+  }
+
+  .hero-lens-route-traveler {
+    display: none;
+  }
+}
+
+/* ============================================================================
+   EDITORIAL SYSTEM — authoritative final layer.
+
+   Audit found 36 distinct size/weight pairs in use across six font weights.
+   That is the reason the page did not read as "designed": there was no system,
+   only accumulated decisions. Everything below collapses that to three weights
+   and nine roles, removes the atmospheric wash the brief bans outright, and
+   introduces one signature device.
+
+   Direction: editorial broadsheet. Type carries the page. Ink on paper.
+   No gradient, no glow, no shadow — the flatness is the statement.
+   ========================================================================== */
+
+:root {
+  --page-max: 1280px;
+  --page-gutter: 32px;
+
+  /* Three weights only: 300 for the signature numeral, 500 display, 400 body,
+     600 labels. Anything outside this set is drift. */
+  --t-display: clamp(3.5rem, 7.4vw, 7.25rem);
+  --t-h2: clamp(2.15rem, 3.7vw, 3.5rem);
+  --t-h3: clamp(1.45rem, 2.05vw, 1.95rem);
+  --t-lead: clamp(1.08rem, 1.35vw, 1.3rem);
+  --t-body: 1rem;
+  --t-small: 0.875rem;
+  --t-micro: 0.78rem;
+  --t-label: 0.72rem;
+  --t-numeral: clamp(4.5rem, 10vw, 10.5rem);
+}
+
+/* ---- 1. Type system ------------------------------------------------------ */
+
+h1, h2, h3, h4,
+.lens-step h3,
+.solutions-intro h3,
+.case-studies h3,
+.case-studies > div:first-child h3,
+.atlas-card strong {
+  font-weight: 500;
+  letter-spacing: -0.028em;
+  line-height: 1.1;
+  color: var(--color-navy);
+}
+
+h1 { font-size: var(--t-display); line-height: 0.98; letter-spacing: -0.038em; max-width: 13ch; }
+h2 { font-size: var(--t-h2); max-width: 17ch; }
+h3, .lens-step h3 { font-size: var(--t-h3); line-height: 1.18; letter-spacing: -0.022em; max-width: 26ch; }
+h4 { font-size: 1.05rem; letter-spacing: -0.018em; }
+
+.hero-supporting, .lead-copy, .section-intro { font-size: var(--t-lead); font-weight: 400; line-height: 1.5; }
+p { font-size: var(--t-body); font-weight: 400; line-height: 1.62; }
+
+/* Labels are the only place 600 appears, always sentence-tracked small caps. */
+.eyebrow, .case-pathway-label, .list-header, .atlas-card-type {
+  font-size: var(--t-label);
+  font-weight: 600;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+/* Inline indices share one register everywhere they appear. */
+.row-index, .step-number, .case-pathway-dot, .atlas-card-index, .workflow-row > span, .determinants b {
+  font-size: var(--t-label);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--color-gold-text);
+}
+
+/* ---- 2. Remove the atmosphere the brief bans ----------------------------- */
+
+.hero-section,
+.global-section,
+.section {
+  background-image: none;
+}
+.hero-section { background-color: var(--color-cloud); }
+.global-section { background-color: var(--color-white); }
+.hero-section::before,
+.hero-lens-spotlight { display: none !important; }
+
+.atlas-card,
+.atlas-card-visual,
+.hero-lens-stage-icon,
+.atlas-detail-visual {
+  background-image: none;
+  box-shadow: none;
+}
+.hero-lens-stage-icon { background: var(--color-white); }
+.atlas-card:hover, .atlas-card:focus-visible { transform: none; border-color: var(--color-navy); }
+
+/* ---- 3. Signature: the numbering motif, scaled up ------------------------ */
+/* The page already counts everything 01..0n — nutrients, steps, solutions,
+   sources. Scaling that same motif up to mark each section turns a repeated
+   detail into the structural signature, and fills the empty left column that
+   every section was carrying. Outlined, so it sits behind the reading order. */
+
+main { counter-reset: gphl-section; }
+
+.section, .hero-section { position: relative; counter-increment: gphl-section; }
+
+/* The counter rides in the section label instead of floating behind the column.
+   A watermark numeral collided with content in three of the seven sections —
+   their inner grids differ too much for one absolute position to be safe — and
+   it never landed in the voids it was meant to fill. As a label prefix it is
+   robust, reinforces the 01..0n motif the page already runs on, and reads like
+   a magazine's chapter mark. */
+.section-heading > .eyebrow::before,
+.mission-grid > div:first-child > .eyebrow::before,
+.app-copy > .eyebrow::before {
+  content: counter(gphl-section, decimal-leading-zero) "\2009/\2009";
+  color: var(--color-gold-text);
+}
+
+/* ---- 4. Vertical rhythm -------------------------------------------------- */
+/* 8284px of scroll for 858 words read as empty, not spacious. */
+
+.section { padding: clamp(72px, 8vw, 116px) 0; }
+.lens-chain { margin: 56px 0 76px; }
+.case-studies { padding-top: 64px; }
+.solutions-wrap { padding: 56px 0; }
+
+/* ---- 5. Motion: one directed moment, not six generic fades ---------------
+   A blanket opacity-0 reveal on six containers had a real failure mode: any
+   element inside a collapsed <details> never enters the view timeline, so
+   .case-pathway sat at opacity 0 permanently once a reader opened a case study.
+   It is also the least interesting use of motion available.
+
+   So the page animates exactly one thing: the Global Lens chain, where the three
+   levels stage in sequence as you arrive. That is the site's whole argument —
+   body, then community, then system — and letting it assemble in that order is
+   motion doing work rather than decorating. The hero route pulse (tracing the
+   same chain) is the only other movement on the page.
+
+   Nothing inside a <details> is ever animated, and nothing starts fully hidden
+   unless the timeline is confirmed available.                                */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes gphl-stage {
+      from { opacity: 0; transform: translateY(26px); }
+      to { opacity: 1; transform: none; }
+    }
+    .lens-chain > *:not(:has(.case-pathway)) .lens-step {
+      animation: gphl-stage linear both;
+      animation-timeline: view();
+      animation-range: entry 2% cover 26%;
+    }
+  }
+}
+
+/* Belt and braces: content revealed by user action is never mid-animation. */
+details .case-pathway,
+details .lens-step {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* ---- 6. Enforcement ------------------------------------------------------
+   The rules above lost specificity battles to an ID selector (#about) and to
+   compound state selectors (.atlas-card.is-active) declared earlier. These
+   match or exceed those weights rather than sprinkling !important around.
+   Weight normalisation is the one place !important is used: the stray 300/700/800
+   declarations are scattered across 44 media blocks and are not worth chasing
+   individually — this layer is the single source of truth for type weight.     */
+
+#about,
+.section,
+.hero-section,
+.global-section { background-image: none; }
+#about { background-color: var(--color-white); }
+
+.atlas-card.is-active {
+  border-radius: 0;
+  background-image: none;
+  background-color: #edf7f5;
+  box-shadow: none;
+}
+.atlas-card.is-active .atlas-card-visual { box-shadow: none; }
+.hero-lens-stage-icon,
+.atlas-card,
+.atlas-card-visual,
+.atlas-detail-visual { box-shadow: none !important; }
+
+/* Display voice: one weight. */
+.hero-lens-journey-core strong b,
+.atlas-detail h3,
+.summary-mark { font-weight: 500 !important; }
+
+/* Label voice: one weight, one tracking. */
+.note-marker,
+.atlas-toolbar-label,
+.atlas-icon,
+.atlas-detail-type,
+.atlas-card-arrow,
+.step-number,
+.row-index,
+.hero-lens-journey-core > span,
+.atlas-toolbar span,
+.nutrient-detail .eyebrow,
+.atlas-detail-block span { font-weight: 600 !important; }
+
+/* The step number is an index, not a headline. */
+.lens-step .step-number { font-size: var(--t-label); line-height: 2.4; }
+
+/* ---- 7. Rhythm correction ------------------------------------------------ */
+/* The first pass at padding made the page taller, not tighter. */
+.section { padding: clamp(64px, 5.6vw, 92px) 0; }
+.hero-grid { padding-top: clamp(40px, 4vw, 64px); padding-bottom: clamp(48px, 5vw, 76px); }
+.micronutrient-section .split-grid,
+.split-grid { row-gap: 48px; }
+
+/* ---- 8. Hero composition -------------------------------------------------
+   The headline now carries the fold, so everything under it tightens: the grid
+   row-gap had opened a ~220px dead band between the headline and the standfirst,
+   and the copy column was centring itself against the much taller visual.       */
+
+.hero-grid {
+  align-items: start;
+  row-gap: clamp(28px, 3.4vw, 52px);
+}
+.hero-heading .eyebrow { margin-bottom: clamp(14px, 1.6vw, 22px); }
+.hero-copy { align-self: start; display: grid; gap: 26px; justify-items: start; }
+.hero-copy .button-row { margin: 0; }
+.hero-copy .hero-note { margin: 0; }
+
+/* The lens diagram supports the headline; it does not compete with it. */
+.hero-art-wrap { align-self: start; }
+.hero-lens,
+.hero-lens-journey { background-image: none !important; }
+.hero-lens { max-width: 660px; margin-left: auto; }
+
+@media (max-width: 900px) {
+  .hero-copy { gap: 22px; }
+  .hero-lens { margin: 0 auto; }
+}
+
+/* The last two atmospheric washes were on pseudo-elements, which the earlier
+   pass could not reach. The 1px dot grid on .hero-lens::after stays — that is
+   material texture, not glow, and it gives the panel a technical surface. */
+.hero-section::after,
+.hero-lens::before { display: none !important; }
+.hero-lens::after { opacity: 0.5; }
+
+/* The eyebrow sits under a 107px headline; give it enough presence to register. */
+.hero-heading .eyebrow { font-size: var(--t-micro); letter-spacing: 0.14em; }
+
+/* The atlas reveal bottomed out at 0.4, which left several nutrients in the
+   list looking disabled rather than pending. A higher floor and a shorter range
+   keep every row legible while still staging them in. */
+@keyframes atlas-card-reveal {
+  from { opacity: 0.72; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@supports (animation-timeline: view()) {
+  .atlas-card { animation-range: entry 0% cover 16%; }
+}
+
+/* ---- 9. Lens connector ---------------------------------------------------
+   Two implementations were live at once. The older one styled `.lens-connector
+   span`, an element selector, so it caught BOTH spans of the newer markup and
+   rotated them 45deg — which is why the down arrow rendered as a diagonal and
+   the rule floated left of the numerals it was meant to thread. Removed above;
+   this is now the only definition, aligned to the numeral column.            */
+
+.lens-connector {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 6px;
+  width: 56px;
+  margin: 0;
+  padding: 14px 0 12px;
+  border: 0;
+}
+.lens-connector-line {
+  display: block;
+  width: 1px;
+  height: 46px;
+  background: var(--color-hairline);
+  transform: none;
+}
+.lens-connector-arrow {
+  display: block;
+  color: var(--color-teal-text);
+  font-size: 0.95rem;
+  line-height: 1;
+  transform: none;
+}
+
+/* The three atlas labels that still carried 700/800 from the earlier markup. */
+.atlas-detail-head > span,
+.atlas-detail-block > span,
+.atlas-panel-label { font-weight: 600 !important; font-size: var(--t-label); letter-spacing: 0.085em; }
+
+/* ---- 10. App stage --------------------------------------------------------
+   Three separately-cut screens on a sticky stage. The base rules below are the
+   finished composition — a fanned trio with the active screen forward — so the
+   section is complete without any motion at all. Scroll only refines it: the
+   stage holds while the workflow copy passes, and the fan opens as it does.   */
+
+.app-grid { align-items: start; }
+.app-art-wrap { position: relative; min-height: 100%; }
+
+.app-stage {
+  position: sticky;
+  top: calc(var(--header-height) + clamp(24px, 4vw, 56px));
+  display: grid;
+  gap: 22px;
+  justify-items: center;
+}
+.app-stage-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 0 18px;
+}
+.app-phone {
+  position: relative;
+  width: 35.5%;
+  transform-origin: center bottom;
+  transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.app-phone img { display: block; width: 100%; height: auto; }
+
+/* Overlap and scale carry the depth. No drop shadow — the dark device frames
+   already separate cleanly on the cloud surface, and the page has none. */
+.app-phone[data-phone="1"] { z-index: 1; margin-right: -5.5%; transform: translateY(3.5%) rotate(-4.5deg) scale(0.9); }
+.app-phone[data-phone="2"] { z-index: 3; transform: translateY(-2%) scale(1.03); }
+.app-phone[data-phone="3"] { z-index: 1; margin-left: -5.5%; transform: translateY(3.5%) rotate(4.5deg) scale(0.9); }
+
+@supports (animation-timeline: view()) and (timeline-scope: --app-track) {
+  @media (prefers-reduced-motion: no-preference) {
+    .app-grid { timeline-scope: --app-track; }
+    .app-copy { view-timeline: --app-track block; }
+
+    @keyframes app-phone-left {
+      from { transform: translateY(7%) rotate(-1deg) scale(0.84); }
+      to { transform: translateY(3.5%) rotate(-4.5deg) scale(0.9); }
+    }
+    @keyframes app-phone-mid {
+      from { transform: translateY(4%) scale(0.94); }
+      to { transform: translateY(-2%) scale(1.03); }
+    }
+    @keyframes app-phone-right {
+      from { transform: translateY(7%) rotate(1deg) scale(0.84); }
+      to { transform: translateY(3.5%) rotate(4.5deg) scale(0.9); }
+    }
+    .app-phone {
+      animation: linear both;
+      animation-timeline: --app-track;
+      animation-range: entry 26% cover 58%;
+    }
+    .app-phone[data-phone="1"] { animation-name: app-phone-left; }
+    .app-phone[data-phone="2"] { animation-name: app-phone-mid; }
+    .app-phone[data-phone="3"] { animation-name: app-phone-right; }
+  }
+}
+
+@media (max-width: 900px) {
+  .app-stage { position: static; }
+  .app-phone { width: 36%; }
+}
+@media (max-width: 560px) {
+  .app-phone[data-phone="1"] { margin-right: -11%; }
+  .app-phone[data-phone="3"] { margin-left: -11%; }
+}
+
+/* ---- 11. Case detail measure ---------------------------------------------
+   The two-column grid here existed to hold the pathway diagram beside the copy.
+   Now that the pathway is hoisted to the section header (it was identical in all
+   three panels), only the copy remains — and it was landing in the narrow 0.65fr
+   column, leaving the wider one empty. One column, capped to a reading measure. */
+
+.case-detail { grid-template-columns: minmax(0, 1fr); }
+.case-detail-copy { max-width: 68ch; }
+.case-detail-copy p { font-size: 0.95rem; line-height: 1.6; }
+
+/* ---- 12. Lens chain: the numerals carry the section ------------------------
+   Two problems, one answer. The chain was capped at 900px inside a 1280px column
+   so the right half sat empty, and the step numbers — the "three connected
+   levels" the heading promises — were 12px labels doing none of that work.
+
+   Scaling the numerals into a real first column uses the width structurally and
+   makes the count the thing you actually see. Each one lights from faint to full
+   as its step arrives, so the chain reads 01 → 02 → 03 as you descend it.      */
+
+.lens-chain { max-width: none; }
+
+.lens-step {
+  grid-template-columns: clamp(84px, 8.5vw, 130px) minmax(0, 1fr);
+  gap: clamp(20px, 2.6vw, 40px);
+  align-items: start;
+}
+.lens-step .step-number {
+  font-size: clamp(2.5rem, 5.4vw, 4.6rem);
+  font-weight: 300;
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  color: var(--color-gold-text);
+  font-variant-numeric: tabular-nums;
+}
+.lens-step h3 { max-width: 30ch; }
+.lens-step p { max-width: 74ch; }
+
+/* The connector threads the numeral column, so it widens with it. */
+.lens-connector { width: clamp(84px, 8.5vw, 130px); }
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes gphl-count {
+      from { opacity: 0.18; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+    .lens-step .step-number {
+      animation: gphl-count linear both;
+      animation-timeline: view();
+      animation-range: entry 8% cover 34%;
+    }
+  }
+}
+
+@media (max-width: 700px) {
+  .lens-step { grid-template-columns: clamp(56px, 15vw, 84px) minmax(0, 1fr); gap: 16px; }
+  .lens-step .step-number { font-size: clamp(1.9rem, 9vw, 2.8rem); }
+  .lens-connector { width: clamp(56px, 15vw, 84px); }
+}
+
+
+
+/* The mark is the only piece of brand imagery on the page, so give it presence
+   rather than treating it as a bullet beside the wordmark. */
+.brand-lockup img { width: 42px; height: 42px; }
+.footer-brand img { width: 56px; height: 56px; }
+.footer-brand { gap: 14px; align-items: center; }
+.footer-brand span { font-size: 1.02rem; line-height: 1.25; }
+
+/* ---- 13. Solutions: one condition at a time ------------------------------
+   The progress gauge that used to live here has been removed. It reported how
+   far you had scrolled through a six-item list that is fully on screen at once
+   — a scroll indicator dressed as a chart, which is decoration, not data.
+
+   What is actually true about this section: the heading claims a better choice
+   needs conditions behind it, and there are six. So the motion attends to them
+   one at a time. Each row's numeral swells and solidifies as the row crosses the
+   middle of the viewport, then recedes — a spotlight travelling the list. The
+   rule beneath it draws in at the same moment, so the row you are reading is
+   unambiguous. Nothing is invented; the emphasis follows the reading order.   */
+
+.solution-row {
+  position: relative;
+  align-items: center;
+  transition: none;
+}
+.solution-row .row-index {
+  display: inline-block;
+  font-size: clamp(1.4rem, 2.3vw, 2.1rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  transform-origin: left center;
+  will-change: transform, opacity;
+}
+/* The rule that marks the row in focus. */
+.solution-row::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background: var(--color-teal-text);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Peaks at the middle of the pass, recedes on the way out. */
+    /* Scale only. Gold-text is 4.87:1 on white at full strength, so there is no
+       opacity headroom left — any fade puts the numeral under AA. The 0.74 -> 1.32
+       swing is a 78% size change, which carries the emphasis on its own. */
+    @keyframes solution-focus {
+      0% { transform: scale(0.74); }
+      46%, 58% { transform: scale(1.32); }
+      100% { transform: scale(0.8); }
+    }
+    @keyframes solution-rule {
+      0% { transform: scaleX(0); }
+      46%, 58% { transform: scaleX(1); }
+      100% { transform: scaleX(0); }
+    }
+    /* Floor measured at 5.56:1 — the receded state still passes AA. */
+    @keyframes solution-title {
+      0% { opacity: 0.72; }
+      46%, 58% { opacity: 1; }
+      100% { opacity: 0.74; }
+    }
+    .solution-row .row-index {
+      animation: solution-focus linear both;
+      animation-timeline: view();
+      animation-range: cover 12% cover 88%;
+    }
+    .solution-row::after {
+      animation: solution-rule linear both;
+      animation-timeline: view();
+      animation-range: cover 12% cover 88%;
+    }
+    .solution-row h4 {
+      animation: solution-title linear both;
+      animation-timeline: view();
+      animation-range: cover 12% cover 88%;
+    }
+  }
+}
+
+/* The intro column holds beside the list instead of leaving a hole under it. */
+.solutions-intro { align-self: start; }
+
+/* The 30ch cap set earlier squeezed 46-50 character claims into two lines with a
+   single orphaned word on the second — in a column 1120px wide. Widened so each
+   level's claim lands on one line at desktop; it still wraps naturally below. */
+.lens-step h3 { max-width: 54ch; }
+
+/* ---- 14. Hero masthead ----------------------------------------------------
+   The site name now carries the weight of a masthead rather than a section
+   label, with a rule separating identity from the display line beneath it. */
+
+.hero-wordmark {
+  margin: 0 0 clamp(14px, 1.5vw, 20px);
+  padding-bottom: clamp(12px, 1.3vw, 18px);
+  border-bottom: 1px solid var(--color-hairline);
+  max-width: 760px;
+  color: var(--color-navy);
+  font-size: clamp(1.35rem, 2vw, 1.85rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.hero-wordmark span { color: var(--color-teal-text); }
+
+@media (max-width: 900px) {
+  .hero-wordmark { max-width: none; }
+}
+
+/* ---- 15. Lens diagram (rebuilt) -------------------------------------------
+   Replaces the SVG route. Everything shares one grid, so the connector cannot
+   drift from the icons the way the old two-coordinate-system version did.
+
+   The motion is the page's own device rather than a one-off: focus travels
+   01 -> 02 -> 03, the same sequential illumination the lens chain and the
+   solutions list use further down. Here it is time-driven because the hero sits
+   above the fold with no scroll to read. Body -> food -> systems is a widening
+   scope, not a flow, so nothing "travels" — each level simply comes into focus.
+
+   Numerals never fade: gold-text is 4.87:1 at full strength, leaving no opacity
+   headroom, so emphasis is carried by scale and by the icon ring.             */
+
+.lens-diagram {
+  display: grid;
+  justify-items: center;
+  gap: clamp(14px, 1.6vw, 22px);
+  width: 100%;
+  max-width: 620px;
+  margin: 0 0 0 auto;
+  padding: 0;
+}
+
+.lens-diagram-kicker,
+.lens-diagram-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: rgba(23, 37, 46, 0.66);
+  font-size: var(--t-label);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.lens-diagram-foot { color: var(--color-teal-text); }
+.lens-diagram-kicker i,
+.lens-diagram-foot i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-gold);
+}
+
+.lens-diagram-core { display: grid; justify-items: center; gap: 4px; text-align: center; }
+.lens-diagram-tag {
+  color: var(--color-teal-text);
+  font-size: var(--t-label);
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.lens-diagram-core strong {
+  color: var(--color-navy);
+  font-size: clamp(2.4rem, 4vw, 3.6rem);
+  font-weight: 300;
+  line-height: 0.94;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+.lens-diagram-core small { color: rgba(23, 37, 46, 0.62); font-size: 0.76rem; }
+
+/* Three equal columns: icon centres land at 1/6, 3/6 and 5/6 of the track. */
+.lens-diagram-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* Which is exactly where the rule starts and stops — no overshoot at any width. */
+.lens-diagram-rule {
+  position: absolute;
+  top: 21px;
+  left: 16.667%;
+  right: 16.667%;
+  height: 1px;
+  background: var(--color-hairline);
+}
+.lens-diagram-rule i {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: var(--color-teal-text);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.lens-diagram-stage { display: grid; justify-items: center; gap: 5px; text-align: center; }
+.lens-diagram-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--color-hairline);
+  border-radius: 50%;
+  background: var(--color-cloud);
+  color: var(--color-teal-text);
+  transition: border-color 400ms ease, transform 400ms ease;
+}
+.lens-diagram-icon svg { width: 23px; height: 23px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.lens-diagram-step {
+  margin-top: 5px;
+  color: var(--color-gold-text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.lens-diagram-stage strong {
+  color: var(--color-navy);
+  font-size: 0.98rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.lens-diagram-stage small { color: rgba(23, 37, 46, 0.66); font-size: 0.76rem; line-height: 1.35; }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 9s cycle, each level holding focus for a third of it. */
+  @keyframes lens-stage-focus {
+    0%, 4% { transform: scale(1); border-color: var(--color-hairline); }
+    11%, 28% { transform: scale(1.13); border-color: var(--color-teal-text); }
+    36%, 100% { transform: scale(1); border-color: var(--color-hairline); }
+  }
+  @keyframes lens-step-focus {
+    0%, 4% { transform: scale(1); }
+    11%, 28% { transform: scale(1.22); }
+    36%, 100% { transform: scale(1); }
+  }
+  @keyframes lens-rule-advance {
+    0%, 8% { transform: scaleX(0); opacity: 1; }
+    30% { transform: scaleX(0.5); }
+    58%, 84% { transform: scaleX(1); opacity: 1; }
+    94%, 100% { transform: scaleX(1); opacity: 0; }
+  }
+  .lens-diagram-icon {
+    animation: lens-stage-focus 9s calc(var(--step) * 3s) infinite;
+  }
+  .lens-diagram-step {
+    display: inline-block;
+    animation: lens-step-focus 9s calc(var(--step) * 3s) infinite;
+  }
+  .lens-diagram-rule i { animation: lens-rule-advance 9s infinite; }
+}
+
+@media (max-width: 900px) {
+  .lens-diagram { margin: 0 auto; max-width: 520px; }
+}
+@media (max-width: 520px) {
+  .lens-diagram-stage small { font-size: 0.7rem; }
+  .lens-diagram-icon { width: 36px; height: 36px; }
+  .lens-diagram-rule { top: 18px; }
+}
+
+/* Fold fit: the hero was 861px against an 800px laptop viewport, which cut the
+   diagram's closing line. Tightened at the three places that carried slack. */
+.lens-diagram { gap: clamp(10px, 1.15vw, 16px); }
+.lens-diagram-core strong { font-size: clamp(2rem, 3.2vw, 2.9rem); }
+.hero-grid { padding-bottom: clamp(30px, 3vw, 48px); }
+
+/* ---- 16. Hero interactive nutrition-lens cutout ---------------------------
+   The image is a photographic ingredient cutout with a real alpha channel.
+   The magnifier and nutrient readout are UI layers so the food stays natural
+   while the lens can respond to the visitor.
+
+   (The alternate three-level diagram this replaced still lives at
+    components/hero/LensDiagram.tsx with its styles in section 15 above.)      */
+
+.hero-illustration {
+  position: relative;
+  overflow: visible;
+  width: 100%;
+  aspect-ratio: 1.7;
+  margin: 0;
+}
+.hero-interactive-art {
+  cursor: crosshair;
+  outline: none;
+  touch-action: manipulation;
+}
+.hero-interactive-art:focus-visible {
+  outline: 2px solid rgba(17, 126, 118, 0.68);
+  outline-offset: 8px;
+}
+.hero-illustration > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transform: scale(1.04);
+  transform-origin: center;
+  filter: drop-shadow(0 20px 28px rgba(18, 49, 75, 0.13));
+}
+
+.hero-inspection-hint {
+  position: absolute;
+  z-index: 3;
+  left: 2%;
+  bottom: 4%;
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  border: 1px solid rgba(17, 126, 118, 0.24);
+  border-radius: 999px;
+  padding: 6px 11px;
+  background: rgba(245, 248, 247, 0.8);
+  color: var(--color-teal-text);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.hero-interactive-art[data-inspecting="true"] .hero-inspection-hint {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.hero-hover-lens {
+  position: absolute;
+  z-index: 2;
+  width: clamp(62px, 7vw, 96px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.84);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.32), rgba(245, 248, 247, 0.08) 52%, rgba(17, 126, 118, 0.1));
+  box-shadow: 0 0 0 1px rgba(17, 126, 118, 0.64), 0 10px 18px rgba(18, 49, 75, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(2px) saturate(125%);
+  backdrop-filter: blur(2px) saturate(125%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, calc(-50% + 18px)) scale(0.82);
+  transition: left 120ms ease-out, top 120ms ease-out, opacity 180ms ease, transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: left, top, opacity, transform;
+}
+.hero-hover-lens::before {
+  content: "";
+  position: absolute;
+  inset: 9%;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+}
+.hero-hover-lens::after {
+  content: "";
+  position: absolute;
+  right: -25px;
+  bottom: -11px;
+  width: 34px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-navy);
+  box-shadow: 0 4px 8px rgba(18, 49, 75, 0.14);
+  transform: rotate(42deg);
+  transform-origin: left center;
+}
+.hero-interactive-art[data-inspecting="true"] .hero-hover-lens {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.hero-nutrient-callout {
+  position: absolute;
+  z-index: 4;
+  width: min(220px, 54%);
+  padding: 12px 14px 13px;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 18px 18px 18px 7px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(232, 243, 239, 0.48));
+  box-shadow: 0 22px 46px rgba(18, 49, 75, 0.18), 0 7px 14px rgba(18, 49, 75, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  filter: drop-shadow(0 4px 10px rgba(17, 126, 118, 0.08));
+  -webkit-backdrop-filter: blur(14px) saturate(135%);
+  backdrop-filter: blur(14px) saturate(135%);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 180ms ease, transform 220ms ease;
+}
+.hero-nutrient-callout::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), transparent 38% 72%, rgba(17, 126, 118, 0.06));
+}
+.hero-nutrient-callout > * {
+  position: relative;
+  z-index: 1;
+}
+@supports not ((backdrop-filter: blur(1px))) {
+  .hero-nutrient-callout {
+    background: rgba(245, 248, 247, 0.9);
+  }
+}
+.hero-interactive-art[data-inspecting="true"] .hero-nutrient-callout {
+  opacity: 1;
+  transform: translateY(0);
+}
+.hero-nutrient-callout-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.hero-nutrient-callout-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(18, 49, 75, 0.16);
+}
+.hero-nutrient-callout-head > span,
+.hero-nutrient-callout > small {
+  display: block;
+  color: var(--color-gold-text);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hero-nutrient-callout strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-navy);
+  font-size: 1.08rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+}
+.hero-nutrient-callout > small {
+  margin-top: 4px;
+  color: var(--color-teal-text);
+  letter-spacing: 0.03em;
+}
+.hero-nutrient-callout p {
+  margin: 6px 0 0;
+  color: var(--color-ink);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .hero-illustration { aspect-ratio: 1.55; }
+  .hero-illustration > img { transform: scale(1.02); }
+  .hero-inspection-hint { font-size: 0.58rem; }
+  .hero-hover-lens { width: clamp(52px, 13vw, 82px); }
+  .hero-nutrient-callout { width: min(214px, 66%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-hover-lens,
+  .hero-nutrient-callout,
+  .hero-inspection-hint { transition: none; }
+}
+
+/* Fold: the illustration column ran 112px taller than the copy column, which
+   pushed the hero past an 800px laptop viewport. */
+.hero-grid { row-gap: clamp(24px, 2.8vw, 40px); }
+
+/* The hero visual belongs below the full headline, aligned to the right column.
+   It stays in document flow and never extends past its own column or the page
+   edge; the transparent cutout provides the integration with the background. */
+@media (min-width: 901px) {
+  .hero-heading { position: relative; z-index: 1; }
+  .hero-art-wrap {
+    position: relative;
+    z-index: 0;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    align-self: start;
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    max-width: 100%;
+    pointer-events: auto;
+  }
+  .hero-illustration {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.5;
+    max-width: 100%;
+  }
+  .hero-illustration > img {
+    object-position: center;
+    width: 100%;
+    height: auto;
+    transform: none;
+    transform-origin: center;
+  }
+}

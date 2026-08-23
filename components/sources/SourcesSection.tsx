@@ -1,0 +1,66 @@
+import { ExternalLink } from "@/components/ui/ExternalLink";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionShell } from "@/components/ui/SectionShell";
+import { siteConfig } from "@/content/site-config";
+import { sources } from "@/content/sources";
+
+const sourceGroups = sources.reduce(
+  (groups, source) => {
+    const organization = source.organization.startsWith("UNICEF") ? "UNICEF" : source.organization;
+    const group = groups.find((item) => item.organization === organization);
+
+    if (group) {
+      group.sources.push(source);
+    } else {
+      groups.push({ organization, sources: [source] });
+    }
+
+    return groups;
+  },
+  [] as Array<{ organization: string; sources: typeof sources }>,
+);
+
+export function SourcesSection() {
+  return (
+    <SectionShell id="sources" surface="white" labelledBy="sources-title" className="sources-section">
+      <div className="page-width sources-grid">
+        <SectionHeading
+          eyebrow="Read further"
+          title="Sources we return to."
+          id="sources-title"
+        />
+        <div className="source-list">
+          <table className="source-table">
+            <colgroup>
+              <col className="source-col-index" />
+              <col className="source-col-organization" />
+              <col />
+            </colgroup>
+            <tbody>
+              {sourceGroups.map((group, groupIndex) =>
+                group.sources.map((source, sourceIndex) => (
+                  <tr key={`${source.organization}-${source.title}`}>
+                    {sourceIndex === 0 && (
+                      <th className="row-index" scope="rowgroup" rowSpan={group.sources.length}>
+                        {String(groupIndex + 1).padStart(2, "0")}
+                      </th>
+                    )}
+                    {sourceIndex === 0 && (
+                      <th className="source-organization" scope="rowgroup" rowSpan={group.sources.length}>
+                        {group.organization}
+                      </th>
+                    )}
+                    <td>
+                      <ExternalLink href={source.url}>{source.title}</ExternalLink>
+                    </td>
+                  </tr>
+                )),
+              )}
+            </tbody>
+          </table>
+          <p className="review-date">Content links last reviewed {siteConfig.lastReviewedAt}.</p>
+        </div>
+      </div>
+    </SectionShell>
+  );
+}
