@@ -5,6 +5,8 @@ import { siteConfig } from "@/content/site-config";
 import { ContactForm } from "./ContactForm";
 
 export function ContactSection() {
+  const hasEmail = !siteConfig.email.startsWith("[");
+
   return (
     <SectionShell id="contact" surface="cloud" labelledBy="contact-title" className="contact-section">
       <div className="page-width contact-grid">
@@ -15,7 +17,7 @@ export function ContactSection() {
             id="contact-title"
           />
           <p>{legal.contactNotice}</p>
-          <p className="contact-email">{siteConfig.email}</p>
+          {hasEmail ? <p className="contact-email">{siteConfig.email}</p> : null}
         </div>
         <ContactForm />
       </div>

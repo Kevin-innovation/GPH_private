@@ -2654,3 +2654,91 @@ details .lens-step {
     transform-origin: center;
   }
 }
+
+/* Final mobile overrides are kept at EOF so the responsive composition wins
+   over the older desktop-first patches above. */
+@media (max-width: 900px) {
+  .site-header {
+    z-index: 100;
+    isolation: isolate;
+    background: var(--color-cloud);
+    box-shadow: 0 3px 12px rgba(18, 49, 75, 0.08);
+  }
+
+  .section,
+  [id] {
+    scroll-margin-top: calc(var(--header-height) + 20px);
+  }
+
+  .hero-grid,
+  .mission-grid,
+  .split-grid,
+  .app-grid,
+  .sources-grid,
+  .contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-grid > *,
+  .mission-grid > *,
+  .split-grid > *,
+  .app-grid > *,
+  .sources-grid > *,
+  .contact-grid > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-heading,
+  .hero-copy,
+  .hero-art-wrap,
+  .hero-illustration {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-heading { grid-row: 1; }
+  .hero-art-wrap { grid-row: 2; margin: 0; }
+  .hero-copy { grid-row: 3; }
+  .hero-illustration { overflow: hidden; }
+  .hero-illustration > img { max-width: 100%; transform: none; }
+
+  .button-row,
+  .button-row .button {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-inspection-hint-desktop { display: none; }
+  .hero-inspection-hint-mobile { display: inline-flex; }
+  .hero-interactive-art { cursor: default; }
+  .mobile-nav { z-index: 101; }
+
+  .section { padding-block: 60px; }
+  .hero-grid { gap: 32px; padding-top: 32px; padding-bottom: 44px; }
+  .mission-grid,
+  .split-grid,
+  .app-grid,
+  .sources-grid,
+  .contact-grid { gap: 40px; }
+  .micronutrient-intro { margin-bottom: 34px; }
+  .nutrient-story { gap: 30px; }
+  .nutrient-story-step { min-height: 154px; }
+  .solutions-wrap { padding-block: 32px; }
+  .case-studies { padding-top: 40px; }
+  .workflow-list { margin-block: 30px 24px; }
+  .site-footer { padding-top: 56px; }
+}
+
+@media (max-width: 560px) {
+  .section { padding-block: 54px; }
+  .hero-grid { gap: 26px; padding-top: 26px; padding-bottom: 36px; }
+  h1 { font-size: clamp(2rem, 10vw, 2.65rem); }
+  .hero-wordmark { margin-bottom: 12px; }
+  .hero-supporting { font-size: 1rem; }
+  .hero-note { font-size: 0.84rem; }
+  .nutrient-story-step { min-height: 142px; }
+  .workflow-list { margin-block: 24px 20px; }
+  .image-caption { margin-top: 16px; }
+}

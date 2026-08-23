@@ -36,13 +36,7 @@ export function Footer() {
             Global Public Health Lens makes health easier to understand by connecting individual experiences with the global
             systems that shape them.
           </p>
-          {hasEmail ? (
-            <a className="footer-email" href={`mailto:${siteConfig.email}`}>
-              {siteConfig.email}
-            </a>
-          ) : (
-            <p className="footer-pending">{siteConfig.email}</p>
-          )}
+          {hasEmail ? <a className="footer-email" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a> : null}
           {siteConfig.socialLinks.length > 0 ? (
             <p className="footer-social">
               {siteConfig.socialLinks.map((link) => (
@@ -65,7 +59,7 @@ export function Footer() {
 
         <div className="footer-links">
           <Eyebrow>Boundaries</Eyebrow>
-          <p className="footer-pending">Privacy policy — in preparation</p>
+          <p className="footer-pending">Privacy information will be published before launch.</p>
           <p>{legal.shortDisclaimer}</p>
         </div>
       </div>

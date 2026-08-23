@@ -110,6 +110,18 @@ export function HeroVisual() {
     setIsInspecting(false);
   };
 
+  const handlePointerEnter = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "touch") setIsInspecting(true);
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "touch") updateInspection(event);
+  };
+
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch") updateInspection(event);
+  };
+
   const calloutLeft = clamp(pointer.x > 58 ? pointer.x - 48 : pointer.x + 5, 2, 42);
   const calloutTop = clamp(pointer.y - 32, 4, 46);
 
@@ -118,10 +130,11 @@ export function HeroVisual() {
       <div
         className="hero-illustration hero-interactive-art"
         data-inspecting={isInspecting}
-        onPointerEnter={() => setIsInspecting(true)}
-        onPointerMove={updateInspection}
+        onPointerEnter={handlePointerEnter}
+        onPointerMove={handlePointerMove}
+        onPointerDown={handlePointerDown}
         onPointerLeave={handleLeave}
-        aria-label="Hover over the ingredients to inspect their representative nutrients"
+        aria-label="Move across or tap the ingredients to inspect their representative nutrients"
       >
         <Image
           src="/brand/hero-nutrition-ingredients-cutout.webp"
@@ -131,8 +144,11 @@ export function HeroVisual() {
           priority
           sizes="(max-width: 900px) 100vw, 46vw"
         />
-        <span className="hero-inspection-hint" aria-hidden="true">
+        <span className="hero-inspection-hint hero-inspection-hint-desktop" aria-hidden="true">
           Move across the ingredients to inspect
+        </span>
+        <span className="hero-inspection-hint hero-inspection-hint-mobile" aria-hidden="true">
+          Tap an ingredient to inspect
         </span>
         <span className="hero-hover-lens" aria-hidden="true" style={{ left: `${pointer.x}%`, top: `${pointer.y}%` }} />
         {activeZone ? (
