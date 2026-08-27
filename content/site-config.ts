@@ -7,8 +7,8 @@ export const siteConfig = {
   domain: "[INSERT DOMAIN]",
   nutritionApp: {
     name: "GPH Lens: Nutrition",
-    status: "coming-soon" as "coming-soon" | "live",
-    webUrl: "https://global-rens-app.vercel.app",
+    status: "live" as "coming-soon" | "live",
+    webUrl: "https://global-lens-app.vercel.app",
     appStoreUrl: "",
     googlePlayUrl: "",
   },
