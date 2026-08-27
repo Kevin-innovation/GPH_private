@@ -16,10 +16,10 @@ export function NutritionAppPreview() {
         <div className="app-copy">
           <Eyebrow>GPH LENS: NUTRITION</Eyebrow>
           <h2 id="app-title">Turn everyday food choices into a learning experience.</h2>
-          <p>A planned app for logging food, seeing nutrient balance, and connecting everyday intake to global nutrition.</p>
+          <p>A web app for logging food, seeing nutrient balance, and connecting everyday intake to global nutrition. It runs in the browser — no install, no account.</p>
           <AppWorkflow />
           <div className="feature-line">
-            <span>Planned features</span>
+            <span>What it does</span>
             {appFeatures.map((feature) => (
               <span key={feature}>{feature}</span>
             ))}
