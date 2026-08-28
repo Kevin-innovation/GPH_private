@@ -2037,13 +2037,32 @@ details .lens-step {
 .app-phone {
   position: relative;
   width: 35.5%;
+  padding: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(9, 34, 53, 0.34);
+  border-radius: 34px;
+  background: linear-gradient(145deg, #1b3c55 0%, #0c263d 72%);
+  box-shadow: 0 18px 34px rgba(18, 49, 75, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   transform-origin: center bottom;
   transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-.app-phone img { display: block; width: 100%; height: auto; }
+.app-phone::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  top: 11px;
+  left: 50%;
+  width: 38%;
+  height: 14px;
+  border-radius: 999px;
+  background: #071a2a;
+  box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.08);
+  transform: translateX(-50%);
+}
+.app-phone img { display: block; width: 100%; height: auto; border-radius: 27px; }
 
-/* Overlap and scale carry the depth. No drop shadow — the dark device frames
-   already separate cleanly on the cloud surface, and the page has none. */
+/* Overlap and scale carry the depth. A restrained iPhone-style bezel keeps
+   the latest live screens feeling like product UI rather than flat artwork. */
 .app-phone[data-phone="1"] { z-index: 1; margin-right: -5.5%; transform: translateY(3.5%) rotate(-4.5deg) scale(0.9); }
 .app-phone[data-phone="2"] { z-index: 3; transform: translateY(-2%) scale(1.03); }
 .app-phone[data-phone="3"] { z-index: 1; margin-left: -5.5%; transform: translateY(3.5%) rotate(4.5deg) scale(0.9); }
