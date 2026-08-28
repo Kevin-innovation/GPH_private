@@ -2501,6 +2501,9 @@ details .lens-step {
   opacity: 0;
   transform: translateY(4px);
 }
+/* Only one instruction belongs in the hero at a time. The mobile copy is
+   explicitly hidden on desktop so both absolutely-positioned pills cannot stack. */
+.hero-inspection-hint-mobile { display: none; }
 .hero-hover-lens {
   position: absolute;
   z-index: 2;
