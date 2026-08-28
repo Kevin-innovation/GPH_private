@@ -46,6 +46,8 @@ export default defineConfig(async () => {
 
   if (isVercelBuild) {
     return {
+      // Keep original source paths out of every production client bundle.
+      build: { sourcemap: false, minify: "esbuild" },
       plugins: [tailwindcss(), vinext(), nitro()],
     };
   }
@@ -54,6 +56,8 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    // Keep original source paths out of every production client bundle.
+    build: { sourcemap: false, minify: "esbuild" },
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,
