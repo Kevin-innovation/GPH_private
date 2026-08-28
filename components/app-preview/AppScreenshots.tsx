@@ -1,6 +1,7 @@
 import Image from "next/image";
 
-// Captured from the running app at 390x844 and composited into a device frame,
+// Captured from the running app at 412x915 (Galaxy S25 Edge reference) and
+// composited into a device frame,
 // so the section shows what someone actually opens rather than artwork of it.
 // Three separate transparent images so the stage can respond to scroll.
 const screens = [
@@ -8,13 +9,13 @@ const screens = [
     src: "/brand/app/screen-today.webp",
     width: 588,
     height: 1302,
-    alt: "The app's Today screen: a nutrition score of 68 out of 100, and a nutrient balance list ranking all thirteen nutrients against their targets.",
+    alt: "The app's Today screen with a daily nutrition score, logged foods, and nutrient balance gauges for thirteen nutrients.",
   },
   {
     src: "/brand/app/screen-add-meal.webp",
     width: 588,
     height: 1302,
-    alt: "The app's Add Food screen, searching the food list and showing matches with their serving sizes.",
+    alt: "The app's Add Food screen with a searchable food catalog, category filters, and serving-size matches.",
   },
   {
     src: "/brand/app/screen-lens.webp",

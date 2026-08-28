@@ -16,7 +16,7 @@ export function NutritionAppPreview() {
         <div className="app-copy">
           <Eyebrow>GPH LENS: NUTRITION</Eyebrow>
           <h2 id="app-title">Turn everyday food choices into a learning experience.</h2>
-          <p>A web app for logging food, seeing nutrient balance, and connecting everyday intake to global nutrition. It runs in the browser — no install, no account.</p>
+          <p>Log meals from a 240-food catalog, see 13 micronutrients respond, and learn what the numbers mean in context. The guest log stays in your browser — no install or account.</p>
           <AppWorkflow />
           <div className="feature-line">
             <span>What it does</span>
