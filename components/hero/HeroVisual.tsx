@@ -1,397 +1,255 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
-type FeaturedNode = {
-  id: string;
-  latitude: number;
-  longitude: number;
-  color: string;
+const layers = [
+  { id: "body", label: "Body", title: "What happens in people", description: "Biology, nutrition, and lived health", color: "#f2b84b" },
+  { id: "environment", label: "Environment", title: "What shapes exposure", description: "Place, climate, food, and inequality", color: "#159a91" },
+  { id: "systems", label: "Systems", title: "What changes outcomes", description: "Policy, prevention, access, and care", color: "#12314b" },
+] as const;
+
+type LayerSceneEntry = {
+  group: THREE.Group;
+  lineMaterial: THREE.LineBasicMaterial;
+  nodeMaterials: THREE.MeshBasicMaterial[];
 };
 
-const featuredNodes: FeaturedNode[] = [
-  { id: "seoul", latitude: 37.56, longitude: 126.98, color: "#f2b84b" },
-  { id: "new-delhi", latitude: 28.61, longitude: 77.21, color: "#159a91" },
-  { id: "mexico-city", latitude: 19.43, longitude: -99.13, color: "#75b85a" },
-  { id: "paris", latitude: 48.86, longitude: 2.35, color: "#f2b84b" },
-  { id: "new-york", latitude: 40.71, longitude: -74.01, color: "#159a91" },
-];
-
-const globeRadius = 2.5;
-const defaultRotation = { x: -0.12, y: -Math.PI / 2 + 0.24, z: 0.04 };
-
-function latLonToVector3(latitude: number, longitude: number, radius = globeRadius) {
-  const lat = THREE.MathUtils.degToRad(latitude);
-  const lon = THREE.MathUtils.degToRad(longitude);
-
-  return new THREE.Vector3(
-    radius * Math.cos(lat) * Math.sin(lon),
-    radius * Math.sin(lat),
-    radius * Math.cos(lat) * Math.cos(lon),
-  );
-}
-
-function createLatitudeRing(latitude: number, radius = globeRadius) {
+function createOrbitPoints(radius: number, squash: number, rotation: THREE.Euler) {
   const points: THREE.Vector3[] = [];
-  const lat = THREE.MathUtils.degToRad(latitude);
-  const ringRadius = radius * Math.cos(lat);
-  const y = radius * Math.sin(lat);
-
-  for (let index = 0; index < 96; index += 1) {
-    const angle = (index / 96) * Math.PI * 2;
-    points.push(new THREE.Vector3(Math.cos(angle) * ringRadius, y, Math.sin(angle) * ringRadius));
+  for (let index = 0; index < 128; index += 1) {
+    const angle = (index / 128) * Math.PI * 2;
+    points.push(new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius * squash, 0).applyEuler(rotation));
   }
-
   return points;
-}
-
-function createMeridian(longitude: number, radius = globeRadius) {
-  const points: THREE.Vector3[] = [];
-  const lon = THREE.MathUtils.degToRad(longitude);
-
-  for (let index = 0; index < 72; index += 1) {
-    const latitude = -Math.PI / 2 + (index / 71) * Math.PI;
-    points.push(
-      new THREE.Vector3(
-        radius * Math.cos(latitude) * Math.sin(lon),
-        radius * Math.sin(latitude),
-        radius * Math.cos(latitude) * Math.cos(lon),
-      ),
-    );
-  }
-
-  return points;
-}
-
-function hexToRgb(hex: string) {
-  const value = hex.replace("#", "");
-  return [
-    Number.parseInt(value.slice(0, 2), 16) / 255,
-    Number.parseInt(value.slice(2, 4), 16) / 255,
-    Number.parseInt(value.slice(4, 6), 16) / 255,
-  ];
-}
-
-function createSignalMaterial() {
-  return new THREE.ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    uniforms: {},
-    vertexShader: `
-      attribute float aSize;
-      attribute vec3 aColor;
-      varying vec3 vColor;
-
-      void main() {
-        vColor = aColor;
-        vec4 modelPosition = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = aSize * (260.0 / max(1.0, -modelPosition.z));
-        gl_Position = projectionMatrix * modelPosition;
-      }
-    `,
-    fragmentShader: `
-      varying vec3 vColor;
-
-      void main() {
-        float distanceFromCenter = length(gl_PointCoord - vec2(0.5));
-        float alpha = 1.0 - smoothstep(0.18, 0.5, distanceFromCenter);
-        if (alpha < 0.02) discard;
-        gl_FragColor = vec4(vColor, alpha * 0.9);
-      }
-    `,
-  });
 }
 
 export function HeroVisual() {
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasMountRef = useRef<HTMLDivElement>(null);
+  const selectLayerRef = useRef<((index: number) => void) | null>(null);
+  const activeIndexRef = useRef(0);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeLayer = layers[activeIndex];
+
+  const selectLayer = (index: number) => {
+    activeIndexRef.current = index;
+    setActiveIndex(index);
+    selectLayerRef.current?.(index);
+  };
 
   useEffect(() => {
     const mount = canvasMountRef.current;
-    const stage = stageRef.current;
-    if (!mount || !stage) return undefined;
+    if (!mount) return undefined;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const geometries: THREE.BufferGeometry[] = [];
     const materials: THREE.Material[] = [];
-    const textures: THREE.Texture[] = [];
     let renderer: THREE.WebGLRenderer | null = null;
     let resizeObserver: ResizeObserver | null = null;
     let frameId = 0;
 
     try {
-      renderer = new THREE.WebGLRenderer({
-        alpha: true,
-        antialias: true,
-        powerPreference: "high-performance",
-      });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
       renderer.setClearColor(0x000000, 0);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.domElement.setAttribute("aria-hidden", "true");
+      renderer.domElement.style.cursor = "grab";
       mount.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
-      camera.position.set(0, 0.1, 11.4);
+      const camera = new THREE.PerspectiveCamera(31, 1, 0.1, 100);
+      camera.position.set(0, 0, 9.8);
 
-      const globe = new THREE.Group();
-      globe.rotation.set(defaultRotation.x, defaultRotation.y, defaultRotation.z);
-      scene.add(globe);
+      const network = new THREE.Group();
+      network.rotation.set(-0.08, -0.12, 0.03);
+      scene.add(network);
 
-      scene.add(new THREE.HemisphereLight("#f8fbfa", "#12314b", 1.4));
-      const sun = new THREE.DirectionalLight("#fff4cf", 2.2);
-      sun.position.set(-4, 3, 6);
-      scene.add(sun);
+      const centerGeometry = new THREE.RingGeometry(0.36, 0.48, 64);
+      const centerMaterial = new THREE.MeshBasicMaterial({ color: "#f8fbfa", transparent: true, opacity: 0.92, side: THREE.DoubleSide });
+      const irisGeometry = new THREE.RingGeometry(0.51, 0.535, 64);
+      const irisMaterial = new THREE.MeshBasicMaterial({ color: "#159a91", transparent: true, opacity: 0.82, side: THREE.DoubleSide });
+      geometries.push(centerGeometry, irisGeometry);
+      materials.push(centerMaterial, irisMaterial);
+      network.add(new THREE.Mesh(centerGeometry, centerMaterial), new THREE.Mesh(irisGeometry, irisMaterial));
 
-      const earthGeometry = new THREE.SphereGeometry(globeRadius, 96, 64);
-      const earthMaterial = new THREE.MeshStandardMaterial({
-        color: "#d8e6df",
-        emissive: "#6d958a",
-        emissiveIntensity: 0.42,
-        roughness: 0.92,
-        metalness: 0,
-        transparent: true,
-        opacity: 0.9,
-      });
-      geometries.push(earthGeometry);
-      materials.push(earthMaterial);
-      globe.add(new THREE.Mesh(earthGeometry, earthMaterial));
+      const dotGeometry = new THREE.SphereGeometry(0.09, 18, 14);
+      const smallDotGeometry = new THREE.SphereGeometry(0.055, 16, 12);
+      geometries.push(dotGeometry, smallDotGeometry);
 
-      const earthTexture = new THREE.TextureLoader().load(
-        "/brand/earth-atmos-2048.jpg",
-        (texture) => {
-          texture.colorSpace = THREE.SRGBColorSpace;
-          earthMaterial.map = texture;
-          earthMaterial.needsUpdate = true;
-          renderer?.render(scene, camera);
-        },
-        undefined,
-        () => {
-          earthMaterial.color.set("#d8e6df");
-          earthMaterial.needsUpdate = true;
-          renderer?.render(scene, camera);
-        },
-      );
-      textures.push(earthTexture);
+      const orbitSpecs = [
+        { radius: 1.35, squash: 0.72, rotation: new THREE.Euler(0.72, 0.2, 0.32), nodes: 5 },
+        { radius: 2.05, squash: 0.63, rotation: new THREE.Euler(-0.48, 0.52, -0.16), nodes: 7 },
+        { radius: 2.7, squash: 0.58, rotation: new THREE.Euler(0.2, -0.56, 0.42), nodes: 9 },
+      ];
 
-      const gridMaterial = new THREE.LineBasicMaterial({
-        color: "#7cbdb8",
-        transparent: true,
-        opacity: 0.34,
-      });
-      materials.push(gridMaterial);
-
-      [-60, -30, 0, 30, 60].forEach((latitude) => {
-        const geometry = new THREE.BufferGeometry().setFromPoints(createLatitudeRing(latitude));
-        geometries.push(geometry);
-        globe.add(new THREE.LineLoop(geometry, gridMaterial));
-      });
-
-      [-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150].forEach((longitude) => {
-        const geometry = new THREE.BufferGeometry().setFromPoints(createMeridian(longitude));
-        geometries.push(geometry);
-        globe.add(new THREE.Line(geometry, gridMaterial));
-      });
-
-      const haloGeometry = new THREE.SphereGeometry(globeRadius * 1.08, 48, 32);
-      const haloMaterial = new THREE.MeshBasicMaterial({
-        color: "#8fd0c8",
-        transparent: true,
-        opacity: 0.1,
-        side: THREE.BackSide,
-        depthWrite: false,
-      });
-      geometries.push(haloGeometry);
-      materials.push(haloMaterial);
-      globe.add(new THREE.Mesh(haloGeometry, haloMaterial));
-
-      const nodePositions: THREE.Vector3[] = [];
-      const nodeSizes: number[] = [];
-      const nodeColors: number[] = [];
-      const genericColor = hexToRgb("#a7d4c9");
-      const accentColors = [hexToRgb("#159a91"), hexToRgb("#f2b84b"), hexToRgb("#75b85a")];
-
-      for (let index = 0; index < 58; index += 1) {
-        const latitude = -62 + ((index * 37) % 124);
-        const longitude = -180 + ((index * 71) % 360);
-        nodePositions.push(latLonToVector3(latitude, longitude, globeRadius * 1.012));
-        nodeSizes.push(index % 9 === 0 ? 0.085 : 0.052 + (index % 3) * 0.008);
-        nodeColors.push(...(index % 8 === 0 ? accentColors[index % accentColors.length] : genericColor));
-      }
-
-      featuredNodes.forEach((node) => {
-        nodePositions.push(latLonToVector3(node.latitude, node.longitude, globeRadius * 1.03));
-        nodeSizes.push(0.14);
-        nodeColors.push(...hexToRgb(node.color));
-      });
-
-      const signalGeometry = new THREE.BufferGeometry();
-      signalGeometry.setAttribute("position", new THREE.Float32BufferAttribute(nodePositions.flatMap((point) => point.toArray()), 3));
-      signalGeometry.setAttribute("aSize", new THREE.Float32BufferAttribute(nodeSizes, 1));
-      signalGeometry.setAttribute("aColor", new THREE.Float32BufferAttribute(nodeColors, 3));
-      const signalMaterial = createSignalMaterial();
-      geometries.push(signalGeometry);
-      materials.push(signalMaterial);
-      globe.add(new THREE.Points(signalGeometry, signalMaterial));
-
-      const connectionMaterial = new THREE.LineBasicMaterial({
-        color: "#d9aa43",
-        transparent: true,
-        opacity: 0.36,
-      });
-      materials.push(connectionMaterial);
-      const featuredPositions = featuredNodes.map((node) => latLonToVector3(node.latitude, node.longitude, globeRadius * 1.03));
-      const connectionPairs: [THREE.Vector3, THREE.Vector3][] = [];
-
-      featuredPositions.forEach((point, featuredIndex) => {
-        const nearby = nodePositions
-          .slice(0, 58)
-          .map((candidate, index) => ({ candidate, index, distance: candidate.distanceTo(point) }))
-          .sort((a, b) => a.distance - b.distance)
-          .slice(0, 3);
-        nearby.forEach(({ candidate }) => connectionPairs.push([point, candidate]));
-        if (featuredIndex > 0) connectionPairs.push([featuredPositions[featuredIndex - 1], point]);
-      });
-
-      connectionPairs.forEach(([start, end]) => {
-        const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
-        geometries.push(geometry);
-        globe.add(new THREE.Line(geometry, connectionMaterial));
-      });
-
-      const markerGeometry = new THREE.SphereGeometry(0.105, 16, 12);
-      geometries.push(markerGeometry);
-      featuredNodes.forEach((node, index) => {
-        const markerMaterial = new THREE.MeshBasicMaterial({
-          color: node.color,
+      const sceneLayers: LayerSceneEntry[] = orbitSpecs.map((spec, layerIndex) => {
+        const layerGroup = new THREE.Group();
+        const points = createOrbitPoints(spec.radius, spec.squash, spec.rotation);
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        const lineMaterial = new THREE.LineBasicMaterial({
+          color: layers[layerIndex].color,
           transparent: true,
-          opacity: 0.95,
+          opacity: layerIndex === activeIndexRef.current ? 0.92 : 0.24,
         });
-        materials.push(markerMaterial);
-        const marker = new THREE.Mesh(markerGeometry, markerMaterial);
-        marker.position.copy(featuredPositions[index]);
-        globe.add(marker);
+        geometries.push(lineGeometry);
+        materials.push(lineMaterial);
+        layerGroup.add(new THREE.LineLoop(lineGeometry, lineMaterial));
+
+        const nodeMaterials: THREE.MeshBasicMaterial[] = [];
+        for (let nodeIndex = 0; nodeIndex < spec.nodes; nodeIndex += 1) {
+          const pointIndex = Math.floor(((nodeIndex + 0.35 * layerIndex) / spec.nodes) * points.length) % points.length;
+          const nodeMaterial = new THREE.MeshBasicMaterial({
+            color: layers[layerIndex].color,
+            transparent: true,
+            opacity: layerIndex === activeIndexRef.current ? 1 : 0.36,
+          });
+          const node = new THREE.Mesh(nodeIndex % 3 === 0 ? dotGeometry : smallDotGeometry, nodeMaterial);
+          node.position.copy(points[pointIndex]);
+          node.scale.setScalar(layerIndex === activeIndexRef.current ? 1.3 : 0.86);
+          nodeMaterials.push(nodeMaterial);
+          materials.push(nodeMaterial);
+          layerGroup.add(node);
+
+          if (nodeIndex % 2 === 0) {
+            const spokeGeometry = new THREE.BufferGeometry().setFromPoints([points[pointIndex].clone().multiplyScalar(0.2), points[pointIndex]]);
+            const spokeMaterial = new THREE.LineBasicMaterial({ color: layers[layerIndex].color, transparent: true, opacity: 0.12 });
+            geometries.push(spokeGeometry);
+            materials.push(spokeMaterial);
+            layerGroup.add(new THREE.Line(spokeGeometry, spokeMaterial));
+          }
+        }
+
+        network.add(layerGroup);
+        return { group: layerGroup, lineMaterial, nodeMaterials };
       });
 
-      const resize = () => {
-        const bounds = mount.getBoundingClientRect();
-        const width = Math.max(1, bounds.width);
-        const height = Math.max(1, bounds.height);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer?.setSize(width, height, false);
-        renderer?.render(scene, camera);
-      };
-
-      resizeObserver = new ResizeObserver(resize);
-      resizeObserver.observe(mount);
-
-      let currentRotation = { ...defaultRotation };
-      let targetRotation = { ...defaultRotation };
-      let dragState: { pointerId: number; x: number; y: number } | null = null;
+      let currentRotation = { x: -0.08, y: -0.12, z: 0.03 };
+      let targetRotation = { ...currentRotation };
+      let currentLayerScale = sceneLayers.map((_, index) => (index === activeIndexRef.current ? 1.06 : 0.98));
+      const targetLayerScale = [...currentLayerScale];
+      let dragState: { pointerId: number; x: number; y: number; moved: boolean } | null = null;
 
       const render = () => renderer?.render(scene, camera);
-      const animateRotation = () => {
+      const animate = () => {
         frameId = 0;
         currentRotation = {
-          x: THREE.MathUtils.lerp(currentRotation.x, targetRotation.x, 0.12),
-          y: THREE.MathUtils.lerp(currentRotation.y, targetRotation.y, 0.12),
-          z: THREE.MathUtils.lerp(currentRotation.z, targetRotation.z, 0.12),
+          x: THREE.MathUtils.lerp(currentRotation.x, targetRotation.x, 0.13),
+          y: THREE.MathUtils.lerp(currentRotation.y, targetRotation.y, 0.13),
+          z: THREE.MathUtils.lerp(currentRotation.z, targetRotation.z, 0.13),
         };
-        globe.rotation.set(currentRotation.x, currentRotation.y, currentRotation.z);
-        render();
-
-        const settled = Math.abs(currentRotation.x - targetRotation.x) < 0.001
+        network.rotation.set(currentRotation.x, currentRotation.y, currentRotation.z);
+        let settled = Math.abs(currentRotation.x - targetRotation.x) < 0.001
           && Math.abs(currentRotation.y - targetRotation.y) < 0.001
           && Math.abs(currentRotation.z - targetRotation.z) < 0.001;
-        if (!settled) frameId = window.requestAnimationFrame(animateRotation);
+
+        sceneLayers.forEach((entry, index) => {
+          currentLayerScale[index] = THREE.MathUtils.lerp(currentLayerScale[index], targetLayerScale[index], 0.15);
+          entry.group.scale.setScalar(currentLayerScale[index]);
+          if (Math.abs(currentLayerScale[index] - targetLayerScale[index]) >= 0.001) settled = false;
+        });
+        render();
+        if (!settled) frameId = window.requestAnimationFrame(animate);
       };
 
-      const scheduleRotation = () => {
+      const schedule = () => {
         if (reducedMotion) {
           currentRotation = { ...targetRotation };
-          globe.rotation.set(currentRotation.x, currentRotation.y, currentRotation.z);
+          network.rotation.set(currentRotation.x, currentRotation.y, currentRotation.z);
+          currentLayerScale = [...targetLayerScale];
+          sceneLayers.forEach((entry, index) => entry.group.scale.setScalar(currentLayerScale[index]));
           render();
           return;
         }
-        if (!frameId) frameId = window.requestAnimationFrame(animateRotation);
+        if (!frameId) frameId = window.requestAnimationFrame(animate);
       };
 
-      const handlePointerMove = (event: PointerEvent) => {
-        if (dragState?.pointerId === event.pointerId) {
-          const deltaX = event.clientX - dragState.x;
-          const deltaY = event.clientY - dragState.y;
-          dragState.x = event.clientX;
-          dragState.y = event.clientY;
-          const scale = event.pointerType === "touch" ? 0.008 : 0.006;
-          targetRotation = {
-            x: THREE.MathUtils.clamp(currentRotation.x - deltaY * scale, -0.9, 0.9),
-            y: currentRotation.y + deltaX * scale,
-            z: currentRotation.z,
-          };
-          scheduleRotation();
-          return;
-        }
-
-        if (event.pointerType === "touch") return;
-        const bounds = stage.getBoundingClientRect();
-        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+      selectLayerRef.current = (index: number) => {
+        sceneLayers.forEach((entry, layerIndex) => {
+          const selected = layerIndex === index;
+          entry.lineMaterial.opacity = selected ? 0.94 : 0.2;
+          entry.nodeMaterials.forEach((material) => {
+            material.opacity = selected ? 1 : 0.3;
+            material.needsUpdate = true;
+          });
+          targetLayerScale[layerIndex] = selected ? 1.08 : 0.96;
+        });
         targetRotation = {
-          x: defaultRotation.x - y * 0.12,
-          y: defaultRotation.y + x * 0.2,
-          z: defaultRotation.z,
+          x: [-0.18, 0.1, -0.05][index],
+          y: [-0.24, 0.18, 0.42][index],
+          z: [0.05, -0.08, 0.14][index],
         };
-        scheduleRotation();
+        schedule();
+      };
+
+      const resize = () => {
+        const bounds = mount.getBoundingClientRect();
+        camera.aspect = Math.max(1, bounds.width) / Math.max(1, bounds.height);
+        camera.updateProjectionMatrix();
+        renderer?.setSize(Math.max(1, bounds.width), Math.max(1, bounds.height), false);
+        render();
       };
 
       const handlePointerDown = (event: PointerEvent) => {
         if (event.pointerType === "mouse" && event.button !== 0) return;
-        dragState = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+        dragState = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
         renderer?.domElement.setPointerCapture(event.pointerId);
         renderer?.domElement.classList.add("is-dragging");
       };
 
-      const handlePointerUp = (event: PointerEvent) => {
-        if (dragState?.pointerId !== event.pointerId) return;
-        if (renderer?.domElement.hasPointerCapture(event.pointerId)) {
-          renderer.domElement.releasePointerCapture(event.pointerId);
-        }
+      const handlePointerMove = (event: PointerEvent) => {
+        if (!dragState || dragState.pointerId !== event.pointerId) return;
+        const deltaX = event.clientX - dragState.x;
+        const deltaY = event.clientY - dragState.y;
+        dragState.x = event.clientX;
+        dragState.y = event.clientY;
+        if (Math.abs(deltaX) + Math.abs(deltaY) > 3) dragState.moved = true;
+        const scale = event.pointerType === "touch" ? 0.008 : 0.006;
+        targetRotation = {
+          x: THREE.MathUtils.clamp(currentRotation.x - deltaY * scale, -0.9, 0.9),
+          y: currentRotation.y + deltaX * scale,
+          z: currentRotation.z,
+        };
+        schedule();
+      };
+
+      const finishPointer = (event: PointerEvent, shouldSelect: boolean) => {
+        if (!dragState || dragState.pointerId !== event.pointerId) return;
+        const wasClick = !dragState.moved;
+        if (renderer?.domElement.hasPointerCapture(event.pointerId)) renderer.domElement.releasePointerCapture(event.pointerId);
         dragState = null;
         renderer?.domElement.classList.remove("is-dragging");
+        if (shouldSelect && wasClick) selectLayer((activeIndexRef.current + 1) % layers.length);
       };
 
-      const handlePointerLeave = () => {
-        if (dragState) return;
-        targetRotation = { ...defaultRotation };
-        scheduleRotation();
-      };
-
-      stage.addEventListener("pointerdown", handlePointerDown);
-      stage.addEventListener("pointermove", handlePointerMove);
-      stage.addEventListener("pointerup", handlePointerUp);
-      stage.addEventListener("pointercancel", handlePointerUp);
-      stage.addEventListener("pointerleave", handlePointerLeave);
+      const handlePointerUp = (event: PointerEvent) => finishPointer(event, true);
+      const handlePointerCancel = (event: PointerEvent) => finishPointer(event, false);
+      resizeObserver = new ResizeObserver(resize);
+      resizeObserver.observe(mount);
+      renderer.domElement.addEventListener("pointerdown", handlePointerDown);
+      renderer.domElement.addEventListener("pointermove", handlePointerMove);
+      renderer.domElement.addEventListener("pointerup", handlePointerUp);
+      renderer.domElement.addEventListener("pointercancel", handlePointerCancel);
       resize();
+      selectLayerRef.current(activeIndexRef.current);
 
       return () => {
-        stage.removeEventListener("pointerdown", handlePointerDown);
-        stage.removeEventListener("pointermove", handlePointerMove);
-        stage.removeEventListener("pointerup", handlePointerUp);
-        stage.removeEventListener("pointercancel", handlePointerUp);
-        stage.removeEventListener("pointerleave", handlePointerLeave);
+        selectLayerRef.current = null;
+        renderer?.domElement.removeEventListener("pointerdown", handlePointerDown);
+        renderer?.domElement.removeEventListener("pointermove", handlePointerMove);
+        renderer?.domElement.removeEventListener("pointerup", handlePointerUp);
+        renderer?.domElement.removeEventListener("pointercancel", handlePointerCancel);
         resizeObserver?.disconnect();
         if (frameId) window.cancelAnimationFrame(frameId);
         geometries.forEach((geometry) => geometry.dispose());
         materials.forEach((material) => material.dispose());
-        textures.forEach((texture) => texture.dispose());
         renderer?.dispose();
         renderer?.domElement.remove();
       };
     } catch (error) {
-      console.warn("Three.js hero visual unavailable; using accessible fallback.", error);
-      stage.classList.add("hero-three-failed");
+      console.warn("Three.js hero lens unavailable; using accessible fallback.", error);
+      stageRef.current?.classList.add("hero-lens-failed");
       renderer?.dispose();
       renderer?.domElement.remove();
       return undefined;
@@ -401,28 +259,36 @@ export function HeroVisual() {
   return (
     <div
       ref={stageRef}
-      className="hero-three-visual"
-      role="img"
-      aria-label="A three-dimensional Earth for Global Public Health Lens. Drag to rotate the globe."
+      className="hero-lens-visual"
+      role="group"
+      aria-label="Interactive global-health lens. Drag the network or choose Body, Environment, or Systems."
     >
-      <div ref={canvasMountRef} className="hero-three-canvas" aria-hidden="true" />
-      <div className="hero-three-fallback" aria-hidden="true">
-        <span>GLOBAL HEALTH NETWORK</span>
-        <strong>Body · Environment · Systems</strong>
-        <small>Five regional signals in view</small>
+      <div className="hero-lens-heading">
+        <span>GLOBAL HEALTH LENS</span>
+        <small>Three connected levels</small>
       </div>
-      <div className="hero-three-label hero-three-label-top" aria-hidden="true">
-        <span>GLOBAL HEALTH</span>
-        <strong>05 signals in view</strong>
+      <div ref={canvasMountRef} className="hero-lens-canvas" aria-hidden="true" />
+      <div className="hero-lens-fallback" aria-hidden="true"><i /><i /><i /></div>
+      <div className="hero-lens-active" aria-live="polite">
+        <span>{activeLayer.label}</span>
+        <strong>{activeLayer.title}</strong>
+        <small>{activeLayer.description}</small>
       </div>
-      <div className="hero-three-label hero-three-label-bottom" aria-hidden="true">
-        <i />
-        <span>Body</span>
-        <i />
-        <span>Environment</span>
-        <i />
-        <span>Systems</span>
+      <div className="hero-lens-controls" aria-label="Choose a global-health level">
+        {layers.map((layer, index) => (
+          <button
+            key={layer.id}
+            type="button"
+            className={index === activeIndex ? "is-active" : ""}
+            aria-pressed={index === activeIndex}
+            onClick={() => selectLayer(index)}
+          >
+            <i style={{ backgroundColor: layer.color }} aria-hidden="true" />
+            {layer.label}
+          </button>
+        ))}
       </div>
+      <p className="hero-lens-hint">Drag the network · Select a level</p>
     </div>
   );
 }

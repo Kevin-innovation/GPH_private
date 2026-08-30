@@ -14,10 +14,12 @@ function latLonToVector3(latitude: number, longitude: number, radius = globeRadi
   const lat = THREE.MathUtils.degToRad(latitude);
   const lon = THREE.MathUtils.degToRad(longitude);
 
+  // Match SphereGeometry's equirectangular UV orientation: Greenwich sits on
+  // +X and east longitudes move toward -Z on the unrotated sphere.
   return new THREE.Vector3(
-    radius * Math.cos(lat) * Math.sin(lon),
-    radius * Math.sin(lat),
     radius * Math.cos(lat) * Math.cos(lon),
+    radius * Math.sin(lat),
+    -radius * Math.cos(lat) * Math.sin(lon),
   );
 }
 
@@ -43,9 +45,9 @@ function createMeridian(longitude: number, radius = globeRadius) {
     const latitude = -Math.PI / 2 + (index / 71) * Math.PI;
     points.push(
       new THREE.Vector3(
-        radius * Math.cos(latitude) * Math.sin(lon),
-        radius * Math.sin(latitude),
         radius * Math.cos(latitude) * Math.cos(lon),
+        radius * Math.sin(latitude),
+        -radius * Math.cos(latitude) * Math.sin(lon),
       ),
     );
   }
@@ -64,7 +66,7 @@ function countryRotation(countryId: string, currentY: number) {
   const country = countrySpotlights.find((item) => item.id === countryId) ?? countrySpotlights[0];
   return {
     x: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(country.latitude) * 0.84, -0.78, 0.78),
-    y: nearestAngle(-THREE.MathUtils.degToRad(country.longitude), currentY),
+    y: nearestAngle(-THREE.MathUtils.degToRad(country.longitude) - Math.PI / 2, currentY),
     z: 0.015,
   };
 }
