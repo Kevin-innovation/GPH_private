@@ -25,7 +25,7 @@ export function Footer() {
       <div className="page-width footer-grid">
         <div className="footer-mission">
           <a className="footer-brand" href="#hero">
-            <Image src="/brand/logo-mark-reverse.svg" alt="" width={56} height={56} />
+            <Image src="/brand/logo-mark-3d.webp" alt="" width={64} height={64} />
             <span>
               Global Public Health
               <br />

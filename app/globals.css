@@ -2168,8 +2168,21 @@ details .lens-step {
 
 /* The mark is the only piece of brand imagery on the page, so give it presence
    rather than treating it as a bullet beside the wordmark. */
-.brand-lockup img { width: 42px; height: 42px; }
-.footer-brand img { width: 56px; height: 56px; }
+.brand-lockup img {
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 4px 7px rgba(18, 49, 75, 0.15));
+}
+.footer-brand img {
+  box-sizing: border-box;
+  width: 64px;
+  height: 64px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  background: rgba(248, 251, 250, 0.94);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+}
 .footer-brand { gap: 14px; align-items: center; }
 .footer-brand span { font-size: 1.02rem; line-height: 1.25; }
 

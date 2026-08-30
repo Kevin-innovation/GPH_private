@@ -18,7 +18,11 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
-  icons: { icon: "/brand/favicon.svg", shortcut: "/brand/favicon.svg", apple: "/brand/logo-mark.svg" },
+  icons: {
+    icon: { url: "/brand/favicon-3d.png", type: "image/png", sizes: "64x64" },
+    shortcut: "/brand/favicon-3d.png",
+    apple: "/brand/logo-mark-3d-512.png",
+  },
   openGraph: { title, description, type: "website", images: [{ url: "/og.jpg", width: 1774, height: 887, alt: "Global Public Health Lens — Understanding health through a global lens." }] },
   twitter: { card: "summary_large_image", title, description, images: ["/og.jpg"] },
 };

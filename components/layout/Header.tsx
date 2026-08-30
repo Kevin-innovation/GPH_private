@@ -43,7 +43,7 @@ export function Header() {
     <header className="site-header">
       <div className="header-inner">
         <a className="brand-lockup" href="#hero" aria-label="Global Public Health Lens home">
-          <Image src="/brand/logo-mark.svg" alt="" width={42} height={42} priority />
+          <Image src="/brand/logo-mark-3d.webp" alt="" width={48} height={48} priority />
           <span>
             <strong>Global Public Health</strong>
             <span>Lens</span>
