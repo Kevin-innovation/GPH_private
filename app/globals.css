@@ -3399,18 +3399,25 @@ details .lens-step {
 
 .country-spotlight-globe-hint {
   position: absolute;
-  z-index: 2;
-  right: 4%;
-  bottom: 5%;
+  z-index: 3;
+  right: 5%;
+  bottom: 7%;
   display: flex;
   align-items: center;
   gap: 9px;
-  color: rgba(18, 49, 75, 0.62);
+  min-height: 32px;
+  padding: 6px 11px;
+  border: 1px solid rgba(18, 49, 75, 0.2);
+  border-radius: 999px;
+  background: rgba(248, 251, 250, 0.9);
+  box-shadow: 0 7px 20px rgba(18, 49, 75, 0.13);
+  color: rgba(18, 49, 75, 0.82);
   font-size: 0.66rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   pointer-events: none;
   text-transform: uppercase;
+  backdrop-filter: blur(9px);
 }
 
 .country-spotlight-globe-hint i {
@@ -3665,9 +3672,11 @@ details .lens-step {
   }
 
   .country-spotlight-globe-hint {
-    right: 1%;
-    bottom: 3%;
+    right: 0;
+    bottom: 2%;
     gap: 6px;
+    min-height: 30px;
+    padding: 5px 9px;
     font-size: 0.54rem;
   }
 
