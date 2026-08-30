@@ -444,7 +444,7 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         if (Math.abs(deltaX) + Math.abs(deltaY) > 3) dragState.moved = true;
         const scale = 0.006;
         const yaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), deltaX * scale);
-        const pitch = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -deltaY * scale);
+        const pitch = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), deltaY * scale);
         targetQuaternion.premultiply(yaw).premultiply(pitch).normalize();
         scheduleRotation();
       };
