@@ -1,9 +1,7 @@
 import Image from "next/image";
 
-// Captured from the running app at 412x915 (Galaxy S25 Edge reference) and
-// composited into a device frame,
-// so the section shows what someone actually opens rather than artwork of it.
-// Three separate transparent images so the stage can respond to scroll.
+// Three product screens composited into device frames so the stage reads as a
+// journey: enter the app, use it, then inspect the nutrition context.
 const screens = [
   {
     src: "/brand/app/screen-today.webp",
@@ -12,10 +10,10 @@ const screens = [
     alt: "The app's Today screen with a daily nutrition score, logged foods, and nutrient balance gauges for thirteen nutrients.",
   },
   {
-    src: "/brand/app/screen-add-meal.webp",
+    src: "/brand/app/screen-welcome.webp",
     width: 588,
     height: 1302,
-    alt: "The app's Add Food screen with a searchable food catalog, category filters, and serving-size matches.",
+    alt: "The app's welcome and sign-in screen with a prominent option to continue as a guest.",
   },
   {
     src: "/brand/app/screen-lens.webp",
@@ -43,7 +41,7 @@ export function AppScreenshots() {
             </div>
           ))}
         </div>
-        <p className="image-caption">Three screens from the running app</p>
+        <p className="image-caption">From welcome to daily nutrition learning</p>
       </div>
     </div>
   );
