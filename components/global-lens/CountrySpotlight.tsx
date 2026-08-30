@@ -84,15 +84,18 @@ function countryQuaternion(countryId: string) {
 type CountryGlobeProps = {
   selectedId: string;
   focusRequest: number;
+  overviewRequest: number;
   onSelect: (countryId: string) => void;
 };
 
-function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps) {
+function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: CountryGlobeProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const focusRef = useRef<((countryId: string) => void) | null>(null);
+  const overviewRef = useRef<(() => void) | null>(null);
   const onSelectRef = useRef(onSelect);
   const selectedIdRef = useRef(selectedId);
   const previousFocusRequestRef = useRef(focusRequest);
+  const previousOverviewRequestRef = useRef(overviewRequest);
   const focusedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -331,7 +334,18 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
         updateMarkerSelection(countryId);
         scheduleRotation();
       };
+
+      const showOverview = () => {
+        focusedIdRef.current = null;
+        capitalLabel.textContent = "";
+        targetQuaternion.copy(countryQuaternion(selectedIdRef.current));
+        targetCameraZ = 9.2;
+        updateMarkerSelection(null);
+        scheduleRotation();
+      };
+
       focusRef.current = focusCountry;
+      overviewRef.current = showOverview;
       updateMarkerSelection(null);
 
       const resize = () => {
@@ -410,6 +424,7 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
 
       return () => {
         focusRef.current = null;
+        overviewRef.current = null;
         renderer?.domElement.removeEventListener("pointerdown", handlePointerDown);
         renderer?.domElement.removeEventListener("pointermove", handlePointerMove);
         renderer?.domElement.removeEventListener("pointerup", handlePointerUp);
@@ -437,14 +452,18 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       previousFocusRequestRef.current = focusRequest;
       focusRef.current?.(selectedId);
     }
-  }, [focusRequest, selectedId]);
+    if (previousOverviewRequestRef.current !== overviewRequest) {
+      previousOverviewRequestRef.current = overviewRequest;
+      overviewRef.current?.();
+    }
+  }, [focusRequest, overviewRequest, selectedId]);
 
   return (
     <div
       ref={mountRef}
       className="country-spotlight-globe"
       role="img"
-      aria-label="Interactive Earth globe. Drag to rotate and select a country marker."
+      aria-label="Interactive Earth globe. Use the country buttons to select a location; drag with a mouse to rotate."
     />
   );
 }
@@ -452,10 +471,17 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
 export function CountrySpotlightSection() {
   const [selectedId, setSelectedId] = useState(countrySpotlights[0].id);
   const [focusRequest, setFocusRequest] = useState(0);
+  const [overviewRequest, setOverviewRequest] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
   const selectedCountry = countrySpotlights.find((country) => country.id === selectedId) ?? countrySpotlights[0];
   const selectCountry = (countryId: string) => {
     setSelectedId(countryId);
+    setIsZoomed(true);
     setFocusRequest((request) => request + 1);
+  };
+  const showFullGlobe = () => {
+    setIsZoomed(false);
+    setOverviewRequest((request) => request + 1);
   };
 
   return (
@@ -473,9 +499,29 @@ export function CountrySpotlightSection() {
         <div className="country-spotlight-layout">
           <div className="country-spotlight-map-column">
             <div className="country-spotlight-globe-wrap">
-              <CountryGlobe selectedId={selectedId} focusRequest={focusRequest} onSelect={selectCountry} />
+              <CountryGlobe
+                selectedId={selectedId}
+                focusRequest={focusRequest}
+                overviewRequest={overviewRequest}
+                onSelect={selectCountry}
+              />
+              {isZoomed ? (
+                <button
+                  type="button"
+                  className="country-spotlight-overview-button"
+                  onClick={showFullGlobe}
+                  aria-label="Return to the full globe view"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="8.5" />
+                    <path d="M3.8 12h16.4M12 3.5c2.2 2.3 3.3 5.1 3.3 8.5S14.2 18.2 12 20.5M12 3.5C9.8 5.8 8.7 8.6 8.7 12s1.1 6.2 3.3 8.5" />
+                  </svg>
+                  <span>View full globe</span>
+                </button>
+              ) : null}
               <div className="country-spotlight-globe-hint" aria-hidden="true">
-                <span>Drag to rotate</span>
+                <span className="country-spotlight-hint-desktop">Drag to rotate</span>
+                <span className="country-spotlight-hint-mobile">Choose below</span>
                 <i />
                 <span>Select a country</span>
               </div>

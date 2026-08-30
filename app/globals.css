@@ -3328,6 +3328,46 @@ details .lens-step {
   cursor: pointer;
 }
 
+.country-spotlight-overview-button {
+  position: absolute;
+  z-index: 4;
+  top: 4%;
+  right: 3%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 13px;
+  border: 1px solid rgba(18, 49, 75, 0.2);
+  border-radius: 999px;
+  background: rgba(248, 251, 250, 0.9);
+  box-shadow: 0 8px 22px rgba(18, 49, 75, 0.12);
+  color: var(--color-navy);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  backdrop-filter: blur(10px);
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.country-spotlight-overview-button svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.country-spotlight-overview-button:hover,
+.country-spotlight-overview-button:focus-visible {
+  border-color: rgba(17, 126, 118, 0.62);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 26px rgba(18, 49, 75, 0.16);
+}
+
 .country-capital-label {
   position: absolute;
   z-index: 3;
@@ -3378,6 +3418,10 @@ details .lens-step {
   height: 5px;
   border-radius: 50%;
   background: var(--color-gold);
+}
+
+.country-spotlight-hint-mobile {
+  display: none;
 }
 
 .country-spotlight-country-list {
@@ -3567,6 +3611,14 @@ details .lens-step {
     min-height: min(92vw, 420px);
   }
 
+  .country-spotlight-hint-desktop {
+    display: none;
+  }
+
+  .country-spotlight-hint-mobile {
+    display: inline;
+  }
+
   .country-spotlight-country-list {
     flex-wrap: nowrap;
     gap: 18px;
@@ -3617,6 +3669,13 @@ details .lens-step {
     bottom: 3%;
     gap: 6px;
     font-size: 0.54rem;
+  }
+
+  .country-spotlight-overview-button {
+    top: 2%;
+    right: 0;
+    padding-inline: 11px;
+    font-size: 0.64rem;
   }
 
   .country-spotlight-detail-topline {
