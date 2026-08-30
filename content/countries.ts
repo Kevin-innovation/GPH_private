@@ -1,0 +1,92 @@
+import type { CountrySpotlight } from "./types";
+
+// Editorial starting points for the interactive atlas. These are intentionally
+// qualitative: the client's final country copy and local sources can replace
+// each entry without changing the interaction or layout.
+export const countrySpotlights: CountrySpotlight[] = [
+  {
+    id: "south-korea",
+    name: "South Korea",
+    region: "East Asia",
+    latitude: 37.56,
+    longitude: 126.98,
+    issueLabel: "A public-health lens",
+    issue: "Ageing, chronic disease, and healthy years",
+    driversLabel: "What shapes the issue",
+    drivers: "Age structure, urban living, air quality, work, and access to prevention shape how long people can live well.",
+    responseLabel: "What to look for",
+    response: "Primary care, prevention, and age-friendly environments that keep health support close to everyday life.",
+    sources: [
+      { organization: "WHO", title: "Republic of Korea country profile", url: "https://www.who.int/countries/kor/", reviewedAt: "2026-08-30" },
+      { organization: "WHO Data", title: "Country inequality profiles", url: "https://www.who.int/data/inequality-monitor/data/country_profiles", reviewedAt: "2026-08-30" },
+    ],
+  },
+  {
+    id: "india",
+    name: "India",
+    region: "South Asia",
+    latitude: 28.61,
+    longitude: 77.21,
+    issueLabel: "A public-health lens",
+    issue: "Nutrition and essential-service reach",
+    driversLabel: "What shapes the issue",
+    drivers: "Diet, infection, sanitation, education, and whether care reaches marginalised communities intersect across very different places.",
+    responseLabel: "What to look for",
+    response: "Integrated nutrition, primary care, and community delivery that connect health, food, education, and social development.",
+    sources: [
+      { organization: "WHO India", title: "Nutrition in India", url: "https://www.who.int/india/health-topics/nutrition", reviewedAt: "2026-08-30" },
+      { organization: "WHO", title: "India country profile", url: "https://www.who.int/about/accountability/results/who-results-report-2024-2025/country-profile/2024/india", reviewedAt: "2026-08-30" },
+    ],
+  },
+  {
+    id: "mexico",
+    name: "Mexico",
+    region: "Latin America",
+    latitude: 19.43,
+    longitude: -99.13,
+    issueLabel: "A public-health lens",
+    issue: "NCD prevention and continuity of care",
+    driversLabel: "What shapes the issue",
+    drivers: "Food environments, tobacco exposure, place, income, and primary-care access shape risk and whether follow-up is sustained.",
+    responseLabel: "What to look for",
+    response: "Stronger primary care, prevention, and coordinated services that make chronic-disease support easier to reach.",
+    sources: [
+      { organization: "WHO", title: "Mexico country profile", url: "https://www.who.int/about/accountability/results/who-results-report-2024-2025/country-profile/2024/mexico", reviewedAt: "2026-08-30" },
+      { organization: "WHO Data", title: "Mexico health data overview", url: "https://www.who.int/data/gho/data/countries/country-details/GHO/mexico", reviewedAt: "2026-08-30" },
+    ],
+  },
+  {
+    id: "france",
+    name: "France",
+    region: "Western Europe",
+    latitude: 48.86,
+    longitude: 2.35,
+    issueLabel: "A public-health lens",
+    issue: "Health inequalities across place and life stage",
+    driversLabel: "What shapes the issue",
+    drivers: "Income, housing, work, education, geography, and access to services influence who benefits from a strong health system.",
+    responseLabel: "What to look for",
+    response: "Equity-focused prevention, accessible care, and local public-health action that meet people where they live.",
+    sources: [
+      { organization: "WHO European Observatory", title: "France: Country Health Profile 2025", url: "https://eurohealthobservatory.who.int/publications/m/france-country-health-profile-2025", reviewedAt: "2026-08-30" },
+      { organization: "WHO", title: "France country profile", url: "https://www.who.int/countries/fra", reviewedAt: "2026-08-30" },
+    ],
+  },
+  {
+    id: "united-states",
+    name: "United States",
+    region: "North America",
+    latitude: 40.71,
+    longitude: -74.01,
+    issueLabel: "A public-health lens",
+    issue: "Unequal access and chronic-disease burden",
+    driversLabel: "What shapes the issue",
+    drivers: "Economic stability, race and ethnicity, rurality, neighbourhood conditions, and insurance shape outcomes and access to care.",
+    responseLabel: "What to look for",
+    response: "Community-led prevention, better local data, and equitable access to services across different places and populations.",
+    sources: [
+      { organization: "CDC", title: "Social determinants of health", url: "https://www.cdc.gov/infrastructure/public-health-systems-emerging-practices/social-determinants-of-health.html", reviewedAt: "2026-08-30" },
+      { organization: "CDC", title: "Measuring the nation's health", url: "https://www.cdc.gov/nchs/about/measuring-the-nations-health.html", reviewedAt: "2026-08-30" },
+    ],
+  },
+];

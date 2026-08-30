@@ -17,6 +17,14 @@ export function MissionSection() {
             Health is shaped by food access, services, place, and policy — not individual choices alone. Global Public
             Health Lens makes those connections easier to understand.
           </p>
+          <div className="mission-story">
+            <Eyebrow>Why this project</Eyebrow>
+            <p>
+              Global Public Health Lens began with a simple question: what changes when we look beyond the nutrient,
+              symptom, or individual choice? The project connects evidence about bodies with the places, environments,
+              policies, and services that shape everyday health.
+            </p>
+          </div>
           <div className="determinants" aria-label="Connected health determinants">
             {determinants.map((item, index) => (
               <span key={item}>

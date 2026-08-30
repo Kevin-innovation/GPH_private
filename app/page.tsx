@@ -1,5 +1,6 @@
 import { NutritionAppPreview } from "@/components/app-preview/NutritionAppPreview";
 import { ContactSection } from "@/components/contact/ContactSection";
+import { CountrySpotlightSection } from "@/components/global-lens/CountrySpotlight";
 import { GlobalLensSection } from "@/components/global-lens/GlobalLensSection";
 import { Hero } from "@/components/hero/Hero";
 import { Footer } from "@/components/layout/Footer";
@@ -20,6 +21,7 @@ export default function Home() {
       <main id="main-content">
         <Hero />
         <MissionSection />
+        <CountrySpotlightSection />
         <MicronutrientSection />
         <GlobalLensSection />
         <NutritionAppPreview />

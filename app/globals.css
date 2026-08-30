@@ -2877,6 +2877,7 @@ details .lens-step {
   isolation: isolate;
   overflow: visible;
   color: var(--color-navy);
+  touch-action: pan-y;
 }
 
 .hero-three-visual::before {
@@ -2904,6 +2905,12 @@ details .lens-step {
   display: block;
   width: 100%;
   height: 100%;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.hero-three-canvas canvas.is-dragging {
+  cursor: grabbing;
 }
 
 .hero-three-label {
@@ -3033,6 +3040,354 @@ details .lens-step {
 @media (prefers-reduced-motion: reduce) {
   .hero-three-visual::before {
     filter: blur(10px);
+  }
+}
+
+/* ---- 18. Country spotlight ------------------------------------------------
+   The atlas is a reading surface with an interactive globe beside it. The
+   rules intentionally stay editorial: no opaque dashboard card and no overlay
+   that hides the map while a country is being explored. */
+.country-spotlight-section {
+  overflow: clip;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(21, 154, 145, 0.055), transparent 25%),
+    var(--color-cloud);
+}
+
+.country-spotlight-intro {
+  padding-bottom: 42px;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.country-spotlight-intro .section-heading {
+  max-width: 840px;
+}
+
+.country-spotlight-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  gap: clamp(42px, 8vw, 128px);
+  align-items: start;
+  padding-top: 54px;
+}
+
+.country-spotlight-map-column {
+  min-width: 0;
+}
+
+.country-spotlight-globe-wrap {
+  position: relative;
+  min-height: clamp(360px, 42vw, 520px);
+}
+
+.country-spotlight-globe-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 13% 8% 10%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(159, 215, 205, 0.15), transparent 66%);
+  filter: blur(16px);
+  pointer-events: none;
+}
+
+.country-spotlight-globe {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  min-width: 0;
+  min-height: 0;
+  touch-action: pan-y;
+}
+
+.country-spotlight-globe canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.country-spotlight-globe canvas.is-dragging {
+  cursor: grabbing;
+}
+
+.country-spotlight-globe canvas.has-marker {
+  cursor: pointer;
+}
+
+.country-spotlight-globe-hint {
+  position: absolute;
+  z-index: 2;
+  right: 4%;
+  bottom: 5%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: rgba(18, 49, 75, 0.62);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+.country-spotlight-globe-hint i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-gold);
+}
+
+.country-spotlight-country-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 5px;
+  border-top: 1px solid var(--color-navy);
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.country-spotlight-country-list button {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 9px;
+  min-height: 45px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: rgba(23, 37, 46, 0.65);
+  padding: 10px 0 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: left;
+  transition: color 170ms ease, border-color 170ms ease;
+}
+
+.country-spotlight-country-list button span {
+  color: var(--color-gold-text);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.country-spotlight-country-list button:hover,
+.country-spotlight-country-list button:focus-visible,
+.country-spotlight-country-list button.is-active {
+  border-bottom-color: var(--color-teal-text);
+  color: var(--color-navy);
+}
+
+.country-spotlight-detail {
+  min-width: 0;
+  padding-top: 17px;
+  border-top: 1px solid var(--color-navy);
+}
+
+.country-spotlight-detail-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--color-hairline);
+  color: var(--color-teal-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.country-spotlight-detail-heading {
+  padding: 33px 0 27px;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.country-spotlight-detail-heading .eyebrow {
+  margin-bottom: 9px;
+  color: var(--color-gold-text);
+}
+
+.country-spotlight-detail-heading h3 {
+  max-width: 15ch;
+  margin: 0 0 11px;
+  color: var(--color-navy);
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+
+.country-spotlight-detail-heading p {
+  max-width: 26ch;
+  margin: 0;
+  color: var(--color-navy);
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  line-height: 1.3;
+}
+
+.country-spotlight-facts > div {
+  padding: 20px 0 19px;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.country-spotlight-facts span,
+.country-spotlight-sources > span {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--color-teal-text);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+}
+
+.country-spotlight-facts p {
+  max-width: 52ch;
+  margin: 0;
+  color: rgba(23, 37, 46, 0.8);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.country-spotlight-sources {
+  padding-top: 21px;
+}
+
+.country-spotlight-sources ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.country-spotlight-sources a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  color: var(--color-navy);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  text-decoration-color: rgba(17, 126, 118, 0.42);
+}
+
+.country-spotlight-sources a:hover,
+.country-spotlight-sources a:focus-visible {
+  color: var(--color-teal-text);
+}
+
+.country-spotlight-sources b {
+  color: var(--color-teal-text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.country-spotlight-note {
+  max-width: 68ch;
+  margin: 43px 0 0;
+  padding-top: 15px;
+  border-top: 1px solid var(--color-hairline);
+  color: rgba(23, 37, 46, 0.62);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.mission-story {
+  max-width: 54ch;
+  margin: 30px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(17, 126, 118, 0.26);
+}
+
+.mission-story .eyebrow {
+  margin-bottom: 8px;
+  color: var(--color-gold-text);
+}
+
+.mission-story p {
+  margin: 0;
+  color: rgba(23, 37, 46, 0.78);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .country-spotlight-intro {
+    padding-bottom: 30px;
+  }
+
+  .country-spotlight-layout {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding-top: 34px;
+  }
+
+  .country-spotlight-globe-wrap {
+    min-height: min(92vw, 420px);
+  }
+
+  .country-spotlight-country-list {
+    flex-wrap: nowrap;
+    gap: 18px;
+    margin-right: -32px;
+    padding-right: 32px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .country-spotlight-country-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .country-spotlight-country-list button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .country-spotlight-detail {
+    padding-top: 15px;
+  }
+
+  .country-spotlight-detail-heading {
+    padding: 25px 0 22px;
+  }
+
+  .country-spotlight-detail-heading h3 {
+    font-size: clamp(2rem, 9vw, 3rem);
+  }
+
+  .country-spotlight-note {
+    margin-top: 32px;
+  }
+}
+
+@media (max-width: 560px) {
+  .country-spotlight-globe-wrap {
+    min-height: 320px;
+  }
+
+  .country-spotlight-globe-hint {
+    right: 1%;
+    bottom: 3%;
+    gap: 6px;
+    font-size: 0.54rem;
+  }
+
+  .country-spotlight-detail-topline {
+    font-size: 0.63rem;
+  }
+
+  .country-spotlight-facts > div {
+    padding: 16px 0;
+  }
+
+  .country-spotlight-facts p {
+    font-size: 0.88rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .country-spotlight-country-list button {
+    transition: none;
   }
 }
 

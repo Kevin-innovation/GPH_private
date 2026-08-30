@@ -1,5 +1,6 @@
 export const navigation = [
   { label: "About", href: "#about" },
+  { label: "Country Spotlight", href: "#country-spotlight" },
   { label: "Micronutrients", href: "#micronutrients" },
   { label: "Global Lens", href: "#global-lens" },
   { label: "Nutrition App", href: "#app" },

@@ -289,6 +289,7 @@ export function HeroVisual() {
 
       let currentRotation = { ...defaultRotation };
       let targetRotation = { ...defaultRotation };
+      let dragState: { pointerId: number; x: number; y: number } | null = null;
 
       const render = () => renderer?.render(scene, camera);
       const animateRotation = () => {
@@ -318,6 +319,21 @@ export function HeroVisual() {
       };
 
       const handlePointerMove = (event: PointerEvent) => {
+        if (dragState?.pointerId === event.pointerId) {
+          const deltaX = event.clientX - dragState.x;
+          const deltaY = event.clientY - dragState.y;
+          dragState.x = event.clientX;
+          dragState.y = event.clientY;
+          const scale = event.pointerType === "touch" ? 0.008 : 0.006;
+          targetRotation = {
+            x: THREE.MathUtils.clamp(currentRotation.x - deltaY * scale, -0.9, 0.9),
+            y: currentRotation.y + deltaX * scale,
+            z: currentRotation.z,
+          };
+          scheduleRotation();
+          return;
+        }
+
         if (event.pointerType === "touch") return;
         const bounds = stage.getBoundingClientRect();
         const x = (event.clientX - bounds.left) / bounds.width - 0.5;
@@ -330,17 +346,40 @@ export function HeroVisual() {
         scheduleRotation();
       };
 
+      const handlePointerDown = (event: PointerEvent) => {
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+        dragState = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+        renderer?.domElement.setPointerCapture(event.pointerId);
+        renderer?.domElement.classList.add("is-dragging");
+      };
+
+      const handlePointerUp = (event: PointerEvent) => {
+        if (dragState?.pointerId !== event.pointerId) return;
+        if (renderer?.domElement.hasPointerCapture(event.pointerId)) {
+          renderer.domElement.releasePointerCapture(event.pointerId);
+        }
+        dragState = null;
+        renderer?.domElement.classList.remove("is-dragging");
+      };
+
       const handlePointerLeave = () => {
+        if (dragState) return;
         targetRotation = { ...defaultRotation };
         scheduleRotation();
       };
 
+      stage.addEventListener("pointerdown", handlePointerDown);
       stage.addEventListener("pointermove", handlePointerMove);
+      stage.addEventListener("pointerup", handlePointerUp);
+      stage.addEventListener("pointercancel", handlePointerUp);
       stage.addEventListener("pointerleave", handlePointerLeave);
       resize();
 
       return () => {
+        stage.removeEventListener("pointerdown", handlePointerDown);
         stage.removeEventListener("pointermove", handlePointerMove);
+        stage.removeEventListener("pointerup", handlePointerUp);
+        stage.removeEventListener("pointercancel", handlePointerUp);
         stage.removeEventListener("pointerleave", handlePointerLeave);
         resizeObserver?.disconnect();
         if (frameId) window.cancelAnimationFrame(frameId);
@@ -364,7 +403,7 @@ export function HeroVisual() {
       ref={stageRef}
       className="hero-three-visual"
       role="img"
-      aria-label="A restrained three-dimensional global health network with connected regional signals."
+      aria-label="A three-dimensional Earth for Global Public Health Lens. Drag to rotate the globe."
     >
       <div ref={canvasMountRef} className="hero-three-canvas" aria-hidden="true" />
       <div className="hero-three-fallback" aria-hidden="true">

@@ -20,6 +20,21 @@ export type Source = {
   reviewedAt: string;
 };
 
+export type CountrySpotlight = {
+  id: string;
+  name: string;
+  region: string;
+  latitude: number;
+  longitude: number;
+  issueLabel: string;
+  issue: string;
+  driversLabel: string;
+  drivers: string;
+  responseLabel: string;
+  response: string;
+  sources: Source[];
+};
+
 export type CaseStudy = {
   slug: string;
   title: string;
