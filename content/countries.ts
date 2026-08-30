@@ -7,6 +7,7 @@ export const countrySpotlights: CountrySpotlight[] = [
   {
     id: "south-korea",
     name: "South Korea",
+    capital: "Seoul",
     region: "East Asia",
     latitude: 37.56,
     longitude: 126.98,
@@ -24,6 +25,7 @@ export const countrySpotlights: CountrySpotlight[] = [
   {
     id: "india",
     name: "India",
+    capital: "New Delhi",
     region: "South Asia",
     latitude: 28.61,
     longitude: 77.21,
@@ -41,6 +43,7 @@ export const countrySpotlights: CountrySpotlight[] = [
   {
     id: "mexico",
     name: "Mexico",
+    capital: "Mexico City",
     region: "Latin America",
     latitude: 19.43,
     longitude: -99.13,
@@ -58,6 +61,7 @@ export const countrySpotlights: CountrySpotlight[] = [
   {
     id: "france",
     name: "France",
+    capital: "Paris",
     region: "Western Europe",
     latitude: 48.86,
     longitude: 2.35,
@@ -75,9 +79,10 @@ export const countrySpotlights: CountrySpotlight[] = [
   {
     id: "united-states",
     name: "United States",
+    capital: "Washington, D.C.",
     region: "North America",
-    latitude: 40.71,
-    longitude: -74.01,
+    latitude: 38.9072,
+    longitude: -77.0369,
     issueLabel: "A public-health lens",
     issue: "Unequal access and chronic-disease burden",
     driversLabel: "What shapes the issue",

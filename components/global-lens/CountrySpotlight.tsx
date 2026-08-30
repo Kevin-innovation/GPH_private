@@ -10,11 +10,6 @@ import { SectionShell } from "@/components/ui/SectionShell";
 const globeRadius = 2.32;
 const accentPalette = ["#159a91", "#f2b84b", "#75b85a", "#117e76", "#d49b2f"];
 
-type BoundaryData = {
-  source: string;
-  boundaries: Record<string, Array<Array<[number, number]>>>;
-};
-
 const countryZoom: Record<string, number> = {
   "south-korea": 3.55,
   india: 5.0,
@@ -115,7 +110,6 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
     let renderer: THREE.WebGLRenderer | null = null;
     let resizeObserver: ResizeObserver | null = null;
     let frameId = 0;
-    let disposed = false;
 
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
@@ -125,6 +119,11 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       renderer.domElement.setAttribute("aria-hidden", "true");
       renderer.domElement.style.cursor = "grab";
       mount.appendChild(renderer.domElement);
+
+      const capitalLabel = document.createElement("div");
+      capitalLabel.className = "country-capital-label";
+      capitalLabel.setAttribute("aria-hidden", "true");
+      mount.appendChild(capitalLabel);
 
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(29, 1, 0.1, 100);
@@ -196,12 +195,6 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       materials.push(haloMaterial);
       globe.add(new THREE.Mesh(haloGeometry, haloMaterial));
 
-      const outlineEntries: Array<{
-        country: (typeof countrySpotlights)[number];
-        outline: THREE.LineSegments;
-        outlineMaterial: THREE.LineBasicMaterial;
-      }> = [];
-
       const markerGeometry = new THREE.SphereGeometry(0.072, 18, 14);
       const hitGeometry = new THREE.SphereGeometry(0.25, 12, 10);
       const ringGeometry = new THREE.RingGeometry(0.13, 0.145, 28);
@@ -250,62 +243,10 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
           markerMaterial.opacity = isSelected ? 0.78 : isOverview ? 0.52 : 0;
           markerMaterial.needsUpdate = true;
           ring.scale.setScalar(isSelected ? 0.12 : 0.08);
-          ringMaterial.opacity = 0;
+          ringMaterial.opacity = isSelected && reducedMotion ? 0.32 : 0;
           ringMaterial.needsUpdate = true;
         });
-        outlineEntries.forEach(({ country, outline, outlineMaterial }) => {
-          const isSelected = country.id === countryId;
-          outline.visible = isSelected;
-          outlineMaterial.opacity = isSelected ? 0.96 : 0;
-          outlineMaterial.needsUpdate = true;
-        });
       };
-
-      void fetch("/data/country-boundaries.json")
-        .then((response) => {
-          if (!response.ok) throw new Error(`Country boundary request failed: ${response.status}`);
-          return response.json() as Promise<BoundaryData>;
-        })
-        .then((data) => {
-          if (disposed) return;
-
-          countrySpotlights.forEach((country, index) => {
-            const segmentPoints: THREE.Vector3[] = [];
-            (data.boundaries[country.id] ?? []).forEach((ring) => {
-              if (ring.length < 3) return;
-              for (let pointIndex = 0; pointIndex < ring.length; pointIndex += 1) {
-                const current = ring[pointIndex];
-                const next = ring[(pointIndex + 1) % ring.length];
-                segmentPoints.push(
-                  latLonToVector3(current[1], current[0], globeRadius * 1.022),
-                  latLonToVector3(next[1], next[0], globeRadius * 1.022),
-                );
-              }
-            });
-
-            if (segmentPoints.length === 0) return;
-            const outlineGeometry = new THREE.BufferGeometry().setFromPoints(segmentPoints);
-            const outlineMaterial = new THREE.LineBasicMaterial({
-              color: accentPalette[index % accentPalette.length],
-              transparent: true,
-              opacity: 0,
-              depthWrite: false,
-              depthTest: true,
-            });
-            const outline = new THREE.LineSegments(outlineGeometry, outlineMaterial);
-            outline.visible = false;
-            geometries.push(outlineGeometry);
-            materials.push(outlineMaterial);
-            globe.add(outline);
-            outlineEntries.push({ country, outline, outlineMaterial });
-          });
-
-          updateMarkerSelection(focusedIdRef.current);
-          renderer?.render(scene, camera);
-        })
-        .catch((error) => {
-          console.warn("Country boundary data unavailable.", error);
-        });
 
       const currentQuaternion = initialQuaternion.clone();
       const targetQuaternion = initialQuaternion.clone();
@@ -314,19 +255,55 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       let dragState: { pointerId: number; x: number; y: number; moved: boolean } | null = null;
       const raycaster = new THREE.Raycaster();
       const pointer = new THREE.Vector2();
+      const labelPoint = new THREE.Vector3();
 
-      const render = () => renderer?.render(scene, camera);
-      const animateRotation = () => {
+      const positionCapitalLabel = () => {
+        const activeEntry = markerEntries.find(({ country }) => country.id === focusedIdRef.current);
+        if (!activeEntry) {
+          capitalLabel.classList.remove("is-visible");
+          return;
+        }
+
+        globe.updateMatrixWorld(true);
+        activeEntry.marker.getWorldPosition(labelPoint);
+        if (labelPoint.z <= 0) {
+          capitalLabel.classList.remove("is-visible");
+          return;
+        }
+
+        labelPoint.project(camera);
+        const bounds = mount.getBoundingClientRect();
+        capitalLabel.style.left = `${(labelPoint.x * 0.5 + 0.5) * bounds.width}px`;
+        capitalLabel.style.top = `${(-labelPoint.y * 0.5 + 0.5) * bounds.height}px`;
+        capitalLabel.classList.add("is-visible");
+      };
+
+      const render = () => {
+        positionCapitalLabel();
+        renderer?.render(scene, camera);
+      };
+      const animateRotation = (time = performance.now()) => {
         frameId = 0;
         currentQuaternion.slerp(targetQuaternion, 0.14).normalize();
         globe.quaternion.copy(currentQuaternion);
         currentCameraZ = THREE.MathUtils.lerp(currentCameraZ, targetCameraZ, 0.11);
         camera.position.z = currentCameraZ;
+
+        const activeEntry = markerEntries.find(({ country }) => country.id === focusedIdRef.current);
+        if (activeEntry && !reducedMotion) {
+          const phase = (time % 1700) / 1700;
+          const pulseScale = 0.12 + phase * 0.18;
+          activeEntry.ring.scale.setScalar(pulseScale);
+          activeEntry.ringMaterial.opacity = (1 - phase) * 0.42;
+          activeEntry.ringMaterial.needsUpdate = true;
+          activeEntry.marker.scale.setScalar(0.09 + Math.sin(phase * Math.PI) * 0.012);
+        }
         render();
 
         const settled = currentQuaternion.angleTo(targetQuaternion) < 0.001
           && Math.abs(currentCameraZ - targetCameraZ) < 0.002;
-        if (!settled) frameId = window.requestAnimationFrame(animateRotation);
+        const shouldPulse = Boolean(focusedIdRef.current) && !reducedMotion;
+        if (!settled || shouldPulse) frameId = window.requestAnimationFrame(animateRotation);
       };
 
       const scheduleRotation = () => {
@@ -343,6 +320,8 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
 
       const focusCountry = (countryId: string) => {
         focusedIdRef.current = countryId;
+        const country = countrySpotlights.find((item) => item.id === countryId);
+        capitalLabel.textContent = country ? `${country.capital} · ${country.name}` : "";
         const nextQuaternion = countryQuaternion(countryId);
         if (targetQuaternion.dot(nextQuaternion) < 0) {
           nextQuaternion.set(-nextQuaternion.x, -nextQuaternion.y, -nextQuaternion.z, -nextQuaternion.w);
@@ -362,7 +341,7 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         renderer?.setSize(width, height, false);
-        renderer?.render(scene, camera);
+        render();
       };
 
       const raycastCountry = (event: PointerEvent) => {
@@ -426,7 +405,6 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       render();
 
       return () => {
-        disposed = true;
         focusRef.current = null;
         renderer?.domElement.removeEventListener("pointerdown", handlePointerDown);
         renderer?.domElement.removeEventListener("pointermove", handlePointerMove);
@@ -439,6 +417,7 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
         textures.forEach((texture) => texture.dispose());
         renderer?.dispose();
         renderer?.domElement.remove();
+        capitalLabel.remove();
       };
     } catch (error) {
       console.warn("Three.js country globe unavailable; country buttons remain available.", error);

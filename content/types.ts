@@ -23,6 +23,7 @@ export type Source = {
 export type CountrySpotlight = {
   id: string;
   name: string;
+  capital: string;
   region: string;
   latitude: number;
   longitude: number;
