@@ -157,9 +157,12 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       globe.add(new THREE.Mesh(earthGeometry, earthMaterial));
 
       const earthTexture = new THREE.TextureLoader().load(
-        "/brand/earth-clear-4096.webp",
+        "/brand/earth-clear-8192.webp",
         (texture) => {
           texture.colorSpace = THREE.SRGBColorSpace;
+          texture.anisotropy = Math.min(8, renderer?.capabilities.getMaxAnisotropy() ?? 1);
+          texture.minFilter = THREE.LinearMipmapLinearFilter;
+          texture.magFilter = THREE.LinearFilter;
           earthMaterial.map = texture;
           earthMaterial.needsUpdate = true;
           renderer?.render(scene, camera);
@@ -255,6 +258,10 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       const targetQuaternion = initialQuaternion.clone();
       let currentCameraZ = 9.2;
       let targetCameraZ = 9.2;
+      let finalCameraZ = 9.2;
+      let transitionPhase: "idle" | "zoom-out" | "rotate" | "zoom-in" = "idle";
+      let capitalLabelEnabled = false;
+      let lastAnimationTime = performance.now();
       let dragState: { pointerId: number; x: number; y: number; moved: boolean } | null = null;
       const raycaster = new THREE.Raycaster();
       const pointer = new THREE.Vector2();
@@ -262,7 +269,7 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
 
       const positionCapitalLabel = () => {
         const activeEntry = markerEntries.find(({ country }) => country.id === focusedIdRef.current);
-        if (!activeEntry) {
+        if (!activeEntry || !capitalLabelEnabled) {
           capitalLabel.classList.remove("is-visible");
           return;
         }
@@ -287,10 +294,35 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       };
       const animateRotation = (time = performance.now()) => {
         frameId = 0;
-        currentQuaternion.slerp(targetQuaternion, 0.14).normalize();
+        const deltaSeconds = Math.min(0.05, Math.max(0.001, (time - lastAnimationTime) / 1000));
+        lastAnimationTime = time;
+
+        if (transitionPhase === "zoom-out") {
+          targetCameraZ = 8.6;
+          if (Math.abs(currentCameraZ - targetCameraZ) < 0.04) transitionPhase = "rotate";
+        } else if (transitionPhase === "rotate") {
+          const rotationAlpha = 1 - Math.exp(-deltaSeconds * 3.6);
+          currentQuaternion.slerp(targetQuaternion, rotationAlpha).normalize();
+          if (currentQuaternion.angleTo(targetQuaternion) < 0.012) {
+            currentQuaternion.copy(targetQuaternion);
+            transitionPhase = "zoom-in";
+            targetCameraZ = finalCameraZ;
+            capitalLabelEnabled = Boolean(focusedIdRef.current);
+          }
+        } else {
+          const rotationAlpha = 1 - Math.exp(-deltaSeconds * 4.2);
+          currentQuaternion.slerp(targetQuaternion, rotationAlpha).normalize();
+        }
+
+        currentCameraZ = THREE.MathUtils.damp(currentCameraZ, targetCameraZ, 4, deltaSeconds);
         globe.quaternion.copy(currentQuaternion);
-        currentCameraZ = THREE.MathUtils.lerp(currentCameraZ, targetCameraZ, 0.11);
         camera.position.z = currentCameraZ;
+
+        if (transitionPhase === "zoom-in" && Math.abs(currentCameraZ - finalCameraZ) < 0.02) {
+          currentCameraZ = finalCameraZ;
+          camera.position.z = finalCameraZ;
+          transitionPhase = "idle";
+        }
 
         const activeEntry = markerEntries.find(({ country }) => country.id === focusedIdRef.current);
         if (activeEntry && !reducedMotion) {
@@ -303,7 +335,8 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         }
         render();
 
-        const settled = currentQuaternion.angleTo(targetQuaternion) < 0.001
+        const settled = transitionPhase === "idle"
+          && currentQuaternion.angleTo(targetQuaternion) < 0.001
           && Math.abs(currentCameraZ - targetCameraZ) < 0.002;
         const shouldPulse = Boolean(focusedIdRef.current) && !reducedMotion;
         if (!settled || shouldPulse) frameId = window.requestAnimationFrame(animateRotation);
@@ -311,14 +344,20 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
 
       const scheduleRotation = () => {
         if (reducedMotion) {
+          transitionPhase = "idle";
+          targetCameraZ = finalCameraZ;
           currentQuaternion.copy(targetQuaternion);
           globe.quaternion.copy(currentQuaternion);
-          currentCameraZ = targetCameraZ;
-          camera.position.z = currentCameraZ;
+          currentCameraZ = finalCameraZ;
+          camera.position.z = finalCameraZ;
+          capitalLabelEnabled = Boolean(focusedIdRef.current);
           render();
           return;
         }
-        if (!frameId) frameId = window.requestAnimationFrame(animateRotation);
+        if (!frameId) {
+          lastAnimationTime = performance.now();
+          frameId = window.requestAnimationFrame(animateRotation);
+        }
       };
 
       const focusCountry = (countryId: string) => {
@@ -330,7 +369,13 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
           nextQuaternion.set(-nextQuaternion.x, -nextQuaternion.y, -nextQuaternion.z, -nextQuaternion.w);
         }
         targetQuaternion.copy(nextQuaternion);
-        targetCameraZ = countryZoom[countryId] ?? 5.6;
+        finalCameraZ = countryZoom[countryId] ?? 5.6;
+        capitalLabelEnabled = false;
+        capitalLabel.classList.remove("is-visible");
+        transitionPhase = currentCameraZ < 7.8 && currentQuaternion.angleTo(targetQuaternion) > 0.04
+          ? "zoom-out"
+          : "rotate";
+        targetCameraZ = transitionPhase === "zoom-out" ? 8.6 : currentCameraZ;
         updateMarkerSelection(countryId);
         scheduleRotation();
       };
@@ -339,7 +384,10 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         focusedIdRef.current = null;
         capitalLabel.textContent = "";
         targetQuaternion.copy(countryQuaternion(selectedIdRef.current));
+        finalCameraZ = 9.2;
         targetCameraZ = 9.2;
+        capitalLabelEnabled = false;
+        transitionPhase = "zoom-in";
         updateMarkerSelection(null);
         scheduleRotation();
       };
@@ -373,6 +421,9 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         // selection path without competing with vertical scrolling.
         if (event.pointerType === "touch") return;
         if (event.pointerType === "mouse" && event.button !== 0) return;
+        transitionPhase = "idle";
+        targetCameraZ = currentCameraZ;
+        finalCameraZ = currentCameraZ;
         dragState = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
         renderer?.domElement.setPointerCapture(event.pointerId);
         renderer?.domElement.classList.add("is-dragging");
