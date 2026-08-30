@@ -130,7 +130,9 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       camera.position.set(0, 0.06, 9.2);
 
       const globe = new THREE.Group();
-      const initialQuaternion = new THREE.Quaternion();
+      // Keep the opening view at globe scale, but orient it to the default
+      // South Korea story so the map and the detail panel share one context.
+      const initialQuaternion = countryQuaternion(selectedIdRef.current);
       globe.quaternion.copy(initialQuaternion);
       scene.add(globe);
 
