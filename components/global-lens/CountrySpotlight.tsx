@@ -10,6 +10,19 @@ import { SectionShell } from "@/components/ui/SectionShell";
 const globeRadius = 2.32;
 const accentPalette = ["#159a91", "#f2b84b", "#75b85a", "#117e76", "#d49b2f"];
 
+type BoundaryData = {
+  source: string;
+  boundaries: Record<string, Array<Array<[number, number]>>>;
+};
+
+const countryZoom: Record<string, number> = {
+  "south-korea": 3.55,
+  india: 5.0,
+  mexico: 5.35,
+  france: 3.85,
+  "united-states": 6.65,
+};
+
 function latLonToVector3(latitude: number, longitude: number, radius = globeRadius) {
   const lat = THREE.MathUtils.degToRad(latitude);
   const lon = THREE.MathUtils.degToRad(longitude);
@@ -55,32 +68,37 @@ function createMeridian(longitude: number, radius = globeRadius) {
   return points;
 }
 
-function nearestAngle(angle: number, current: number) {
-  let next = angle;
-  while (next - current > Math.PI) next -= Math.PI * 2;
-  while (next - current < -Math.PI) next += Math.PI * 2;
-  return next;
-}
-
-function countryRotation(countryId: string, currentY: number) {
+function countryQuaternion(countryId: string) {
   const country = countrySpotlights.find((item) => item.id === countryId) ?? countrySpotlights[0];
-  return {
-    x: THREE.MathUtils.clamp(THREE.MathUtils.degToRad(country.latitude) * 0.84, -0.78, 0.78),
-    y: nearestAngle(-THREE.MathUtils.degToRad(country.longitude) - Math.PI / 2, currentY),
-    z: 0.015,
-  };
+  const lat = THREE.MathUtils.degToRad(country.latitude);
+  const lon = THREE.MathUtils.degToRad(country.longitude);
+  const normal = latLonToVector3(country.latitude, country.longitude, 1).normalize();
+  const east = new THREE.Vector3(-Math.sin(lon), 0, -Math.cos(lon)).normalize();
+  const north = new THREE.Vector3(
+    -Math.sin(lat) * Math.cos(lon),
+    Math.cos(lat),
+    Math.sin(lat) * Math.sin(lon),
+  ).normalize();
+
+  // Invert the country's east/north/normal basis so its surface normal faces
+  // the camera (+Z) while geographic north remains upright (+Y).
+  const basis = new THREE.Matrix4().makeBasis(east, north, normal).invert();
+  return new THREE.Quaternion().setFromRotationMatrix(basis).normalize();
 }
 
 type CountryGlobeProps = {
   selectedId: string;
+  focusRequest: number;
   onSelect: (countryId: string) => void;
 };
 
-function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
+function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const focusRef = useRef<((countryId: string) => void) | null>(null);
   const onSelectRef = useRef(onSelect);
   const selectedIdRef = useRef(selectedId);
+  const previousFocusRequestRef = useRef(focusRequest);
+  const focusedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     onSelectRef.current = onSelect;
@@ -97,6 +115,7 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
     let renderer: THREE.WebGLRenderer | null = null;
     let resizeObserver: ResizeObserver | null = null;
     let frameId = 0;
+    let disposed = false;
 
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
@@ -112,8 +131,8 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
       camera.position.set(0, 0.06, 9.2);
 
       const globe = new THREE.Group();
-      const initialRotation = countryRotation(selectedIdRef.current, 0);
-      globe.rotation.set(initialRotation.x, initialRotation.y, initialRotation.z);
+      const initialQuaternion = new THREE.Quaternion();
+      globe.quaternion.copy(initialQuaternion);
       scene.add(globe);
 
       scene.add(new THREE.HemisphereLight("#f8fbfa", "#12314b", 1.25));
@@ -136,7 +155,7 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
       globe.add(new THREE.Mesh(earthGeometry, earthMaterial));
 
       const earthTexture = new THREE.TextureLoader().load(
-        "/brand/earth-atmos-2048.jpg",
+        "/brand/earth-atmos-8192.jpg",
         (texture) => {
           texture.colorSpace = THREE.SRGBColorSpace;
           earthMaterial.map = texture;
@@ -177,14 +196,24 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
       materials.push(haloMaterial);
       globe.add(new THREE.Mesh(haloGeometry, haloMaterial));
 
-      const markerGeometry = new THREE.SphereGeometry(0.085, 18, 14);
+      const outlineEntries: Array<{
+        country: (typeof countrySpotlights)[number];
+        outline: THREE.LineSegments;
+        outlineMaterial: THREE.LineBasicMaterial;
+      }> = [];
+
+      const markerGeometry = new THREE.SphereGeometry(0.072, 18, 14);
       const hitGeometry = new THREE.SphereGeometry(0.25, 12, 10);
       const ringGeometry = new THREE.RingGeometry(0.13, 0.145, 28);
       geometries.push(markerGeometry, hitGeometry, ringGeometry);
 
       const markerEntries = countrySpotlights.map((country, index) => {
         const position = latLonToVector3(country.latitude, country.longitude, globeRadius * 1.025);
-        const markerMaterial = new THREE.MeshBasicMaterial({ color: accentPalette[index % accentPalette.length] });
+        const markerMaterial = new THREE.MeshBasicMaterial({
+          color: accentPalette[index % accentPalette.length],
+          transparent: true,
+          opacity: country.id === selectedIdRef.current ? 0.9 : 0,
+        });
         const hitMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
         const ringMaterial = new THREE.MeshBasicMaterial({
           color: accentPalette[index % accentPalette.length],
@@ -210,21 +239,78 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
         ring.lookAt(position.clone().multiplyScalar(2));
         globe.add(ring);
 
-        return { country, marker, hit, ring, ringMaterial };
+        return { country, marker, markerMaterial, hit, ring, ringMaterial };
       });
 
-      const updateMarkerSelection = (countryId: string) => {
-        markerEntries.forEach(({ country, marker, ring, ringMaterial }) => {
+      const updateMarkerSelection = (countryId: string | null) => {
+        markerEntries.forEach(({ country, marker, markerMaterial, ring, ringMaterial }) => {
           const isSelected = country.id === countryId;
-          marker.scale.setScalar(isSelected ? 1.55 : 1);
-          ring.scale.setScalar(isSelected ? 1.45 : 1);
-          ringMaterial.opacity = isSelected ? 0.9 : 0.28;
+          const isOverview = countryId === null;
+          marker.scale.setScalar(isSelected ? 0.09 : 0.055);
+          markerMaterial.opacity = isSelected ? 0.78 : isOverview ? 0.52 : 0;
+          markerMaterial.needsUpdate = true;
+          ring.scale.setScalar(isSelected ? 0.12 : 0.08);
+          ringMaterial.opacity = 0;
           ringMaterial.needsUpdate = true;
+        });
+        outlineEntries.forEach(({ country, outline, outlineMaterial }) => {
+          const isSelected = country.id === countryId;
+          outline.visible = isSelected;
+          outlineMaterial.opacity = isSelected ? 0.96 : 0;
+          outlineMaterial.needsUpdate = true;
         });
       };
 
-      let currentRotation = { ...initialRotation };
-      let targetRotation = { ...initialRotation };
+      void fetch("/data/country-boundaries.json")
+        .then((response) => {
+          if (!response.ok) throw new Error(`Country boundary request failed: ${response.status}`);
+          return response.json() as Promise<BoundaryData>;
+        })
+        .then((data) => {
+          if (disposed) return;
+
+          countrySpotlights.forEach((country, index) => {
+            const segmentPoints: THREE.Vector3[] = [];
+            (data.boundaries[country.id] ?? []).forEach((ring) => {
+              if (ring.length < 3) return;
+              for (let pointIndex = 0; pointIndex < ring.length; pointIndex += 1) {
+                const current = ring[pointIndex];
+                const next = ring[(pointIndex + 1) % ring.length];
+                segmentPoints.push(
+                  latLonToVector3(current[1], current[0], globeRadius * 1.022),
+                  latLonToVector3(next[1], next[0], globeRadius * 1.022),
+                );
+              }
+            });
+
+            if (segmentPoints.length === 0) return;
+            const outlineGeometry = new THREE.BufferGeometry().setFromPoints(segmentPoints);
+            const outlineMaterial = new THREE.LineBasicMaterial({
+              color: accentPalette[index % accentPalette.length],
+              transparent: true,
+              opacity: 0,
+              depthWrite: false,
+              depthTest: true,
+            });
+            const outline = new THREE.LineSegments(outlineGeometry, outlineMaterial);
+            outline.visible = false;
+            geometries.push(outlineGeometry);
+            materials.push(outlineMaterial);
+            globe.add(outline);
+            outlineEntries.push({ country, outline, outlineMaterial });
+          });
+
+          updateMarkerSelection(focusedIdRef.current);
+          renderer?.render(scene, camera);
+        })
+        .catch((error) => {
+          console.warn("Country boundary data unavailable.", error);
+        });
+
+      const currentQuaternion = initialQuaternion.clone();
+      const targetQuaternion = initialQuaternion.clone();
+      let currentCameraZ = 9.2;
+      let targetCameraZ = 9.2;
       let dragState: { pointerId: number; x: number; y: number; moved: boolean } | null = null;
       const raycaster = new THREE.Raycaster();
       const pointer = new THREE.Vector2();
@@ -232,24 +318,23 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
       const render = () => renderer?.render(scene, camera);
       const animateRotation = () => {
         frameId = 0;
-        currentRotation = {
-          x: THREE.MathUtils.lerp(currentRotation.x, targetRotation.x, 0.14),
-          y: THREE.MathUtils.lerp(currentRotation.y, targetRotation.y, 0.14),
-          z: THREE.MathUtils.lerp(currentRotation.z, targetRotation.z, 0.14),
-        };
-        globe.rotation.set(currentRotation.x, currentRotation.y, currentRotation.z);
+        currentQuaternion.slerp(targetQuaternion, 0.14).normalize();
+        globe.quaternion.copy(currentQuaternion);
+        currentCameraZ = THREE.MathUtils.lerp(currentCameraZ, targetCameraZ, 0.11);
+        camera.position.z = currentCameraZ;
         render();
 
-        const settled = Math.abs(currentRotation.x - targetRotation.x) < 0.001
-          && Math.abs(currentRotation.y - targetRotation.y) < 0.001
-          && Math.abs(currentRotation.z - targetRotation.z) < 0.001;
+        const settled = currentQuaternion.angleTo(targetQuaternion) < 0.001
+          && Math.abs(currentCameraZ - targetCameraZ) < 0.002;
         if (!settled) frameId = window.requestAnimationFrame(animateRotation);
       };
 
       const scheduleRotation = () => {
         if (reducedMotion) {
-          currentRotation = { ...targetRotation };
-          globe.rotation.set(currentRotation.x, currentRotation.y, currentRotation.z);
+          currentQuaternion.copy(targetQuaternion);
+          globe.quaternion.copy(currentQuaternion);
+          currentCameraZ = targetCameraZ;
+          camera.position.z = currentCameraZ;
           render();
           return;
         }
@@ -257,12 +342,18 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
       };
 
       const focusCountry = (countryId: string) => {
-        targetRotation = countryRotation(countryId, targetRotation.y);
+        focusedIdRef.current = countryId;
+        const nextQuaternion = countryQuaternion(countryId);
+        if (targetQuaternion.dot(nextQuaternion) < 0) {
+          nextQuaternion.set(-nextQuaternion.x, -nextQuaternion.y, -nextQuaternion.z, -nextQuaternion.w);
+        }
+        targetQuaternion.copy(nextQuaternion);
+        targetCameraZ = countryZoom[countryId] ?? 5.6;
         updateMarkerSelection(countryId);
         scheduleRotation();
       };
       focusRef.current = focusCountry;
-      updateMarkerSelection(selectedIdRef.current);
+      updateMarkerSelection(null);
 
       const resize = () => {
         const bounds = mount.getBoundingClientRect();
@@ -304,11 +395,9 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
         dragState.y = event.clientY;
         if (Math.abs(deltaX) + Math.abs(deltaY) > 3) dragState.moved = true;
         const scale = event.pointerType === "touch" ? 0.008 : 0.006;
-        targetRotation = {
-          x: THREE.MathUtils.clamp(currentRotation.x - deltaY * scale, -1.05, 1.05),
-          y: currentRotation.y + deltaX * scale,
-          z: currentRotation.z,
-        };
+        const yaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), deltaX * scale);
+        const pitch = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -deltaY * scale);
+        targetQuaternion.premultiply(yaw).premultiply(pitch).normalize();
         scheduleRotation();
       };
 
@@ -337,6 +426,7 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
       render();
 
       return () => {
+        disposed = true;
         focusRef.current = null;
         renderer?.domElement.removeEventListener("pointerdown", handlePointerDown);
         renderer?.domElement.removeEventListener("pointermove", handlePointerMove);
@@ -360,8 +450,11 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
 
   useEffect(() => {
     selectedIdRef.current = selectedId;
-    focusRef.current?.(selectedId);
-  }, [selectedId]);
+    if (previousFocusRequestRef.current !== focusRequest) {
+      previousFocusRequestRef.current = focusRequest;
+      focusRef.current?.(selectedId);
+    }
+  }, [focusRequest, selectedId]);
 
   return (
     <div
@@ -375,7 +468,12 @@ function CountryGlobe({ selectedId, onSelect }: CountryGlobeProps) {
 
 export function CountrySpotlightSection() {
   const [selectedId, setSelectedId] = useState(countrySpotlights[0].id);
+  const [focusRequest, setFocusRequest] = useState(0);
   const selectedCountry = countrySpotlights.find((country) => country.id === selectedId) ?? countrySpotlights[0];
+  const selectCountry = (countryId: string) => {
+    setSelectedId(countryId);
+    setFocusRequest((request) => request + 1);
+  };
 
   return (
     <SectionShell id="country-spotlight" surface="cloud" labelledBy="country-spotlight-title" className="country-spotlight-section">
@@ -392,7 +490,7 @@ export function CountrySpotlightSection() {
         <div className="country-spotlight-layout">
           <div className="country-spotlight-map-column">
             <div className="country-spotlight-globe-wrap">
-              <CountryGlobe selectedId={selectedId} onSelect={setSelectedId} />
+              <CountryGlobe selectedId={selectedId} focusRequest={focusRequest} onSelect={selectCountry} />
               <div className="country-spotlight-globe-hint" aria-hidden="true">
                 <span>Drag to rotate</span>
                 <i />
@@ -406,7 +504,7 @@ export function CountrySpotlightSection() {
                   type="button"
                   aria-pressed={country.id === selectedId}
                   className={country.id === selectedId ? "is-active" : ""}
-                  onClick={() => setSelectedId(country.id)}
+                  onClick={() => selectCountry(country.id)}
                 >
                   <span>0{index + 1}</span>
                   {country.name}

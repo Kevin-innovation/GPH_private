@@ -3428,7 +3428,7 @@ details .lens-step {
 }
 
 .country-spotlight-detail-heading p {
-  max-width: 26ch;
+  max-width: none;
   margin: 0;
   color: var(--color-navy);
   font-size: clamp(1.15rem, 1.8vw, 1.45rem);
@@ -3452,7 +3452,7 @@ details .lens-step {
 }
 
 .country-spotlight-facts p {
-  max-width: 52ch;
+  max-width: none;
   margin: 0;
   color: rgba(23, 37, 46, 0.8);
   font-size: 0.94rem;
@@ -3464,8 +3464,9 @@ details .lens-step {
 }
 
 .country-spotlight-sources ul {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -3557,6 +3558,11 @@ details .lens-step {
 
   .country-spotlight-detail {
     padding-top: 15px;
+  }
+
+  .country-spotlight-sources ul {
+    display: grid;
+    gap: 8px;
   }
 
   .country-spotlight-detail-heading {
