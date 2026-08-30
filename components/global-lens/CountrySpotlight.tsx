@@ -145,18 +145,16 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       const earthMaterial = new THREE.MeshStandardMaterial({
         color: "#d8e6df",
         emissive: "#557e75",
-        emissiveIntensity: 0.28,
-        roughness: 0.92,
+        emissiveIntensity: 0.08,
+        roughness: 0.82,
         metalness: 0,
-        transparent: true,
-        opacity: 0.94,
       });
       geometries.push(earthGeometry);
       materials.push(earthMaterial);
       globe.add(new THREE.Mesh(earthGeometry, earthMaterial));
 
       const earthTexture = new THREE.TextureLoader().load(
-        "/brand/earth-atmos-8192.jpg",
+        "/brand/earth-clear-4096.webp",
         (texture) => {
           texture.colorSpace = THREE.SRGBColorSpace;
           earthMaterial.map = texture;
@@ -172,7 +170,7 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       );
       textures.push(earthTexture);
 
-      const gridMaterial = new THREE.LineBasicMaterial({ color: "#9acdc6", transparent: true, opacity: 0.27 });
+      const gridMaterial = new THREE.LineBasicMaterial({ color: "#9acdc6", transparent: true, opacity: 0.09 });
       materials.push(gridMaterial);
       [-60, -30, 0, 30, 60].forEach((latitude) => {
         const geometry = new THREE.BufferGeometry().setFromPoints(createLatitudeRing(latitude, globeRadius * 1.008));
@@ -189,7 +187,7 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       const haloMaterial = new THREE.MeshBasicMaterial({
         color: "#8fd0c8",
         transparent: true,
-        opacity: 0.1,
+        opacity: 0.035,
         side: THREE.BackSide,
         depthWrite: false,
       });
@@ -357,6 +355,9 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       };
 
       const handlePointerDown = (event: PointerEvent) => {
+        // Touch belongs to the page: country buttons provide the mobile
+        // selection path without competing with vertical scrolling.
+        if (event.pointerType === "touch") return;
         if (event.pointerType === "mouse" && event.button !== 0) return;
         dragState = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
         renderer?.domElement.setPointerCapture(event.pointerId);
@@ -364,6 +365,7 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
       };
 
       const handlePointerMove = (event: PointerEvent) => {
+        if (event.pointerType === "touch") return;
         if (!dragState || dragState.pointerId !== event.pointerId) {
           const countryId = raycastCountry(event);
           renderer?.domElement.classList.toggle("has-marker", Boolean(countryId));
@@ -375,7 +377,7 @@ function CountryGlobe({ selectedId, focusRequest, onSelect }: CountryGlobeProps)
         dragState.x = event.clientX;
         dragState.y = event.clientY;
         if (Math.abs(deltaX) + Math.abs(deltaY) > 3) dragState.moved = true;
-        const scale = event.pointerType === "touch" ? 0.008 : 0.006;
+        const scale = 0.006;
         const yaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), deltaX * scale);
         const pitch = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -deltaY * scale);
         targetQuaternion.premultiply(yaw).premultiply(pitch).normalize();
