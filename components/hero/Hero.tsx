@@ -27,8 +27,10 @@ export function Hero() {
             </ButtonLink>
           </div>
           <p className="hero-note">
-            An evidence-led educational project connecting lived experience, local context, and
-            <span className="no-orphan"> public systems.</span>
+            <span>
+              An evidence-led educational project connecting lived experience, local context, and{" "}
+              <span className="no-orphan">public systems.</span>
+            </span>
           </p>
         </div>
         <HeroVisual />

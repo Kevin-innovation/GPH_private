@@ -3949,7 +3949,8 @@ details .lens-step {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
   align-items: center;
   gap: 13px;
   min-width: 0;
@@ -4009,6 +4010,9 @@ details .lens-step {
 }
 
 .mission-signature .determinants button .mission-determinant-index {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: start;
   color: var(--color-gold-text);
   font-size: 0.69rem;
   font-weight: 600;
@@ -4017,6 +4021,8 @@ details .lens-step {
 }
 
 .mission-signature .determinants button .mission-determinant-label {
+  grid-column: 2;
+  grid-row: 1;
   flex: 1 1 auto;
   min-width: 0;
   font-size: clamp(0.9rem, 1.15vw, 1.08rem);
@@ -4026,6 +4032,8 @@ details .lens-step {
 }
 
 .mission-signature .determinants button .mission-determinant-state {
+  grid-column: 2;
+  grid-row: 2;
   color: var(--color-teal-text);
   font-size: 0.62rem;
   font-weight: 600;
@@ -4195,7 +4203,8 @@ details .lens-step {
 
   .mission-signature .determinants button .mission-determinant-state {
     grid-column: 2;
-    margin-top: -3px;
+    grid-row: 2;
+    margin-top: 0;
   }
 
   .mission-signature .determinants button .mission-determinant-label {
@@ -4468,11 +4477,18 @@ summary {
 }
 
 .country-spotlight-country-list {
-  gap: 8px 10px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  container-type: inline-size;
 }
 
 .country-spotlight-country-list button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 8px;
+  width: 100%;
+  min-width: 0;
   padding-inline: 8px;
   transition:
     color 180ms ease,
@@ -4488,9 +4504,11 @@ summary {
 }
 
 .country-spotlight-country-list button .country-spotlight-country-name {
+  min-width: 0;
   color: inherit;
   font-size: inherit;
   font-weight: inherit;
+  white-space: nowrap;
 }
 
 .country-spotlight-country-action {
@@ -4502,6 +4520,7 @@ summary {
   font-weight: 700 !important;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .country-spotlight-country-action b {
@@ -4512,6 +4531,32 @@ summary {
 
 .country-spotlight-country-list button.is-active .country-spotlight-country-action b {
   display: none;
+}
+
+@container (max-width: 720px) {
+  .country-spotlight-country-action {
+    font-size: 0 !important;
+  }
+
+  .country-spotlight-country-action b {
+    display: inline-block;
+    font-size: 0.78rem;
+  }
+
+  .country-spotlight-country-list button.is-active .country-spotlight-country-action b {
+    display: none;
+  }
+}
+
+@container (max-width: 520px) {
+  .country-spotlight-country-list button {
+    gap: 4px;
+    padding-inline: 4px;
+  }
+
+  .country-spotlight-country-action {
+    display: none;
+  }
 }
 
 .atlas-card-arrow {
@@ -4585,7 +4630,6 @@ details[open] .summary-mark b { transform: rotate(45deg); }
 @media (hover: hover) and (pointer: fine) {
   .button:hover {
     box-shadow: 0 11px 24px rgba(18, 49, 75, 0.14);
-    transform: translateY(-2px);
   }
 
   .button:hover .button-arrow,
@@ -4600,7 +4644,6 @@ details[open] .summary-mark b { transform: rotate(45deg); }
   .country-spotlight-country-list button:hover,
   .country-spotlight-country-list button:focus-visible {
     background: rgba(159, 215, 205, 0.16);
-    transform: translateY(-2px);
   }
 
   .atlas-card:hover,
@@ -4612,13 +4655,6 @@ details[open] .summary-mark b { transform: rotate(45deg); }
   .atlas-card:hover .atlas-card-arrow,
   .atlas-card:focus-visible .atlas-card-arrow {
     transform: translateX(4px);
-  }
-
-  .atlas-filters button:hover,
-  .atlas-filters button:focus-visible,
-  .hero-lens-controls button:hover,
-  .hero-lens-controls button:focus-visible {
-    transform: translateY(-2px);
   }
 
   .case-row summary:hover,
@@ -4642,10 +4678,42 @@ details[open] .summary-mark b { transform: rotate(45deg); }
 .atlas-mobile-trigger:active,
 .case-row summary:active,
 .hero-lens-controls button:active {
-  transform: scale(0.985);
+  filter: brightness(0.95);
+}
+
+/* Never move the pointer hit target itself. Moving a hovered control can make
+   the cursor repeatedly enter and leave at an edge, which looks like shaking. */
+.button:hover,
+.button:focus-visible,
+.mission-signature .determinants button,
+.mission-signature .determinants button:hover,
+.mission-signature .determinants button:focus-visible,
+.mission-signature .determinants button.is-active,
+.country-spotlight-country-list button:hover,
+.country-spotlight-country-list button:focus-visible,
+.country-spotlight-country-list button:active,
+.atlas-filters button:hover,
+.atlas-filters button:focus-visible,
+.atlas-filters button:active,
+.atlas-mobile-trigger:active,
+.case-row summary:active,
+.hero-lens-controls button:hover,
+.hero-lens-controls button:focus-visible,
+.hero-lens-controls button:active {
+  transform: none;
 }
 
 @media (max-width: 900px) {
+  .country-spotlight-country-list {
+    display: flex;
+    gap: 18px;
+  }
+
+  .country-spotlight-country-list button {
+    display: inline-flex;
+    width: auto;
+  }
+
   .country-spotlight-country-action {
     font-size: 0 !important;
   }
