@@ -3,7 +3,8 @@ type Variant = "primary" | "secondary";
 export function ButtonLink({ href, variant = "primary", children }: { href: string; variant?: Variant; children: React.ReactNode }) {
   return (
     <a className={`button button-${variant}`} href={href}>
-      {children}
+      <span>{children}</span>
+      <span className="button-arrow" aria-hidden="true">→</span>
     </a>
   );
 }

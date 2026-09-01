@@ -688,8 +688,11 @@ export function CountrySpotlightSection() {
                   onClick={() => selectCountry(country.id)}
                   onKeyDown={(event) => handleCountryKeyDown(event, index)}
                 >
-                  <span>0{index + 1}</span>
-                  {country.name}
+                  <span className="country-spotlight-country-index">0{index + 1}</span>
+                  <span className="country-spotlight-country-name">{country.name}</span>
+                  <span className="country-spotlight-country-action" aria-hidden="true">
+                    {country.id === selectedId ? "Selected" : "View"}<b>→</b>
+                  </span>
                 </button>
               ))}
             </div>

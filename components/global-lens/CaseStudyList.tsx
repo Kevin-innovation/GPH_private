@@ -47,7 +47,8 @@ export function CaseStudyList() {
               <span className="row-index">0{index + 1}</span>
               <span>{orphanSafeText(study.title)}</span>
               <span className="summary-mark" aria-hidden="true">
-                +
+                <span className="summary-action" />
+                <b>+</b>
               </span>
             </summary>
             <div className="case-detail">

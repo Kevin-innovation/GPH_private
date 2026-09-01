@@ -4432,6 +4432,258 @@ details .lens-step {
   }
 }
 
+/* ---- 19. Interaction affordance ------------------------------------------
+   Repeated controls now share one clear vocabulary: a directional cue at
+   rest, stronger contrast on hover/focus, and a short press response. The
+   motion is functional and disappears for reduced-motion preferences. */
+a[href],
+button,
+summary {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.button {
+  box-shadow: 0 7px 18px rgba(18, 49, 75, 0.08);
+}
+
+.button .button-arrow {
+  display: inline-block;
+  font-size: 1.05em;
+  line-height: 1;
+  transition: transform 190ms ease;
+}
+
+.mission-signature .mission-determinant-state {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.mission-signature .mission-determinant-state::after {
+  content: "→";
+  display: inline-block;
+  font-size: 0.82rem;
+  transition: transform 190ms ease;
+}
+
+.country-spotlight-country-list {
+  gap: 8px 10px;
+}
+
+.country-spotlight-country-list button {
+  gap: 8px;
+  padding-inline: 8px;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+.country-spotlight-country-list button .country-spotlight-country-index {
+  color: var(--color-gold-text);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.country-spotlight-country-list button .country-spotlight-country-name {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.country-spotlight-country-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-teal-text) !important;
+  font-size: 0.6rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.country-spotlight-country-action b {
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: transform 180ms ease;
+}
+
+.country-spotlight-country-list button.is-active .country-spotlight-country-action b {
+  display: none;
+}
+
+.atlas-card-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.atlas-card-arrow b {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.case-row summary {
+  grid-template-columns: 40px minmax(0, 1fr) minmax(74px, auto);
+  margin-inline: -14px;
+  padding-inline: 14px;
+  transition: background-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+}
+
+.summary-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: auto;
+  color: var(--color-teal-text);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: transform 180ms ease;
+}
+
+.summary-action::before { content: "Open"; }
+details[open] .summary-action::before { content: "Close"; }
+
+.summary-mark b {
+  font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1;
+  transition: transform 190ms ease;
+}
+
+details[open] .summary-mark { transform: none; }
+details[open] .summary-mark b { transform: rotate(45deg); }
+
+.atlas-mobile-trigger-arrow {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 1px solid rgba(17, 126, 118, 0.35);
+  border-radius: 50%;
+  background: var(--color-white);
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.atlas-mobile-item.is-active .atlas-mobile-trigger-arrow {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button:hover {
+    box-shadow: 0 11px 24px rgba(18, 49, 75, 0.14);
+    transform: translateY(-2px);
+  }
+
+  .button:hover .button-arrow,
+  .button:focus-visible .button-arrow,
+  .mission-signature .determinants button:hover .mission-determinant-state::after,
+  .mission-signature .determinants button:focus-visible .mission-determinant-state::after,
+  .country-spotlight-country-list button:hover .country-spotlight-country-action b,
+  .country-spotlight-country-list button:focus-visible .country-spotlight-country-action b {
+    transform: translateX(3px);
+  }
+
+  .country-spotlight-country-list button:hover,
+  .country-spotlight-country-list button:focus-visible {
+    background: rgba(159, 215, 205, 0.16);
+    transform: translateY(-2px);
+  }
+
+  .atlas-card:hover,
+  .atlas-card:focus-visible {
+    background: #f7fbfa;
+    box-shadow: 0 12px 28px rgba(18, 49, 75, 0.1);
+  }
+
+  .atlas-card:hover .atlas-card-arrow,
+  .atlas-card:focus-visible .atlas-card-arrow {
+    transform: translateX(4px);
+  }
+
+  .atlas-filters button:hover,
+  .atlas-filters button:focus-visible,
+  .hero-lens-controls button:hover,
+  .hero-lens-controls button:focus-visible {
+    transform: translateY(-2px);
+  }
+
+  .case-row summary:hover,
+  .case-row summary:focus-visible {
+    background: rgba(159, 215, 205, 0.13);
+    box-shadow: inset 3px 0 0 var(--color-teal-text);
+    color: var(--color-teal-text);
+  }
+
+  .case-row summary:hover .summary-mark,
+  .case-row summary:focus-visible .summary-mark {
+    transform: translateX(2px);
+  }
+}
+
+.button:active,
+.mission-signature .determinants button:active,
+.country-spotlight-country-list button:active,
+.atlas-card:active,
+.atlas-filters button:active,
+.atlas-mobile-trigger:active,
+.case-row summary:active,
+.hero-lens-controls button:active {
+  transform: scale(0.985);
+}
+
+@media (max-width: 900px) {
+  .country-spotlight-country-action {
+    font-size: 0 !important;
+  }
+
+  .country-spotlight-country-action b {
+    display: inline-block;
+    font-size: 0.82rem;
+  }
+
+  .country-spotlight-country-list button.is-active .country-spotlight-country-action b {
+    display: none;
+  }
+
+  .case-row summary {
+    grid-template-columns: 32px minmax(0, 1fr) 24px;
+  }
+
+  .summary-action { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .button-arrow,
+  .mission-determinant-state::after,
+  .country-spotlight-country-list button,
+  .country-spotlight-country-action b,
+  .atlas-card,
+  .atlas-card-arrow,
+  .atlas-filters button,
+  .atlas-mobile-trigger-arrow,
+  .case-row summary,
+  .summary-mark,
+  .summary-mark b,
+  .hero-lens-controls button {
+    transition: none !important;
+  }
+}
+
 /* Final mobile interaction: each nutrient owns its own expanded explanation.
    This keeps the thing being read and the thing being selected in one place. */
 @media (max-width: 900px) {

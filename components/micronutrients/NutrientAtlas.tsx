@@ -314,7 +314,7 @@ export function NutrientAtlas() {
                 <span className="atlas-card-type">{nutrient.category}</span>
                 <strong>{orphanSafeText(nutrient.name)}</strong>
                 <span className="atlas-card-summary">{orphanSafeText(nutrient.summary)}</span>
-                <span className="atlas-card-arrow" aria-hidden="true">→</span>
+                <span className="atlas-card-arrow" aria-hidden="true"><span>Explore</span><b>→</b></span>
               </button>
             );
           })}
