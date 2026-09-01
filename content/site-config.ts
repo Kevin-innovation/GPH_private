@@ -16,5 +16,5 @@ export const siteConfig = {
     endpoint: "",
     responseTime: "[INSERT, E.G. 3-5 WORKING DAYS]",
   },
-  lastReviewedAt: "2026-08-20",
+  lastReviewedAt: "2026-09-01",
 } as const;

@@ -1,6 +1,7 @@
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ExternalLink } from "@/components/ui/ExternalLink";
 import type { Nutrient } from "@/content/types";
+import { orphanSafeText } from "@/components/ui/orphanSafeText";
 
 // Native <details> keeps the expand/collapse behaviour on the server with no client JS.
 export function NutrientRow({ nutrient, index, defaultOpen }: { nutrient: Nutrient; index: number; defaultOpen?: boolean }) {
@@ -9,9 +10,9 @@ export function NutrientRow({ nutrient, index, defaultOpen }: { nutrient: Nutrie
       <summary>
         <span className="nutrient-name">
           <span className="row-index">0{index + 1}</span>
-          {nutrient.name}
+          {orphanSafeText(nutrient.name)}
         </span>
-        <span className="nutrient-summary">{nutrient.summary}</span>
+        <span className="nutrient-summary">{orphanSafeText(nutrient.summary)}</span>
         <span className="summary-mark" aria-hidden="true">
           +
         </span>
@@ -19,21 +20,23 @@ export function NutrientRow({ nutrient, index, defaultOpen }: { nutrient: Nutrie
       <div className="nutrient-detail">
         <div>
           <Eyebrow>What it does in the body</Eyebrow>
-          <p>{nutrient.whatItDoes}</p>
+          <p>{orphanSafeText(nutrient.whatItDoes)}</p>
         </div>
         <div>
           <Eyebrow>Food sources</Eyebrow>
-          <p>{nutrient.foodSources}</p>
+          <p>{orphanSafeText(nutrient.foodSources)}</p>
         </div>
         <div>
           <Eyebrow>Global public-health lens</Eyebrow>
-          <p>{nutrient.globalLens}</p>
+          <p>{orphanSafeText(nutrient.globalLens)}</p>
         </div>
         <div className="safety-note">
           <Eyebrow>Safety</Eyebrow>
-          <p>{nutrient.safetyNote}</p>
+          <p>{orphanSafeText(nutrient.safetyNote)}</p>
         </div>
-        <ExternalLink href={nutrient.sourceUrl}>Read the {nutrient.source} fact sheet</ExternalLink>
+        <ExternalLink href={nutrient.sourceUrl}>
+          {orphanSafeText(`Read the ${nutrient.source} fact sheet`)}
+        </ExternalLink>
       </div>
     </details>
   );

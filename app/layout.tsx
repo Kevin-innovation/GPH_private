@@ -11,9 +11,9 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const title = "Global Public Health Lens | Understanding Health Globally";
+const title = "Global Public Health Lens | See Health in Context";
 const description =
-  "Explore how nutrition, food access, policy, geography, and inequality shape health across communities worldwide.";
+  "Explore how place, environment, inequality, policy, care access, and nutrition shape health across communities worldwide.";
 
 export const metadata: Metadata = {
   title,

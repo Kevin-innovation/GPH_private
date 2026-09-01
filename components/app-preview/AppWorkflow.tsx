@@ -1,4 +1,5 @@
 import { appWorkflow } from "@/content/app-preview";
+import { orphanSafeText } from "@/components/ui/orphanSafeText";
 
 export function AppWorkflow() {
   return (
@@ -6,8 +7,8 @@ export function AppWorkflow() {
       {appWorkflow.map((item) => (
         <div className="workflow-row" key={item.step}>
           <span>{item.step}</span>
-          <h3>{item.title}</h3>
-          <p>{item.body}</p>
+          <h3>{orphanSafeText(item.title)}</h3>
+          <p>{orphanSafeText(item.body)}</p>
         </div>
       ))}
     </div>

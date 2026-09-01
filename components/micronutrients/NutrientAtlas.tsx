@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { nutrients } from "@/content/nutrients";
 import type { Nutrient } from "@/content/types";
+import { ExternalLink } from "@/components/ui/ExternalLink";
+import { orphanSafeText } from "@/components/ui/orphanSafeText";
 
 type Filter = "all" | Nutrient["category"];
 
@@ -65,34 +67,34 @@ function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
             <NutrientIcon nutrient={nutrient} />
             <div>
               <span className="atlas-detail-type">{nutrient.category}</span>
-              <h3>{nutrient.name}</h3>
+              <h3>{orphanSafeText(nutrient.name)}</h3>
             </div>
           </div>
-          <p className="atlas-detail-summary">{nutrient.summary}</p>
+          <p className="atlas-detail-summary">{orphanSafeText(nutrient.summary)}</p>
         </div>
       </div>
       <div className="atlas-detail-body">
         <div className="atlas-detail-facts">
           <div>
             <span>In the body</span>
-            <p>{nutrient.whatItDoes}</p>
+            <p>{orphanSafeText(nutrient.whatItDoes)}</p>
           </div>
           <div>
             <span>Food sources</span>
-            <p>{nutrient.foodSources}</p>
+            <p>{orphanSafeText(nutrient.foodSources)}</p>
           </div>
           <div>
             <span>Public-health lens</span>
-            <p>{nutrient.globalLens}</p>
+            <p>{orphanSafeText(nutrient.globalLens)}</p>
           </div>
           <div className="atlas-detail-safety">
             <span>Safety context</span>
-            <p>{nutrient.safetyNote}</p>
+            <p>{orphanSafeText(nutrient.safetyNote)}</p>
           </div>
         </div>
-        <a href={nutrient.sourceUrl} target="_blank" rel="noreferrer">
-          Read the {nutrient.source} fact sheet <span aria-hidden="true">↗</span>
-        </a>
+        <ExternalLink href={nutrient.sourceUrl}>
+          {orphanSafeText(`Read the ${nutrient.source} fact sheet`)} <span aria-hidden="true">↗</span>
+        </ExternalLink>
       </div>
     </aside>
   );
@@ -129,8 +131,8 @@ function MobileNutrientList({
               </div>
               <div className="atlas-mobile-trigger-copy">
                 <span className="atlas-card-type">{nutrient.category}</span>
-                <strong>{nutrient.name}</strong>
-                <span className="atlas-card-summary">{nutrient.summary}</span>
+                <strong>{orphanSafeText(nutrient.name)}</strong>
+                <span className="atlas-card-summary">{orphanSafeText(nutrient.summary)}</span>
               </div>
               <span className="atlas-mobile-trigger-arrow" aria-hidden="true">
                 {isActive ? "−" : "+"}
@@ -148,33 +150,33 @@ function MobileNutrientList({
                       <NutrientIcon nutrient={nutrient} />
                       <div>
                         <span className="atlas-detail-type">{nutrient.category}</span>
-                        <h3>{nutrient.name}</h3>
+                        <h3>{orphanSafeText(nutrient.name)}</h3>
                       </div>
                     </div>
-                    <p className="atlas-detail-summary">{nutrient.summary}</p>
+                    <p className="atlas-detail-summary">{orphanSafeText(nutrient.summary)}</p>
                   </div>
                 </div>
                 <div className="atlas-mobile-facts">
                   <div>
                     <span>In the body</span>
-                    <p>{nutrient.whatItDoes}</p>
+                    <p>{orphanSafeText(nutrient.whatItDoes)}</p>
                   </div>
                   <div>
                     <span>Food sources</span>
-                    <p>{nutrient.foodSources}</p>
+                    <p>{orphanSafeText(nutrient.foodSources)}</p>
                   </div>
                   <div>
                     <span>Public-health lens</span>
-                    <p>{nutrient.globalLens}</p>
+                    <p>{orphanSafeText(nutrient.globalLens)}</p>
                   </div>
                   <div className="atlas-detail-safety">
                     <span>Safety context</span>
-                    <p>{nutrient.safetyNote}</p>
+                    <p>{orphanSafeText(nutrient.safetyNote)}</p>
                   </div>
                 </div>
-                <a href={nutrient.sourceUrl} target="_blank" rel="noreferrer">
-                  Read the {nutrient.source} fact sheet <span aria-hidden="true">↗</span>
-                </a>
+                <ExternalLink href={nutrient.sourceUrl}>
+                  {orphanSafeText(`Read the ${nutrient.source} fact sheet`)} <span aria-hidden="true">↗</span>
+                </ExternalLink>
               </div>
             ) : null}
           </article>
@@ -275,14 +277,13 @@ export function NutrientAtlas() {
           <span className="atlas-toolbar-label">Current editorial scope</span>
           <strong>8 nutrients to begin</strong>
         </div>
-        <div className="atlas-filters" role="tablist" aria-label="Filter nutrients by type">
+        <div className="atlas-filters" role="group" aria-label="Filter nutrients by type">
           {(["all", "vitamin", "mineral"] as Filter[]).map((option) => (
             <button
               key={option}
               className={filter === option ? "is-active" : ""}
               type="button"
-              role="tab"
-              aria-selected={filter === option}
+              aria-pressed={filter === option}
               onClick={() => selectFilter(option)}
             >
               {option === "all" ? "All" : option === "vitamin" ? "Vitamins" : "Minerals"}
@@ -311,8 +312,8 @@ export function NutrientAtlas() {
                   <NutrientVisual nutrient={nutrient} className="atlas-card-image" />
                 </div>
                 <span className="atlas-card-type">{nutrient.category}</span>
-                <strong>{nutrient.name}</strong>
-                <span className="atlas-card-summary">{nutrient.summary}</span>
+                <strong>{orphanSafeText(nutrient.name)}</strong>
+                <span className="atlas-card-summary">{orphanSafeText(nutrient.summary)}</span>
                 <span className="atlas-card-arrow" aria-hidden="true">→</span>
               </button>
             );

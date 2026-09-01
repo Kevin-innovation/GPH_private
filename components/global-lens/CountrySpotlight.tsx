@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { countrySpotlights } from "@/content/countries";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { ExternalLink } from "@/components/ui/ExternalLink";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SectionShell } from "@/components/ui/SectionShell";
+import { orphanSafeText } from "@/components/ui/orphanSafeText";
+
+type ThreeModule = typeof import("three");
 
 const globeRadius = 2.32;
 const accentPalette = ["#159a91", "#f2b84b", "#75b85a", "#117e76", "#d49b2f"];
@@ -18,7 +21,16 @@ const countryZoom: Record<string, number> = {
   "united-states": 6.65,
 };
 
-function latLonToVector3(latitude: number, longitude: number, radius = globeRadius) {
+function formatReviewedDate(value: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${value}T00:00:00Z`));
+}
+
+function latLonToVector3(THREE: ThreeModule, latitude: number, longitude: number, radius = globeRadius) {
   const lat = THREE.MathUtils.degToRad(latitude);
   const lon = THREE.MathUtils.degToRad(longitude);
 
@@ -31,8 +43,8 @@ function latLonToVector3(latitude: number, longitude: number, radius = globeRadi
   );
 }
 
-function createLatitudeRing(latitude: number, radius = globeRadius) {
-  const points: THREE.Vector3[] = [];
+function createLatitudeRing(THREE: ThreeModule, latitude: number, radius = globeRadius) {
+  const points: import("three").Vector3[] = [];
   const lat = THREE.MathUtils.degToRad(latitude);
   const ringRadius = radius * Math.cos(lat);
   const y = radius * Math.sin(lat);
@@ -45,8 +57,8 @@ function createLatitudeRing(latitude: number, radius = globeRadius) {
   return points;
 }
 
-function createMeridian(longitude: number, radius = globeRadius) {
-  const points: THREE.Vector3[] = [];
+function createMeridian(THREE: ThreeModule, longitude: number, radius = globeRadius) {
+  const points: import("three").Vector3[] = [];
   const lon = THREE.MathUtils.degToRad(longitude);
 
   for (let index = 0; index < 72; index += 1) {
@@ -63,11 +75,11 @@ function createMeridian(longitude: number, radius = globeRadius) {
   return points;
 }
 
-function countryQuaternion(countryId: string) {
+function countryQuaternion(THREE: ThreeModule, countryId: string) {
   const country = countrySpotlights.find((item) => item.id === countryId) ?? countrySpotlights[0];
   const lat = THREE.MathUtils.degToRad(country.latitude);
   const lon = THREE.MathUtils.degToRad(country.longitude);
-  const normal = latLonToVector3(country.latitude, country.longitude, 1).normalize();
+  const normal = latLonToVector3(THREE, country.latitude, country.longitude, 1).normalize();
   const east = new THREE.Vector3(-Math.sin(lon), 0, -Math.cos(lon)).normalize();
   const north = new THREE.Vector3(
     -Math.sin(lat) * Math.cos(lon),
@@ -97,6 +109,7 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
   const previousFocusRequestRef = useRef(focusRequest);
   const previousOverviewRequestRef = useRef(overviewRequest);
   const focusedIdRef = useRef<string | null>(null);
+  const [globeStatus, setGlobeStatus] = useState<"waiting" | "loading" | "ready" | "unavailable">("waiting");
 
   useEffect(() => {
     onSelectRef.current = onSelect;
@@ -106,15 +119,28 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
     const mount = mountRef.current;
     if (!mount) return undefined;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const geometries: THREE.BufferGeometry[] = [];
-    const materials: THREE.Material[] = [];
-    const textures: THREE.Texture[] = [];
-    let renderer: THREE.WebGLRenderer | null = null;
-    let resizeObserver: ResizeObserver | null = null;
-    let frameId = 0;
+    let cancelled = false;
+    let hasStarted = false;
+    let visibilityObserver: IntersectionObserver | null = null;
+    let cleanupScene: (() => void) | undefined;
 
-    try {
+    const initialize = async () => {
+      if (hasStarted) return;
+      hasStarted = true;
+      setGlobeStatus("loading");
+      let renderer: import("three").WebGLRenderer | null = null;
+
+      try {
+        const THREE = await import("three");
+        if (cancelled) return;
+
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const geometries: import("three").BufferGeometry[] = [];
+        const materials: import("three").Material[] = [];
+        const textures: import("three").Texture[] = [];
+        let resizeObserver: ResizeObserver | null = null;
+        let frameId = 0;
+
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
       renderer.setClearColor(0x000000, 0);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -135,7 +161,7 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       const globe = new THREE.Group();
       // Keep the opening view at globe scale, but orient it to the default
       // South Korea story so the map and the detail panel share one context.
-      const initialQuaternion = countryQuaternion(selectedIdRef.current);
+      const initialQuaternion = countryQuaternion(THREE, selectedIdRef.current);
       globe.quaternion.copy(initialQuaternion);
       scene.add(globe);
 
@@ -157,7 +183,7 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       globe.add(new THREE.Mesh(earthGeometry, earthMaterial));
 
       const earthTexture = new THREE.TextureLoader().load(
-        "/brand/earth-clear-8192.webp",
+        "/brand/earth-atmos-2048.jpg",
         (texture) => {
           texture.colorSpace = THREE.SRGBColorSpace;
           texture.anisotropy = Math.min(8, renderer?.capabilities.getMaxAnisotropy() ?? 1);
@@ -179,12 +205,12 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       const gridMaterial = new THREE.LineBasicMaterial({ color: "#9acdc6", transparent: true, opacity: 0.09 });
       materials.push(gridMaterial);
       [-60, -30, 0, 30, 60].forEach((latitude) => {
-        const geometry = new THREE.BufferGeometry().setFromPoints(createLatitudeRing(latitude, globeRadius * 1.008));
+        const geometry = new THREE.BufferGeometry().setFromPoints(createLatitudeRing(THREE, latitude, globeRadius * 1.008));
         geometries.push(geometry);
         globe.add(new THREE.LineLoop(geometry, gridMaterial));
       });
       [-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150].forEach((longitude) => {
-        const geometry = new THREE.BufferGeometry().setFromPoints(createMeridian(longitude, globeRadius * 1.008));
+        const geometry = new THREE.BufferGeometry().setFromPoints(createMeridian(THREE, longitude, globeRadius * 1.008));
         geometries.push(geometry);
         globe.add(new THREE.Line(geometry, gridMaterial));
       });
@@ -201,13 +227,15 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       materials.push(haloMaterial);
       globe.add(new THREE.Mesh(haloGeometry, haloMaterial));
 
-      const markerGeometry = new THREE.SphereGeometry(0.072, 18, 14);
+      // The visible marker stays deliberately small at the closest country
+      // zoom. A separate invisible hit sphere preserves an easy click target.
+      const markerGeometry = new THREE.SphereGeometry(0.01, 18, 14);
       const hitGeometry = new THREE.SphereGeometry(0.25, 12, 10);
-      const ringGeometry = new THREE.RingGeometry(0.13, 0.145, 28);
+      const ringGeometry = new THREE.RingGeometry(0.02, 0.024, 28);
       geometries.push(markerGeometry, hitGeometry, ringGeometry);
 
       const markerEntries = countrySpotlights.map((country, index) => {
-        const position = latLonToVector3(country.latitude, country.longitude, globeRadius * 1.025);
+        const position = latLonToVector3(THREE, country.latitude, country.longitude, globeRadius * 1.025);
         const markerMaterial = new THREE.MeshBasicMaterial({
           color: accentPalette[index % accentPalette.length],
           transparent: true,
@@ -241,14 +269,13 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         return { country, marker, markerMaterial, hit, ring, ringMaterial };
       });
 
-      const updateMarkerSelection = (countryId: string | null) => {
+      const updateMarkerSelection = (countryId: string, showAll = false) => {
         markerEntries.forEach(({ country, marker, markerMaterial, ring, ringMaterial }) => {
           const isSelected = country.id === countryId;
-          const isOverview = countryId === null;
-          marker.scale.setScalar(isSelected ? 0.09 : 0.055);
-          markerMaterial.opacity = isSelected ? 0.78 : isOverview ? 0.52 : 0;
+          marker.scale.setScalar(isSelected ? 1 : 0.82);
+          markerMaterial.opacity = isSelected ? 0.92 : showAll ? 0.5 : 0;
           markerMaterial.needsUpdate = true;
-          ring.scale.setScalar(isSelected ? 0.12 : 0.08);
+          ring.scale.setScalar(isSelected ? 1 : 0.9);
           ringMaterial.opacity = isSelected && reducedMotion ? 0.32 : 0;
           ringMaterial.needsUpdate = true;
         });
@@ -262,10 +289,12 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       let transitionPhase: "idle" | "zoom-out" | "rotate" | "zoom-in" = "idle";
       let capitalLabelEnabled = false;
       let lastAnimationTime = performance.now();
+      let pulseUntil = 0;
       let dragState: { pointerId: number; x: number; y: number; moved: boolean } | null = null;
       const raycaster = new THREE.Raycaster();
       const pointer = new THREE.Vector2();
       const labelPoint = new THREE.Vector3();
+      const hitWorldPoint = new THREE.Vector3();
 
       const positionCapitalLabel = () => {
         const activeEntry = markerEntries.find(({ country }) => country.id === focusedIdRef.current);
@@ -325,20 +354,29 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         }
 
         const activeEntry = markerEntries.find(({ country }) => country.id === focusedIdRef.current);
-        if (activeEntry && !reducedMotion) {
-          const phase = (time % 1700) / 1700;
-          const pulseScale = 0.12 + phase * 0.18;
-          activeEntry.ring.scale.setScalar(pulseScale);
-          activeEntry.ringMaterial.opacity = (1 - phase) * 0.42;
+        if (activeEntry && !reducedMotion && time < pulseUntil) {
+          const phase = (time % 720) / 720;
+          const blink = 0.5 - Math.cos(phase * Math.PI * 2) * 0.5;
+          activeEntry.marker.scale.setScalar(0.94 + blink * 0.12);
+          activeEntry.markerMaterial.opacity = 0.52 + blink * 0.46;
+          activeEntry.markerMaterial.needsUpdate = true;
+          activeEntry.ring.scale.setScalar(1 + blink * 0.14);
+          activeEntry.ringMaterial.opacity = 0.18 + blink * 0.48;
           activeEntry.ringMaterial.needsUpdate = true;
-          activeEntry.marker.scale.setScalar(0.09 + Math.sin(phase * Math.PI) * 0.012);
+        } else if (activeEntry && !reducedMotion) {
+          activeEntry.marker.scale.setScalar(1);
+          activeEntry.markerMaterial.opacity = 0.92;
+          activeEntry.markerMaterial.needsUpdate = true;
+          activeEntry.ring.scale.setScalar(1);
+          activeEntry.ringMaterial.opacity = 0.26;
+          activeEntry.ringMaterial.needsUpdate = true;
         }
         render();
 
         const settled = transitionPhase === "idle"
           && currentQuaternion.angleTo(targetQuaternion) < 0.001
           && Math.abs(currentCameraZ - targetCameraZ) < 0.002;
-        const shouldPulse = Boolean(focusedIdRef.current) && !reducedMotion;
+        const shouldPulse = Boolean(focusedIdRef.current) && !reducedMotion && time < pulseUntil;
         if (!settled || shouldPulse) frameId = window.requestAnimationFrame(animateRotation);
       };
 
@@ -364,7 +402,7 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         focusedIdRef.current = countryId;
         const country = countrySpotlights.find((item) => item.id === countryId);
         capitalLabel.textContent = country ? `${country.capital} · ${country.name}` : "";
-        const nextQuaternion = countryQuaternion(countryId);
+        const nextQuaternion = countryQuaternion(THREE, countryId);
         if (targetQuaternion.dot(nextQuaternion) < 0) {
           nextQuaternion.set(-nextQuaternion.x, -nextQuaternion.y, -nextQuaternion.z, -nextQuaternion.w);
         }
@@ -377,24 +415,26 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
           : "rotate";
         targetCameraZ = transitionPhase === "zoom-out" ? 8.6 : currentCameraZ;
         updateMarkerSelection(countryId);
+        pulseUntil = performance.now() + 3600;
         scheduleRotation();
       };
 
       const showOverview = () => {
         focusedIdRef.current = null;
         capitalLabel.textContent = "";
-        targetQuaternion.copy(countryQuaternion(selectedIdRef.current));
+        targetQuaternion.copy(countryQuaternion(THREE, selectedIdRef.current));
         finalCameraZ = 9.2;
         targetCameraZ = 9.2;
         capitalLabelEnabled = false;
+        pulseUntil = 0;
         transitionPhase = "zoom-in";
-        updateMarkerSelection(null);
+        updateMarkerSelection(selectedIdRef.current, true);
         scheduleRotation();
       };
 
       focusRef.current = focusCountry;
       overviewRef.current = showOverview;
-      updateMarkerSelection(null);
+      updateMarkerSelection(selectedIdRef.current, true);
 
       const resize = () => {
         const bounds = mount.getBoundingClientRect();
@@ -412,8 +452,13 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         pointer.x = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
         pointer.y = -((event.clientY - bounds.top) / bounds.height) * 2 + 1;
         raycaster.setFromCamera(pointer, camera);
+        globe.updateMatrixWorld(true);
         const hits = raycaster.intersectObjects(markerEntries.map(({ hit }) => hit), false);
-        return hits[0]?.object.userData.countryId as string | undefined;
+        const visibleHit = hits.find((hit) => {
+          hit.object.getWorldPosition(hitWorldPoint);
+          return hitWorldPoint.z > 0;
+        });
+        return visibleHit?.object.userData.countryId as string | undefined;
       };
 
       const handlePointerDown = (event: PointerEvent) => {
@@ -452,7 +497,9 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       const finishPointer = (event: PointerEvent, shouldSelect: boolean) => {
         if (!dragState || dragState.pointerId !== event.pointerId) return;
         const wasClick = !dragState.moved;
-        renderer?.domElement.releasePointerCapture(event.pointerId);
+        if (renderer?.domElement.hasPointerCapture(event.pointerId)) {
+          renderer.domElement.releasePointerCapture(event.pointerId);
+        }
         renderer?.domElement.classList.remove("is-dragging");
         dragState = null;
         if (shouldSelect && wasClick) {
@@ -472,8 +519,9 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       renderer.domElement.addEventListener("pointercancel", handlePointerCancel);
       resize();
       render();
+      setGlobeStatus("ready");
 
-      return () => {
+      cleanupScene = () => {
         focusRef.current = null;
         overviewRef.current = null;
         renderer?.domElement.removeEventListener("pointerdown", handlePointerDown);
@@ -489,12 +537,33 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         renderer?.domElement.remove();
         capitalLabel.remove();
       };
-    } catch (error) {
-      console.warn("Three.js country globe unavailable; country buttons remain available.", error);
-      renderer?.dispose();
-      renderer?.domElement.remove();
-      return undefined;
+      } catch (error) {
+        console.warn("Three.js country globe unavailable; country buttons remain available.", error);
+        if (!cancelled) setGlobeStatus("unavailable");
+        renderer?.dispose();
+        renderer?.domElement.remove();
+      }
+    };
+
+    if ("IntersectionObserver" in window) {
+      visibilityObserver = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          visibilityObserver?.disconnect();
+          void initialize();
+        },
+        { rootMargin: "480px 0px" },
+      );
+      visibilityObserver.observe(mount);
+    } else {
+      void initialize();
     }
+
+    return () => {
+      cancelled = true;
+      visibilityObserver?.disconnect();
+      cleanupScene?.();
+    };
   }, []);
 
   useEffect(() => {
@@ -511,11 +580,18 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
 
   return (
     <div
-      ref={mountRef}
-      className="country-spotlight-globe"
-      role="img"
+      className={`country-spotlight-globe is-${globeStatus}`}
+      role="group"
       aria-label="Interactive Earth globe. Use the country buttons to select a location; drag with a mouse to rotate."
-    />
+    >
+      <div ref={mountRef} className="country-spotlight-globe-canvas" aria-hidden="true" />
+      {globeStatus !== "ready" ? (
+        <div className="country-spotlight-globe-status" role="status" aria-live="polite">
+          <span>{globeStatus === "unavailable" ? "Interactive globe unavailable" : "Preparing interactive globe"}</span>
+          <small>Country profiles remain available below.</small>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -524,7 +600,12 @@ export function CountrySpotlightSection() {
   const [focusRequest, setFocusRequest] = useState(0);
   const [overviewRequest, setOverviewRequest] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
+  const countryButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const selectedCountry = countrySpotlights.find((country) => country.id === selectedId) ?? countrySpotlights[0];
+  const reviewedAt = selectedCountry.sources.reduce(
+    (latest, source) => (source.reviewedAt > latest ? source.reviewedAt : latest),
+    selectedCountry.sources[0]?.reviewedAt ?? "",
+  );
   const selectCountry = (countryId: string) => {
     setSelectedId(countryId);
     setIsZoomed(true);
@@ -533,6 +614,23 @@ export function CountrySpotlightSection() {
   const showFullGlobe = () => {
     setIsZoomed(false);
     setOverviewRequest((request) => request + 1);
+  };
+  const focusCountryAt = (index: number) => {
+    const normalizedIndex = (index + countrySpotlights.length) % countrySpotlights.length;
+    selectCountry(countrySpotlights[normalizedIndex].id);
+    countryButtonRefs.current[normalizedIndex]?.focus();
+  };
+  const handleCountryKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let nextIndex: number | undefined;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = index + 1;
+    if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = index - 1;
+    if (event.key === "Home") nextIndex = 0;
+    if (event.key === "End") nextIndex = countrySpotlights.length - 1;
+    if (nextIndex === undefined) return;
+
+    event.preventDefault();
+    focusCountryAt(nextIndex);
   };
 
   return (
@@ -581,10 +679,14 @@ export function CountrySpotlightSection() {
               {countrySpotlights.map((country, index) => (
                 <button
                   key={country.id}
+                  ref={(button) => {
+                    countryButtonRefs.current[index] = button;
+                  }}
                   type="button"
                   aria-pressed={country.id === selectedId}
                   className={country.id === selectedId ? "is-active" : ""}
                   onClick={() => selectCountry(country.id)}
+                  onKeyDown={(event) => handleCountryKeyDown(event, index)}
                 >
                   <span>0{index + 1}</span>
                   {country.name}
@@ -593,37 +695,48 @@ export function CountrySpotlightSection() {
             </div>
           </div>
 
-          <article className="country-spotlight-detail" aria-live="polite">
-            <div className="country-spotlight-detail-topline">
-              <span>{selectedCountry.region}</span>
-              <span>Selected country</span>
-            </div>
-            <div className="country-spotlight-detail-heading">
-              <Eyebrow>{selectedCountry.issueLabel}</Eyebrow>
-              <h3>{selectedCountry.name}</h3>
-              <p>{selectedCountry.issue}</p>
-            </div>
-            <div className="country-spotlight-facts">
-              <div>
-                <span>{selectedCountry.driversLabel}</span>
-                <p>{selectedCountry.drivers}</p>
+          <article
+            className="country-spotlight-detail"
+            aria-live="polite"
+            aria-labelledby={`country-detail-${selectedCountry.id}`}
+          >
+            <div className="country-spotlight-detail-content" key={selectedCountry.id}>
+              <div className="country-spotlight-detail-topline">
+                <span>{selectedCountry.region}</span>
+                <span>Selected country</span>
               </div>
-              <div>
-                <span>{selectedCountry.responseLabel}</span>
-                <p>{selectedCountry.response}</p>
+              <div className="country-spotlight-detail-heading">
+                <Eyebrow>{selectedCountry.issueLabel}</Eyebrow>
+                <h3 id={`country-detail-${selectedCountry.id}`}>{orphanSafeText(selectedCountry.name)}</h3>
+                <p>{orphanSafeText(selectedCountry.issue)}</p>
               </div>
-            </div>
-            <div className="country-spotlight-sources">
-              <span>Read the starting sources</span>
-              <ul>
-                {selectedCountry.sources.map((source) => (
-                  <li key={source.url}>
-                    <a href={source.url} target="_blank" rel="noreferrer">
-                      {source.organization} · {source.title}<b aria-hidden="true">↗</b>
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <div className="country-spotlight-facts">
+                <div>
+                  <span>{selectedCountry.driversLabel}</span>
+                  <p>{orphanSafeText(selectedCountry.drivers)}</p>
+                </div>
+                <div>
+                  <span>{selectedCountry.responseLabel}</span>
+                  <p>{orphanSafeText(selectedCountry.response)}</p>
+                </div>
+              </div>
+              <div className="country-spotlight-sources">
+                <span>Read the starting sources</span>
+                <ul>
+                  {selectedCountry.sources.map((source) => (
+                    <li key={source.url}>
+                      <ExternalLink href={source.url}>
+                        {orphanSafeText(`${source.organization} · ${source.title}`)}<b aria-hidden="true">↗</b>
+                      </ExternalLink>
+                    </li>
+                  ))}
+                </ul>
+                {reviewedAt ? (
+                  <p className="country-spotlight-reviewed">
+                    Sources reviewed <time dateTime={reviewedAt}>{formatReviewedDate(reviewedAt)}</time>
+                  </p>
+                ) : null}
+              </div>
             </div>
           </article>
         </div>

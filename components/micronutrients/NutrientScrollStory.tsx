@@ -3,6 +3,8 @@
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { nutrients } from "@/content/nutrients";
 import type { Nutrient } from "@/content/types";
+import { ExternalLink } from "@/components/ui/ExternalLink";
+import { orphanSafeText } from "@/components/ui/orphanSafeText";
 
 const nutrientMarks: Record<string, string> = {
   "vitamin-a": "A",
@@ -37,10 +39,10 @@ function NutrientPanel({ nutrient, index }: { nutrient: Nutrient; index: number 
           <NutrientIcon nutrient={nutrient} />
           <div>
             <span className="nutrient-category">{nutrient.category}</span>
-            <h3>{nutrient.name}</h3>
+            <h3>{orphanSafeText(nutrient.name)}</h3>
           </div>
         </div>
-        <p>{nutrient.summary}</p>
+        <p>{orphanSafeText(nutrient.summary)}</p>
       </div>
       <div className="nutrient-axis" aria-hidden="true">
         <span>body</span>
@@ -52,24 +54,24 @@ function NutrientPanel({ nutrient, index }: { nutrient: Nutrient; index: number 
       <div className="nutrient-panel-facts">
         <div>
           <span className="eyebrow">In the body</span>
-          <p>{nutrient.whatItDoes}</p>
+          <p>{orphanSafeText(nutrient.whatItDoes)}</p>
         </div>
         <div>
           <span className="eyebrow">Food sources</span>
-          <p>{nutrient.foodSources}</p>
+          <p>{orphanSafeText(nutrient.foodSources)}</p>
         </div>
         <div>
           <span className="eyebrow">Public-health lens</span>
-          <p>{nutrient.globalLens}</p>
+          <p>{orphanSafeText(nutrient.globalLens)}</p>
         </div>
       </div>
       <div className="nutrient-panel-safety">
         <span className="eyebrow">Safety context</span>
-        <p>{nutrient.safetyNote}</p>
+        <p>{orphanSafeText(nutrient.safetyNote)}</p>
       </div>
-      <a href={nutrient.sourceUrl} target="_blank" rel="noreferrer">
-        Read the {nutrient.source} fact sheet <span aria-hidden="true">↗</span>
-      </a>
+      <ExternalLink href={nutrient.sourceUrl}>
+        {orphanSafeText(`Read the ${nutrient.source} fact sheet`)} <span aria-hidden="true">↗</span>
+      </ExternalLink>
     </div>
   );
 }
@@ -150,8 +152,8 @@ export function NutrientScrollStory() {
                   <NutrientIcon nutrient={nutrient} />
                   <span>{nutrient.category}</span>
                 </div>
-                <h3>{nutrient.name}</h3>
-                <p>{nutrient.summary}</p>
+                <h3>{orphanSafeText(nutrient.name)}</h3>
+                <p>{orphanSafeText(nutrient.summary)}</p>
               </div>
               <span className="step-arrow" aria-hidden="true">→</span>
             </article>

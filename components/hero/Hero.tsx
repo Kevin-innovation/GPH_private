@@ -6,35 +6,29 @@ export function Hero() {
     <section className="hero-section" id="hero" aria-labelledby="hero-title">
       <div className="page-width hero-grid">
         <div className="hero-heading">
-          {/* The organisation name, not a section kicker. It was rendering at the
-              same 12.5px as every other eyebrow on the page, which put the site's
-              own name a rung below its tagline. Set as the wordmark instead, in
-              the header lockup's own treatment so the brand reads consistently. */}
           <p className="hero-wordmark">
             Global Public Health <span>Lens</span>
           </p>
           <h1 id="hero-title">
-            Understanding health
+            See what shapes health
             <br />
-            through a global lens.
+            around <span className="no-orphan">the world.</span>
           </h1>
         </div>
         <div className="hero-copy">
           <p className="hero-supporting">
-            Explore how nutrition, food access, geography, policy, and inequality shape the health of communities around the
-            world.
+            Explore how place, environment, inequality, policy, access to care, and nutrition combine to shape health — and
+            what <span className="no-orphan">public-health action can change.</span>
           </p>
-          {/* Two routes out of the hero, per the brief: into the guide, or to the app.
-              The header already carries "Explore the App", so the primary here leads
-              into the content rather than duplicating that link. */}
           <div className="button-row">
-            <ButtonLink href="#micronutrients">Explore Micronutrients</ButtonLink>
-            <ButtonLink href="#app" variant="secondary">
-              Discover the Nutrition App
+            <ButtonLink href="#country-spotlight">Explore Country Spotlights</ButtonLink>
+            <ButtonLink href="#about" variant="secondary">
+              See the Public-Health Lens
             </ButtonLink>
           </div>
           <p className="hero-note">
-            Learning that connects what happens in the body with what communities and public-health systems can do.
+            An evidence-led educational project connecting lived experience, local context, and
+            <span className="no-orphan"> public systems.</span>
           </p>
         </div>
         <HeroVisual />

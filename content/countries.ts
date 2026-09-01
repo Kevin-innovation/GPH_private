@@ -18,8 +18,8 @@ export const countrySpotlights: CountrySpotlight[] = [
     responseLabel: "What to look for",
     response: "Primary care, prevention, and age-friendly environments that keep health support close to everyday life.",
     sources: [
-      { organization: "WHO", title: "Republic of Korea country profile", url: "https://www.who.int/countries/kor/", reviewedAt: "2026-08-30" },
-      { organization: "WHO Data", title: "Country inequality profiles", url: "https://www.who.int/data/inequality-monitor/data/country_profiles", reviewedAt: "2026-08-30" },
+      { organization: "WHO", title: "Republic of Korea country profile", url: "https://www.who.int/countries/kor/", reviewedAt: "2026-09-01" },
+      { organization: "WHO Data", title: "Republic of Korea health data overview", url: "https://data.who.int/countries/410", reviewedAt: "2026-09-01" },
     ],
   },
   {
@@ -36,8 +36,8 @@ export const countrySpotlights: CountrySpotlight[] = [
     responseLabel: "What to look for",
     response: "Integrated nutrition, primary care, and community delivery that connect health, food, education, and social development.",
     sources: [
-      { organization: "WHO India", title: "Nutrition in India", url: "https://www.who.int/india/health-topics/nutrition", reviewedAt: "2026-08-30" },
-      { organization: "WHO", title: "India country profile", url: "https://www.who.int/about/accountability/results/who-results-report-2024-2025/country-profile/2024/india", reviewedAt: "2026-08-30" },
+      { organization: "WHO India", title: "Nutrition in India", url: "https://www.who.int/india/health-topics/nutrition", reviewedAt: "2026-09-01" },
+      { organization: "WHO Data", title: "India health data overview", url: "https://data.who.int/countries/356", reviewedAt: "2026-09-01" },
     ],
   },
   {
@@ -54,8 +54,8 @@ export const countrySpotlights: CountrySpotlight[] = [
     responseLabel: "What to look for",
     response: "Stronger primary care, prevention, and coordinated services that make chronic-disease support easier to reach.",
     sources: [
-      { organization: "WHO", title: "Mexico country profile", url: "https://www.who.int/about/accountability/results/who-results-report-2024-2025/country-profile/2024/mexico", reviewedAt: "2026-08-30" },
-      { organization: "WHO Data", title: "Mexico health data overview", url: "https://www.who.int/data/gho/data/countries/country-details/GHO/mexico", reviewedAt: "2026-08-30" },
+      { organization: "WHO", title: "Mexico results report 2024–2025", url: "https://www.who.int/about/accountability/results/who-results-report-2024-2025/country-profile/2024/mexico", reviewedAt: "2026-09-01" },
+      { organization: "WHO Data", title: "Mexico health data overview", url: "https://data.who.int/countries/484", reviewedAt: "2026-09-01" },
     ],
   },
   {
@@ -72,8 +72,8 @@ export const countrySpotlights: CountrySpotlight[] = [
     responseLabel: "What to look for",
     response: "Equity-focused prevention, accessible care, and local public-health action that meet people where they live.",
     sources: [
-      { organization: "WHO European Observatory", title: "France: Country Health Profile 2025", url: "https://eurohealthobservatory.who.int/publications/m/france-country-health-profile-2025", reviewedAt: "2026-08-30" },
-      { organization: "WHO", title: "France country profile", url: "https://www.who.int/countries/fra", reviewedAt: "2026-08-30" },
+      { organization: "WHO European Observatory", title: "France: Country Health Profile 2025", url: "https://eurohealthobservatory.who.int/publications/m/france-country-health-profile-2025", reviewedAt: "2026-09-01" },
+      { organization: "WHO Data", title: "France health data overview", url: "https://data.who.int/countries/250", reviewedAt: "2026-09-01" },
     ],
   },
   {
@@ -90,8 +90,8 @@ export const countrySpotlights: CountrySpotlight[] = [
     responseLabel: "What to look for",
     response: "Community-led prevention, better local data, and equitable access to services across different places and populations.",
     sources: [
-      { organization: "CDC", title: "Social determinants of health", url: "https://www.cdc.gov/infrastructure/public-health-systems-emerging-practices/social-determinants-of-health.html", reviewedAt: "2026-08-30" },
-      { organization: "CDC", title: "Measuring the nation's health", url: "https://www.cdc.gov/nchs/about/measuring-the-nations-health.html", reviewedAt: "2026-08-30" },
+      { organization: "CDC", title: "Social determinants of health", url: "https://www.cdc.gov/infrastructure/public-health-systems-emerging-practices/social-determinants-of-health.html", reviewedAt: "2026-09-01" },
+      { organization: "CDC", title: "Measuring the nation's health", url: "https://www.cdc.gov/nchs/about/measuring-the-nations-health.html", reviewedAt: "2026-09-01" },
     ],
   },
 ];

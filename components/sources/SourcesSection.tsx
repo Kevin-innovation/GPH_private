@@ -1,6 +1,7 @@
 import { ExternalLink } from "@/components/ui/ExternalLink";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SectionShell } from "@/components/ui/SectionShell";
+import { orphanSafeText } from "@/components/ui/orphanSafeText";
 import { siteConfig } from "@/content/site-config";
 import { sources } from "@/content/sources";
 
@@ -25,8 +26,8 @@ export function SourcesSection() {
     <SectionShell id="sources" surface="white" labelledBy="sources-title" className="sources-section">
       <div className="page-width sources-grid">
         <SectionHeading
-          eyebrow="Read further"
-          title="Sources we return to."
+          eyebrow="Evidence base"
+          title={<>Sources behind <span className="no-orphan">the lens.</span></>}
           id="sources-title"
         />
         <div className="source-list">
@@ -47,11 +48,11 @@ export function SourcesSection() {
                     )}
                     {sourceIndex === 0 && (
                       <th className="source-organization" scope="rowgroup" rowSpan={group.sources.length}>
-                        {group.organization}
+                        {orphanSafeText(group.organization)}
                       </th>
                     )}
                     <td>
-                      <ExternalLink href={source.url}>{source.title}</ExternalLink>
+                      <ExternalLink href={source.url}>{orphanSafeText(source.title)}</ExternalLink>
                     </td>
                   </tr>
                 )),

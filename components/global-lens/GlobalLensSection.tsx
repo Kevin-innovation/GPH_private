@@ -10,8 +10,9 @@ export function GlobalLensSection() {
       <div className="page-width">
         <div className="global-intro">
           <SectionHeading
-            eyebrow="The GPHL difference"
-            title="One nutrient. Three connected levels."
+            eyebrow="How the lens works"
+            title={<>One health issue. Three <span className="no-orphan">levels of action.</span></>}
+            intro={<>Using iron as a worked example, follow one question from the body to community conditions and <span className="no-orphan">public-health systems.</span></>}
             id="global-lens-title"
           />
         </div>

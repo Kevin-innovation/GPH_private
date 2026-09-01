@@ -56,8 +56,8 @@ export function Header() {
               {item.label}
             </a>
           ))}
-          <a className="nav-cta" href="#app">
-            Explore the App
+          <a className="nav-cta" href="#country-spotlight">
+            Explore the Map
           </a>
         </nav>
 
@@ -86,8 +86,8 @@ export function Header() {
                 {item.label}
               </a>
             ))}
-            <a className="mobile-cta" href="#app" onClick={closeMenu}>
-              Explore the App
+            <a className="mobile-cta" href="#country-spotlight" onClick={closeMenu}>
+              Explore the Map
             </a>
           </nav>
         </div>

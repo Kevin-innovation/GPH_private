@@ -1,5 +1,6 @@
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ExternalLink } from "@/components/ui/ExternalLink";
+import { orphanSafeText } from "@/components/ui/orphanSafeText";
 import { caseStudies } from "@/content/case-studies";
 
 // Every case study follows the same three beats. Rendered as a vertical stepped
@@ -19,8 +20,8 @@ function CasePathway() {
         {pathwaySteps.map((item) => (
           <li className="case-pathway-step" key={item.step}>
             <span className="case-pathway-dot">{item.step}</span>
-            <b>{item.title}</b>
-            <small>{item.detail}</small>
+            <b>{orphanSafeText(item.title)}</b>
+            <small>{orphanSafeText(item.detail)}</small>
           </li>
         ))}
       </ol>
@@ -32,8 +33,8 @@ export function CaseStudyList() {
   return (
     <div className="case-studies">
       <div>
-        <Eyebrow>Case studies</Eyebrow>
-        <h3>What action looks like in practice.</h3>
+        <Eyebrow>First initiative: nutrition</Eyebrow>
+        <h3>One lens, applied <span className="no-orphan">in practice.</span></h3>
         {/* One instance, not one per study: these three beats are the same for
             every case below, so this is a key for reading them — repeating it
             inside each panel just printed identical content three times. */}
@@ -44,7 +45,7 @@ export function CaseStudyList() {
           <details key={study.slug} className="case-row">
             <summary>
               <span className="row-index">0{index + 1}</span>
-              <span>{study.title}</span>
+              <span>{orphanSafeText(study.title)}</span>
               <span className="summary-mark" aria-hidden="true">
                 +
               </span>
@@ -52,21 +53,23 @@ export function CaseStudyList() {
             <div className="case-detail">
               <div className="case-detail-copy">
                 <p>
-                  <b>Location:</b> {study.location}
+                  <b>Location:</b> {orphanSafeText(study.location)}
                 </p>
                 <p>
-                  <b>Issue:</b> {study.issue}
+                  <b>Issue:</b> {orphanSafeText(study.issue)}
                 </p>
                 <p>
-                  <b>Population:</b> {study.population}
+                  <b>Population:</b> {orphanSafeText(study.population)}
                 </p>
                 <p>
-                  <b>Intervention:</b> {study.intervention}
+                  <b>Intervention:</b> {orphanSafeText(study.intervention)}
                 </p>
                 <p>
-                  <b>Lessons:</b> {study.lessons}
+                  <b>Lessons:</b> {orphanSafeText(study.lessons)}
                 </p>
-                <ExternalLink href={study.sources[0].url}>Read the {study.sources[0].organization} source</ExternalLink>
+                <ExternalLink href={study.sources[0].url}>
+                  {orphanSafeText(`Read the ${study.sources[0].organization} source`)}
+                </ExternalLink>
               </div>
             </div>
           </details>

@@ -16,13 +16,14 @@ img { display: block; max-width: 100%; }
 h1, h2, h3, h4, p { margin-top: 0; }
 /* break-word is a floor, not the plan: the mobile scale below is sized so the
    longest word in any heading still fits the 320px container. */
-h1, h2, h3, h4 { color: var(--color-navy); font-weight: 300; letter-spacing: -0.03em; line-height: 1.12; overflow-wrap: break-word; }
+h1, h2, h3, h4 { color: var(--color-navy); font-weight: 300; letter-spacing: -0.03em; line-height: 1.12; overflow-wrap: break-word; text-wrap: balance; }
 h1, h2 { font-weight: 500; }
 h1 { font-size: clamp(2.9rem, 4.6vw, 4.35rem); max-width: 15ch; }
 h2 { font-size: clamp(2.1rem, 3.2vw, 3.1rem); max-width: 18ch; }
 h3 { font-size: clamp(1.4rem, 1.9vw, 1.85rem); letter-spacing: -0.022em; }
 h4 { font-size: 1.12rem; letter-spacing: -0.015em; }
-p { max-width: 66ch; }
+p { max-width: 66ch; text-wrap: pretty; }
+li, dd, figcaption, blockquote { text-wrap: pretty; }
 /* Tailwind preflight zeroes every margin, so paragraph rhythm is declared once here. */
 p + p { margin-top: 1.15em; }
 .page-width { width: min(1280px, calc(100% - 64px)); margin: 0 auto; }
@@ -399,6 +400,7 @@ details[open] .summary-mark { transform: rotate(45deg); }
 .field-error, .form-error { display: block; margin-top: 6px; color: #8e2626; font-size: 0.75rem; }
 .form-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
 .form-actions .button { border: 0; }
+.form-actions .button:disabled { cursor: wait; opacity: 0.55; }
 .form-note { margin: 0; color: rgba(23, 37, 46, 0.7); font-size: 0.76rem; }
 .honeypot { position: absolute !important; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
 .form-success { max-width: 600px; padding-left: 24px; border-left: 2px solid var(--color-teal); }
@@ -815,7 +817,7 @@ details[open] .summary-mark { transform: rotate(45deg); }
 
 @media (min-width: 1200px) {
   .global-intro .section-heading { max-width: 100%; }
-  .global-intro .section-heading h2 { white-space: nowrap; text-wrap: initial; }
+  .global-intro .section-heading h2 { white-space: normal; text-wrap: balance; }
 }
 
 /* Hero lens diagram: a restrained, data-led alternative to stock-like AI
@@ -1476,7 +1478,7 @@ details[open] .summary-mark { transform: rotate(45deg); }
 }
 
 @media (min-width: 901px) {
-  .source-table .source-organization { white-space: nowrap; overflow-wrap: normal; }
+  .source-table .source-organization { white-space: normal; overflow-wrap: anywhere; text-wrap: pretty; }
 
   .source-table .row-index {
     font-size: clamp(1rem, 1.25vw, 1.2rem);
@@ -1581,7 +1583,9 @@ details[open] .summary-mark { transform: rotate(45deg); }
     justify-content: flex-start;
     gap: 10px;
     width: auto;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
   }
 
   .source-table td a::after {
@@ -3233,7 +3237,9 @@ details .lens-step {
 .hero-lens-fallback i:nth-child(2) { width: 61%; transform: rotate(58deg); }
 .hero-lens-fallback i:nth-child(3) { width: 82%; transform: rotate(-34deg); }
 .hero-lens-fallback[aria-hidden="true"] { visibility: hidden; }
-.hero-lens-failed .hero-lens-fallback { visibility: visible; }
+.hero-lens-loading .hero-lens-fallback,
+.hero-lens-unavailable .hero-lens-fallback { visibility: visible; }
+.hero-lens-loading .hero-lens-fallback { opacity: 0.55; }
 
 @media (max-width: 900px) {
   .hero-grid > .hero-copy {
@@ -3325,6 +3331,40 @@ details .lens-step {
   touch-action: pan-y;
 }
 
+.country-spotlight-globe-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.country-spotlight-globe-status {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  min-width: min(78%, 310px);
+  gap: 6px;
+  padding: 14px 0;
+  border-top: 1px solid rgba(17, 126, 118, 0.28);
+  border-bottom: 1px solid rgba(17, 126, 118, 0.18);
+  color: var(--color-navy);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.country-spotlight-globe-status span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.country-spotlight-globe-status small {
+  color: rgba(23, 37, 46, 0.62);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
 .country-spotlight-globe canvas {
   display: block;
   width: 100%;
@@ -3392,7 +3432,7 @@ details .lens-step {
   border-radius: 999px;
   background: rgba(248, 251, 250, 0.82);
   box-shadow: 0 7px 18px rgba(18, 49, 75, 0.14);
-  color: var(--navy);
+  color: var(--color-navy);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -3488,6 +3528,22 @@ details .lens-step {
   border-top: 1px solid var(--color-navy);
 }
 
+.country-spotlight-detail-content {
+  animation: country-detail-enter 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes country-detail-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .country-spotlight-detail-topline {
   display: flex;
   justify-content: space-between;
@@ -3573,6 +3629,7 @@ details .lens-step {
   font-size: 0.8rem;
   line-height: 1.4;
   text-decoration-color: rgba(17, 126, 118, 0.42);
+  text-wrap: pretty;
 }
 
 .country-spotlight-sources a:hover,
@@ -3585,6 +3642,20 @@ details .lens-step {
   font-size: 0.95rem;
   font-weight: 500;
   text-decoration: none;
+}
+
+.country-spotlight-reviewed {
+  margin: 14px 0 0;
+  color: rgba(23, 37, 46, 0.56);
+  font-size: 0.68rem;
+  letter-spacing: 0.035em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.country-spotlight-reviewed time {
+  color: rgba(23, 37, 46, 0.75);
+  font-weight: 700;
 }
 
 .country-spotlight-note {
@@ -3743,6 +3814,424 @@ details .lens-step {
   .solution-row::after {
     animation: none !important;
     transform: scaleX(0);
+  }
+}
+
+/* ---- Phase 1: mission signature -----------------------------------------
+   This section is the editorial thesis of the site. Its movement explains the
+   relationship between determinants; it never changes layout dimensions. */
+#about.mission-signature {
+  overflow: clip;
+  isolation: isolate;
+  padding-block: clamp(104px, 10vw, 156px);
+  border-top: 1px solid var(--color-navy);
+  border-bottom: 1px solid var(--color-navy);
+  background: #eef6f3;
+  box-shadow: inset 0 12px 0 #e4f0ec;
+}
+
+.mission-signature::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(18, 49, 75, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 49, 75, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+  pointer-events: none;
+}
+
+.mission-stage {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(64px, 8vw, 128px);
+  align-items: start;
+}
+
+.mission-heading-column {
+  min-width: 0;
+}
+
+.mission-heading-column h2 {
+  max-width: 11ch;
+  margin: 0;
+  font-size: clamp(3.15rem, 4.5vw, 4.5rem);
+  line-height: 0.99;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.no-orphan {
+  white-space: nowrap;
+}
+
+.mission-prompt {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  max-width: 38ch;
+  margin: 34px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(18, 49, 75, 0.24);
+  color: rgba(23, 37, 46, 0.7);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.mission-prompt::before {
+  content: "";
+  width: 28px;
+  margin-top: 0.72em;
+  border-top: 1px solid var(--color-gold-text);
+}
+
+.mission-copy {
+  min-width: 0;
+}
+
+.mission-signature .lead-copy {
+  max-width: 56ch;
+  margin: 0;
+  color: var(--color-navy);
+  font-size: clamp(1.25rem, 1.7vw, 1.65rem);
+  line-height: 1.42;
+  letter-spacing: -0.022em;
+  text-wrap: pretty;
+}
+
+.mission-signature .mission-story {
+  max-width: 58ch;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top-color: rgba(18, 49, 75, 0.2);
+}
+
+.mission-signature .mission-story p {
+  color: rgba(23, 37, 46, 0.76);
+  font-size: 1rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.mission-interactive {
+  margin-top: 52px;
+  border-top: 1px solid var(--color-navy);
+}
+
+.mission-network-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid var(--color-hairline);
+  color: var(--color-teal-text);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.mission-signature .determinants {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 18px 0 24px;
+  border-top: 0;
+  border-bottom: 1px solid var(--color-hairline);
+  background: transparent;
+}
+
+.mission-signature .determinants button {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  min-height: 108px;
+  padding: 18px;
+  border: 1px solid rgba(18, 49, 75, 0.2);
+  background: rgba(255, 255, 255, 0.64);
+  color: rgba(23, 37, 46, 0.68);
+  cursor: pointer;
+  text-align: left;
+  touch-action: manipulation;
+  transition:
+    transform 220ms ease,
+    border-color 200ms ease,
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 220ms ease;
+}
+
+.mission-signature .determinants button:hover,
+.mission-signature .determinants button:focus-visible {
+  background: #ffffff;
+  color: var(--color-navy);
+  border-color: rgba(17, 126, 118, 0.72);
+  box-shadow: 0 10px 24px rgba(18, 49, 75, 0.08);
+  transform: translateY(-2px);
+}
+
+.mission-signature .determinants button.is-active {
+  z-index: 2;
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
+  box-shadow: 0 12px 0 rgba(17, 126, 118, 0.13);
+  transform: translateY(-4px);
+}
+
+.mission-signature .determinants button:focus-visible {
+  z-index: 3;
+  outline: 3px solid var(--color-gold-text);
+  outline-offset: 3px;
+}
+
+/* The original determinants rule styles every descendant span. These scoped
+   resets keep the interactive card labels typographic and predictable. */
+.mission-signature .determinants button .mission-determinant-index,
+.mission-signature .determinants button .mission-determinant-label,
+.mission-signature .determinants button .mission-determinant-state {
+  display: block;
+  flex: 0 0 auto;
+  align-items: initial;
+  gap: 0;
+  padding: 0;
+  color: inherit;
+  line-height: 1;
+  text-transform: none;
+}
+
+.mission-signature .determinants button .mission-determinant-index {
+  color: var(--color-gold-text);
+  font-size: 0.69rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.mission-signature .determinants button .mission-determinant-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: clamp(0.9rem, 1.15vw, 1.08rem);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.mission-signature .determinants button .mission-determinant-state {
+  color: var(--color-teal-text);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mission-signature .determinants button.is-active .mission-determinant-state {
+  color: var(--color-gold-text);
+}
+
+.mission-focus-panel {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 28px;
+  min-height: 214px;
+  padding: 30px 0 28px;
+  border-bottom: 1px solid var(--color-navy);
+}
+
+.mission-focus-index {
+  color: rgba(18, 49, 75, 0.16);
+  font-size: 3.8rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.07em;
+  line-height: 0.9;
+}
+
+.mission-focus-copy {
+  align-self: start;
+  animation: mission-focus-in 260ms ease-out both;
+}
+
+.mission-focus-copy > span {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--color-teal-text);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.mission-focus-copy h3 {
+  max-width: 30ch;
+  margin: 0 0 12px;
+  font-size: clamp(1.45rem, 2vw, 1.9rem);
+  line-height: 1.16;
+  text-wrap: balance;
+}
+
+.mission-focus-copy p {
+  max-width: 60ch;
+  margin: 0;
+  color: rgba(23, 37, 46, 0.74);
+  font-size: 0.94rem;
+  line-height: 1.58;
+  text-wrap: pretty;
+}
+
+.mission-signature .mission-coda {
+  margin: 30px 0 0;
+  color: var(--color-navy);
+  font-size: clamp(1.08rem, 1.45vw, 1.3rem);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+@keyframes mission-focus-in {
+  from { opacity: 0.35; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes mission-title-enter {
+      from { opacity: 0.32; transform: translateY(28px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .mission-heading-column h2 {
+      animation: mission-title-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 2% cover 28%;
+    }
+  }
+}
+
+@media (min-width: 901px) {
+  .mission-heading-column {
+    position: sticky;
+    top: calc(var(--header-height) + 48px);
+    align-self: start;
+  }
+}
+
+@media (max-width: 900px) {
+  #about.mission-signature {
+    padding-block: 84px;
+  }
+
+  .mission-stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 52px;
+  }
+
+  .mission-heading-column h2 {
+    max-width: 12ch;
+    font-size: clamp(3rem, 9vw, 4.15rem);
+  }
+
+  .mission-prompt {
+    max-width: 52ch;
+  }
+}
+
+@media (max-width: 640px) {
+  #about.mission-signature {
+    padding-block: 68px;
+    box-shadow: inset 0 8px 0 #e4f0ec;
+  }
+
+  .mission-stage {
+    gap: 40px;
+  }
+
+  .mission-heading-column h2 {
+    max-width: 100%;
+    font-size: clamp(2.2rem, 9.5vw, 3rem);
+    line-height: 1.02;
+  }
+
+  .mission-signature .lead-copy {
+    font-size: 1.14rem;
+    line-height: 1.48;
+  }
+
+  .mission-signature .mission-story {
+    margin-top: 32px;
+    padding-top: 20px;
+  }
+
+  .mission-interactive {
+    margin-top: 40px;
+  }
+
+  .mission-network-header {
+    font-size: 0.6rem;
+  }
+
+  .mission-network-header span:last-child {
+    display: none;
+  }
+
+  .mission-signature .determinants {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 14px 0 20px;
+  }
+
+  .mission-signature .determinants button {
+    grid-template-columns: auto minmax(0, 1fr);
+    min-height: 82px;
+    padding: 14px 12px;
+  }
+
+  .mission-signature .determinants button .mission-determinant-state {
+    grid-column: 2;
+    margin-top: -3px;
+  }
+
+  .mission-signature .determinants button .mission-determinant-label {
+    font-size: 0.88rem;
+  }
+
+  .mission-focus-panel {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 18px;
+    min-height: 248px;
+    padding: 26px 0 24px;
+  }
+
+  .mission-focus-index {
+    font-size: 2.7rem;
+  }
+
+  .mission-focus-copy h3 {
+    font-size: 1.42rem;
+  }
+
+  .mission-focus-copy p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mission-heading-column h2,
+  .mission-focus-copy {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .mission-signature .determinants button {
+    transition: none;
   }
 }
 

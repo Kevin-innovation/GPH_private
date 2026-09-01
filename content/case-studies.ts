@@ -1,6 +1,6 @@
 import type { CaseStudy } from "./types";
 
-const reviewedAt = "2026-08-20";
+const reviewedAt = "2026-09-01";
 
 export const caseStudies: CaseStudy[] = [
   {

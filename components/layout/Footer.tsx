@@ -1,15 +1,17 @@
 import Image from "next/image";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { orphanSafeText } from "@/components/ui/orphanSafeText";
 import { legal } from "@/content/legal";
 import { siteConfig } from "@/content/site-config";
 
 const exploreLinks = [
+  { label: "Country Spotlights", href: "#country-spotlight" },
+  { label: "How the Lens Works", href: "#global-lens" },
   { label: "Micronutrient Guide", href: "#micronutrients" },
   { label: "Nutrition App", href: "#app" },
-  { label: "Solutions & Action", href: "#global-lens" },
   { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
   { label: "Sources", href: "#sources" },
+  { label: "Contact", href: "#contact" },
 ];
 
 // Owner-supplied values are still placeholders, so these render as plain text
@@ -33,8 +35,8 @@ export function Footer() {
             </span>
           </a>
           <p>
-            Global Public Health Lens makes health easier to understand by connecting individual experiences with the global
-            systems that shape them.
+            Global Public Health Lens connects individual experiences with the places, environments, policies, and
+            <span className="no-orphan"> systems that shape health.</span>
           </p>
           {hasEmail ? <a className="footer-email" href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a> : null}
           {siteConfig.socialLinks.length > 0 ? (
@@ -60,7 +62,7 @@ export function Footer() {
         <div className="footer-links">
           <Eyebrow>Boundaries</Eyebrow>
           <p className="footer-pending">Privacy information will be published before launch.</p>
-          <p>{legal.shortDisclaimer}</p>
+          <p>{orphanSafeText(legal.shortDisclaimer)}</p>
         </div>
       </div>
 

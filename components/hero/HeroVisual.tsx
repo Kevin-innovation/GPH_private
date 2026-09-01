@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
+
+type ThreeModule = typeof import("three");
 
 const layers = [
   { id: "body", label: "Body", title: "What happens in people", description: "Biology, nutrition, and lived health", color: "#f2b84b" },
@@ -10,13 +11,13 @@ const layers = [
 ] as const;
 
 type LayerSceneEntry = {
-  group: THREE.Group;
-  lineMaterial: THREE.LineBasicMaterial;
-  nodeMaterials: THREE.MeshBasicMaterial[];
+  group: import("three").Group;
+  lineMaterial: import("three").LineBasicMaterial;
+  nodeMaterials: import("three").MeshBasicMaterial[];
 };
 
-function createOrbitPoints(radius: number, squash: number, rotation: THREE.Euler) {
-  const points: THREE.Vector3[] = [];
+function createOrbitPoints(THREE: ThreeModule, radius: number, squash: number, rotation: import("three").Euler) {
+  const points: import("three").Vector3[] = [];
   for (let index = 0; index < 128; index += 1) {
     const angle = (index / 128) * Math.PI * 2;
     points.push(new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius * squash, 0).applyEuler(rotation));
@@ -30,6 +31,7 @@ export function HeroVisual() {
   const selectLayerRef = useRef<((index: number) => void) | null>(null);
   const activeIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [renderStatus, setRenderStatus] = useState<"loading" | "ready" | "unavailable">("loading");
   const activeLayer = layers[activeIndex];
 
   const selectLayer = (index: number) => {
@@ -42,14 +44,21 @@ export function HeroVisual() {
     const mount = canvasMountRef.current;
     if (!mount) return undefined;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const geometries: THREE.BufferGeometry[] = [];
-    const materials: THREE.Material[] = [];
-    let renderer: THREE.WebGLRenderer | null = null;
-    let resizeObserver: ResizeObserver | null = null;
-    let frameId = 0;
+    let cancelled = false;
+    let cleanupScene: (() => void) | undefined;
+    const initialize = async () => {
+      let renderer: import("three").WebGLRenderer | null = null;
 
-    try {
+      try {
+        const THREE = await import("three");
+        if (cancelled) return;
+
+        const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const geometries: import("three").BufferGeometry[] = [];
+        const materials: import("three").Material[] = [];
+        let resizeObserver: ResizeObserver | null = null;
+        let frameId = 0;
+
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
       renderer.setClearColor(0x000000, 0);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -86,7 +95,7 @@ export function HeroVisual() {
 
       const sceneLayers: LayerSceneEntry[] = orbitSpecs.map((spec, layerIndex) => {
         const layerGroup = new THREE.Group();
-        const points = createOrbitPoints(spec.radius, spec.squash, spec.rotation);
+        const points = createOrbitPoints(THREE, spec.radius, spec.squash, spec.rotation);
         const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
         const lineMaterial = new THREE.LineBasicMaterial({
           color: layers[layerIndex].color,
@@ -97,7 +106,7 @@ export function HeroVisual() {
         materials.push(lineMaterial);
         layerGroup.add(new THREE.LineLoop(lineGeometry, lineMaterial));
 
-        const nodeMaterials: THREE.MeshBasicMaterial[] = [];
+        const nodeMaterials: import("three").MeshBasicMaterial[] = [];
         for (let nodeIndex = 0; nodeIndex < spec.nodes; nodeIndex += 1) {
           const pointIndex = Math.floor(((nodeIndex + 0.35 * layerIndex) / spec.nodes) * points.length) % points.length;
           const nodeMaterial = new THREE.MeshBasicMaterial({
@@ -233,8 +242,9 @@ export function HeroVisual() {
       renderer.domElement.addEventListener("pointercancel", handlePointerCancel);
       resize();
       selectLayerRef.current(activeIndexRef.current);
+      setRenderStatus("ready");
 
-      return () => {
+      cleanupScene = () => {
         selectLayerRef.current = null;
         renderer?.domElement.removeEventListener("pointerdown", handlePointerDown);
         renderer?.domElement.removeEventListener("pointermove", handlePointerMove);
@@ -247,19 +257,31 @@ export function HeroVisual() {
         renderer?.dispose();
         renderer?.domElement.remove();
       };
-    } catch (error) {
-      console.warn("Three.js hero lens unavailable; using accessible fallback.", error);
-      stageRef.current?.classList.add("hero-lens-failed");
-      renderer?.dispose();
-      renderer?.domElement.remove();
-      return undefined;
-    }
+      } catch (error) {
+        console.warn("Three.js hero lens unavailable; using accessible fallback.", error);
+        if (!cancelled) setRenderStatus("unavailable");
+        renderer?.dispose();
+        renderer?.domElement.remove();
+      }
+    };
+
+    // Keep the hero readable immediately, then hydrate the heavier WebGL layer
+    // after the critical text and controls have painted.
+    const loadTimer = window.setTimeout(() => {
+      void initialize();
+    }, 180);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(loadTimer);
+      cleanupScene?.();
+    };
   }, []);
 
   return (
     <div
       ref={stageRef}
-      className="hero-lens-visual"
+      className={`hero-lens-visual hero-lens-${renderStatus}`}
       role="group"
       aria-label="Interactive global-health lens. Drag the network or choose Body, Environment, or Systems."
     >
@@ -269,6 +291,13 @@ export function HeroVisual() {
       </div>
       <div ref={canvasMountRef} className="hero-lens-canvas" aria-hidden="true" />
       <div className="hero-lens-fallback" aria-hidden="true"><i /><i /><i /></div>
+      <p className="sr-only" role="status" aria-live="polite">
+        {renderStatus === "loading"
+          ? "Preparing the interactive global-health lens."
+          : renderStatus === "unavailable"
+            ? "The interactive visual is unavailable. Use the labelled controls to explore each level."
+            : "Interactive global-health lens ready."}
+      </p>
       <div className="hero-lens-active" aria-live="polite">
         <span>{activeLayer.label}</span>
         <strong>{activeLayer.title}</strong>

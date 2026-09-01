@@ -1,4 +1,5 @@
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { orphanSafeText } from "@/components/ui/orphanSafeText";
 import { lensChain } from "@/content/global-lens";
 
 // The connector rule between steps is what makes this read as one chain
@@ -12,8 +13,8 @@ export function LensChain() {
             <span className="step-number">{item.step}</span>
             <div>
               <Eyebrow>{item.level}</Eyebrow>
-              <h3>{item.claim}</h3>
-              <p>{item.detail}</p>
+              <h3>{orphanSafeText(item.claim)}</h3>
+              <p>{orphanSafeText(item.detail)}</p>
             </div>
           </div>
           {index < lensChain.length - 1 ? (

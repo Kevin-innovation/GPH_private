@@ -42,6 +42,7 @@ const formCategories = [
 const MIN_FILL_TIME_MS = 900;
 
 export function ContactForm() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<FormStatus>("idle");
@@ -71,6 +72,9 @@ export function ContactForm() {
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       setStatus("error");
+      window.requestAnimationFrame(() => {
+        formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+      });
       return;
     }
 
@@ -100,15 +104,22 @@ export function ContactForm() {
   };
 
   if (status === "success") {
+    const deliveryEnabled = Boolean(siteConfig.contact.endpoint);
+
     return (
       <div className="form-success" role="status">
-        <Eyebrow>Message received</Eyebrow>
-        <h3>Thank you for contacting Global Public Health Lens.</h3>
+        <Eyebrow>{deliveryEnabled ? "Message received" : "Demo complete"}</Eyebrow>
+        <h3>
+          {deliveryEnabled
+            ? "Thank you for contacting Global Public Health Lens."
+            : "The form interaction is working, but no message was sent."}
+        </h3>
         <p>
-          Your message has been received. Please remember that we cannot provide emergency assistance, diagnosis, or
-          personalized medical treatment through this form.
+          {deliveryEnabled
+            ? "Your message has been received. Please remember that we cannot provide emergency assistance, diagnosis, or personalized medical treatment through this form."
+            : "This preview has no delivery endpoint. Connect one in the site configuration before publishing the contact form."}
         </p>
-        {!siteConfig.contact.endpoint ? (
+        {!deliveryEnabled ? (
           <p className="form-note">
             This preview is in demo mode. Add a Formspree endpoint in the site configuration to enable delivery.
           </p>
@@ -129,80 +140,104 @@ export function ContactForm() {
   }
 
   return (
-    <form className="contact-form" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className="contact-form" onSubmit={handleSubmit} noValidate aria-busy={status === "submitting"}>
       <div className="form-grid">
         <label>
           Name
           <input
+            id="contact-name"
+            name="name"
+            required
             value={form.name}
             onChange={(event) => updateField("name", event.target.value)}
             autoComplete="name"
             aria-invalid={Boolean(errors.name)}
+            aria-describedby={errors.name ? "contact-name-error" : undefined}
           />
-          {errors.name ? <span className="field-error">{errors.name}</span> : null}
+          {errors.name ? <span className="field-error" id="contact-name-error">{errors.name}</span> : null}
         </label>
         <label>
           Email address
           <input
+            id="contact-email"
+            name="email"
+            required
             type="email"
             value={form.email}
             onChange={(event) => updateField("email", event.target.value)}
             autoComplete="email"
             aria-invalid={Boolean(errors.email)}
+            aria-describedby={errors.email ? "contact-email-error" : undefined}
           />
-          {errors.email ? <span className="field-error">{errors.email}</span> : null}
+          {errors.email ? <span className="field-error" id="contact-email-error">{errors.email}</span> : null}
         </label>
         <label>
           Question category
           <select
+            id="contact-category"
+            name="category"
+            required
             value={form.category}
             onChange={(event) => updateField("category", event.target.value)}
             aria-invalid={Boolean(errors.category)}
+            aria-describedby={errors.category ? "contact-category-error" : undefined}
           >
             <option value="">Select a category</option>
             {formCategories.map((category) => (
               <option key={category}>{category}</option>
             ))}
           </select>
-          {errors.category ? <span className="field-error">{errors.category}</span> : null}
+          {errors.category ? <span className="field-error" id="contact-category-error">{errors.category}</span> : null}
         </label>
         <label>
           Subject
           <input
+            id="contact-subject"
+            name="subject"
+            required
             value={form.subject}
             onChange={(event) => updateField("subject", event.target.value)}
             aria-invalid={Boolean(errors.subject)}
+            aria-describedby={errors.subject ? "contact-subject-error" : undefined}
           />
-          {errors.subject ? <span className="field-error">{errors.subject}</span> : null}
+          {errors.subject ? <span className="field-error" id="contact-subject-error">{errors.subject}</span> : null}
         </label>
       </div>
       <label>
         Message
         <textarea
+          id="contact-message"
+          name="message"
+          required
           rows={6}
           value={form.message}
           onChange={(event) => updateField("message", event.target.value)}
           aria-invalid={Boolean(errors.message)}
+          aria-describedby={errors.message ? "contact-message-error" : undefined}
         />
-        {errors.message ? <span className="field-error">{errors.message}</span> : null}
+        {errors.message ? <span className="field-error" id="contact-message-error">{errors.message}</span> : null}
       </label>
       <label className="honeypot" aria-hidden="true">
         Website
-        <input tabIndex={-1} autoComplete="off" value={form.website} onChange={(event) => updateField("website", event.target.value)} />
+        <input name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={(event) => updateField("website", event.target.value)} />
       </label>
       <label className="consent-label">
         <input
+          id="contact-consent"
+          name="consent"
+          required
           type="checkbox"
           checked={form.consent}
           onChange={(event) => updateField("consent", event.target.checked)}
           aria-invalid={Boolean(errors.consent)}
+          aria-describedby={errors.consent ? "contact-consent-error" : undefined}
         />
         <span>
           I understand that this form is for general contact only and is not a source of diagnosis, emergency assistance, or
           individualized medical advice.
         </span>
       </label>
-      {errors.consent ? <span className="field-error">{errors.consent}</span> : null}
+      {errors.consent ? <span className="field-error" id="contact-consent-error">{errors.consent}</span> : null}
       {errors.form ? (
         <p className="form-error" role="alert">
           {errors.form}
