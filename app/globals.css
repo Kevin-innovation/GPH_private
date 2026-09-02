@@ -3101,11 +3101,9 @@ details .lens-step {
   display: block;
   width: 100%;
   height: 100%;
-  cursor: grab;
+  cursor: default;
   touch-action: pan-y;
 }
-
-.hero-lens-canvas canvas.is-dragging { cursor: grabbing; }
 
 .hero-lens-heading,
 .hero-lens-active,
@@ -3187,6 +3185,7 @@ details .lens-step {
   background: transparent;
   color: rgba(18, 49, 75, 0.62);
   padding: 10px 7px 7px;
+  cursor: pointer;
   font-size: 0.7rem;
   font-weight: 600;
   transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
