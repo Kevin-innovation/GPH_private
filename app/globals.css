@@ -4973,3 +4973,269 @@ details[open] .summary-mark b { transform: rotate(45deg); }
     animation: atlas-mobile-detail-in 200ms ease-out both;
   }
 }
+
+/* ---- Phase: founder byline -----------------------------------------------
+   Placed between the app preview and the sources table. The rest of the page
+   is machinery — a globe, an atlas, a scroll story — so this one is
+   deliberately still: no selector, no canvas, no client JavaScript. Hierarchy
+   comes from scale contrast and hairline rhythm.
+
+   The ground is a warm paper tone rather than another Cloud/White beat, which
+   is what separates the human passage from the data sections around it.
+   #faf8f3 was chosen by measurement, not taste: it is the lightest warm value
+   at which --color-teal-text (4.64:1) and --color-gold-text (4.60:1) both
+   still clear WCAG AA for the small labels used below. */
+.founder-section {
+  background: #faf8f3;
+  border-top: 1px solid var(--color-navy);
+  border-bottom: 1px solid var(--color-hairline);
+  padding-block: clamp(96px, 9vw, 148px);
+}
+
+.founder-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: clamp(56px, 8vw, 136px);
+  align-items: start;
+}
+
+.founder-identity {
+  position: sticky;
+  top: calc(var(--header-height) + 32px);
+  align-self: start;
+  min-width: 0;
+}
+
+/* The circular letter-mark language belongs to the nutrient icons. Reusing it
+   here files the person who assembled the index inside that same system. */
+.founder-mark {
+  position: relative;
+  display: grid;
+  width: 88px;
+  height: 88px;
+  place-items: center;
+  margin-bottom: 26px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: var(--color-teal-text);
+  font-size: 1.32rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.founder-mark::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1px solid currentColor;
+  border-radius: inherit;
+  opacity: 0.28;
+}
+
+.founder-identity h2 {
+  max-width: 12ch;
+  margin: 0;
+  font-size: clamp(2.5rem, 3.5vw, 3.5rem);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.founder-role {
+  max-width: 26ch;
+  margin: 18px 0 0;
+  color: var(--color-navy);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  line-height: 1.45;
+}
+
+.founder-affiliation {
+  max-width: 30ch;
+  margin: 7px 0 0;
+  color: var(--color-teal-text);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.founder-facts {
+  margin: 34px 0 0;
+  border-top: 1px solid rgba(18, 49, 75, 0.24);
+}
+
+.founder-facts > div {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.founder-facts dt {
+  margin-bottom: 6px;
+  color: var(--color-teal-text);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.075em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.founder-facts dd {
+  margin: 0;
+  color: rgba(23, 37, 46, 0.8);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.founder-story {
+  min-width: 0;
+}
+
+/* The one display-scale line in the section, and the founder's own opening
+   sentence. Everything after it steps down a level. */
+.founder-standfirst {
+  max-width: 28ch;
+  margin: 0;
+  color: var(--color-navy);
+  font-size: clamp(1.5rem, 2.15vw, 2.1rem);
+  font-weight: 300;
+  letter-spacing: -0.032em;
+  line-height: 1.24;
+  text-wrap: balance;
+}
+
+.founder-chapters {
+  margin: 52px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-navy);
+}
+
+.founder-chapters > li {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: clamp(20px, 2.6vw, 36px);
+  padding: 30px 0;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.founder-chapter-index {
+  color: var(--color-gold-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+}
+
+.founder-chapter-copy {
+  min-width: 0;
+}
+
+.founder-chapter-copy h3 {
+  margin: 0 0 10px;
+  color: var(--color-navy);
+  font-size: clamp(1.08rem, 1.35vw, 1.24rem);
+  font-weight: 500;
+  letter-spacing: -0.022em;
+  line-height: 1.25;
+}
+
+.founder-chapter-copy p {
+  max-width: 62ch;
+  margin: 0;
+  color: rgba(23, 37, 46, 0.8);
+  font-size: 1rem;
+  line-height: 1.68;
+  text-wrap: pretty;
+}
+
+.founder-signoff {
+  margin: 30px 0 0;
+}
+
+.founder-signoff a {
+  color: var(--color-teal-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(17, 126, 118, 0.4);
+  padding-bottom: 2px;
+  transition: color 170ms ease, border-color 170ms ease;
+}
+
+.founder-signoff a:hover,
+.founder-signoff a:focus-visible {
+  color: var(--color-navy);
+  border-bottom-color: var(--color-navy);
+}
+
+.founder-signoff-arrow {
+  display: inline-block;
+  margin-left: 5px;
+  transition: transform 170ms ease;
+}
+
+.founder-signoff a:hover .founder-signoff-arrow,
+.founder-signoff a:focus-visible .founder-signoff-arrow {
+  transform: translate(2px, -2px);
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes founder-chapter-enter {
+      from { opacity: 0.3; transform: translateY(20px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .founder-standfirst,
+    .founder-chapters > li {
+      animation: founder-chapter-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 26%;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .founder-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .founder-identity {
+    position: static;
+    top: auto;
+  }
+
+  .founder-mark {
+    width: 68px;
+    height: 68px;
+    margin-bottom: 20px;
+    font-size: 1.08rem;
+  }
+
+  .founder-facts {
+    margin-top: 28px;
+  }
+
+  .founder-chapters {
+    margin-top: 40px;
+  }
+}
+
+@media (max-width: 560px) {
+  .founder-identity h2 {
+    max-width: none;
+  }
+
+  .founder-standfirst {
+    max-width: none;
+  }
+
+  .founder-chapters > li {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 14px;
+    padding: 26px 0;
+  }
+}

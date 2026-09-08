@@ -85,14 +85,20 @@ export function MissionSection() {
           <h2 id="about-title">
             Health is shaped by more than <span className="no-orphan">individual choices.</span>
           </h2>
+          {/* .mission-prompt is a two-column grid whose ::before draws the rule.
+              The sentence has to be a single grid item, otherwise the trailing
+              no-orphan span becomes a third item and drops to its own row. */}
           <p className="mission-prompt">
-            Follow the six forces that connect personal health with the <span className="no-orphan">conditions around us.</span>
+            <span>
+              Follow the six forces that connect personal health with the{" "}
+              <span className="no-orphan">conditions around us.</span>
+            </span>
           </p>
         </div>
         <div className="mission-copy">
           <p className="lead-copy">
-            Health is shaped by food access, services, place, and policy — not individual choices alone. Global Public
-            Health Lens makes those connections <span className="no-orphan">easier to understand.</span>
+            You can only eat what reaches your market, and only visit the clinic you can afford to reach. Global Public
+            Health Lens follows those limits back to <span className="no-orphan">where they get set.</span>
           </p>
           <div className="mission-story">
             <Eyebrow>Why this project</Eyebrow>
@@ -180,7 +186,7 @@ export function MissionSection() {
           </div>
 
           <p className="mission-coda">
-            Nutrition is our first lens — <span className="no-orphan">not our last.</span>
+            We start with nutrition because everyone eats. The rest of the system <span className="no-orphan">comes next.</span>
           </p>
         </div>
       </div>

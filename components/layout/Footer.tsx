@@ -10,6 +10,7 @@ const exploreLinks = [
   { label: "Micronutrient Guide", href: "#micronutrients" },
   { label: "Nutrition App", href: "#app" },
   { label: "About", href: "#about" },
+  { label: "Meet the Founder", href: "#founder" },
   { label: "Sources", href: "#sources" },
   { label: "Contact", href: "#contact" },
 ];

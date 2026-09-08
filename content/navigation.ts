@@ -4,5 +4,6 @@ export const navigation = [
   { label: "Micronutrients", href: "#micronutrients" },
   { label: "The Lens", href: "#global-lens" },
   { label: "Nutrition App", href: "#app" },
+  { label: "Founder", href: "#founder" },
   { label: "Contact", href: "#contact" },
 ] as const;
