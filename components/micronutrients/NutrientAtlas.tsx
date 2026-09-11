@@ -179,10 +179,11 @@ function MobileNutrientList({
 
     let frame = 0;
     let settleTimer: number | null = null;
+    let scrollVersion = 0;
     const pendingSlugRef = { current: null as string | null };
     let waitForInputAfterHandoff = false;
     let handoffScrollY = 0;
-    const settleDelay = 140;
+    const settleDelay = 360;
     const handoffDuration = 620;
     const getTargetTrigger = () => {
       const activationLine = Math.min(window.innerHeight * 0.52, window.innerHeight - 140);
@@ -220,14 +221,17 @@ function MobileNutrientList({
       }
 
       const currentIndex = triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === currentSlug);
-      const targetIndex = triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === targetSlug);
-      if (currentIndex >= 0 && targetIndex >= 0 && Math.abs(targetIndex - currentIndex) > 1) {
+      let targetIndex = triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === targetSlug);
+      const atPageBoundary = window.scrollY <= 2 ||
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      if (!atPageBoundary && currentIndex >= 0 && targetIndex >= 0 && Math.abs(targetIndex - currentIndex) > 1) {
         // A fast wheel gesture can move several rows in a single frame. Keep
         // the reading sequence one row at a time so each detail gets a
         // complete, visible hand-off instead of jumping straight to a distant
         // nutrient at the end of momentum.
         const step = targetIndex > currentIndex ? 1 : -1;
         targetSlug = triggers[currentIndex + step]?.dataset.nutrientSlug ?? targetSlug;
+        targetIndex = currentIndex + step;
       }
       const pendingIndex = pendingSlugRef.current
         ? triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === pendingSlugRef.current)
@@ -249,8 +253,15 @@ function MobileNutrientList({
         }
       }
       if (settleTimer !== null) return;
+      const scheduledScrollVersion = scrollVersion;
       settleTimer = window.setTimeout(() => {
         settleTimer = null;
+        if (scheduledScrollVersion !== scrollVersion) {
+          // The reader is still moving. Keep the pending adjacent row, but
+          // wait for a quiet reading window before starting its transition.
+          requestSync();
+          return;
+        }
         const nextSlug = pendingSlugRef.current;
         pendingSlugRef.current = null;
         if (!nextSlug || performance.now() < autoSuppressedUntilRef.current) return;
@@ -280,7 +291,10 @@ function MobileNutrientList({
         if (Math.abs(window.scrollY - handoffScrollY) < 72) return;
         waitForInputAfterHandoff = false;
       }
-      const targetSlug = getTargetTrigger()?.dataset.nutrientSlug;
+      const atTop = window.scrollY <= 2;
+      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      const boundaryTrigger = atTop ? triggers[0] : atBottom ? triggers[triggers.length - 1] : null;
+      const targetSlug = (boundaryTrigger ?? getTargetTrigger())?.dataset.nutrientSlug;
       const currentSlug = activeSlugRef.current;
       if (!targetSlug || targetSlug === currentSlug) return;
 
@@ -307,8 +321,13 @@ function MobileNutrientList({
     // Scroll is the source of truth for the reading sequence. Unlike a
     // view-timeline animation, this also works when the user drags the bar or
     // jumps several rows with a trackpad.
+    const handleScroll = () => {
+      scrollVersion += 1;
+      requestSync();
+    };
+
     requestSync();
-    window.addEventListener("scroll", requestSync, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", requestSync);
 
     // A manual toggle can change the document height and make the next row
@@ -338,7 +357,7 @@ function MobileNutrientList({
 
     triggers.forEach((trigger) => observer?.observe(trigger));
     return () => {
-      window.removeEventListener("scroll", requestSync);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", requestSync);
       window.removeEventListener("wheel", resumeAutoSelection);
       window.removeEventListener("touchmove", resumeAutoSelection);
