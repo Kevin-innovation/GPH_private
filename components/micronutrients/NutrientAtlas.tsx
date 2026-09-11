@@ -102,17 +102,32 @@ function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
 
 function MobileNutrientList({
   nutrients: visibleNutrients,
+  activeSlug,
   expandedSlug,
   onSelect,
   onToggle,
+  onAutoSelect,
 }: {
   nutrients: Nutrient[];
+  activeSlug: string;
   expandedSlug: string | null;
   onSelect: (slug: string) => void;
   onToggle: (slug: string) => void;
+  onAutoSelect: (slug: string) => void;
 }) {
   const listRef = useRef<HTMLDivElement>(null);
+  const activeSlugRef = useRef(activeSlug);
+  const onAutoSelectRef = useRef(onAutoSelect);
+  const autoSuppressedUntilRef = useRef(0);
   const revealKey = visibleNutrients.map((nutrient) => nutrient.slug).join("|");
+
+  useEffect(() => {
+    activeSlugRef.current = activeSlug;
+  }, [activeSlug]);
+
+  useEffect(() => {
+    onAutoSelectRef.current = onAutoSelect;
+  }, [onAutoSelect]);
 
   useEffect(() => {
     const list = listRef.current;
@@ -146,6 +161,101 @@ function MobileNutrientList({
     return () => observer.disconnect();
   }, [revealKey]);
 
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const triggers = Array.from(list.querySelectorAll<HTMLElement>(".atlas-mobile-trigger"));
+    if (!triggers.length) return;
+
+    let frame = 0;
+    const getTargetTrigger = () => {
+      const activationLine = Math.min(window.innerHeight * 0.52, window.innerHeight - 140);
+      const rows = triggers.map((trigger) => ({ trigger, rect: trigger.getBoundingClientRect() }));
+      const inReadingBand = rows.filter(
+        ({ rect }) => rect.bottom > activationLine - 80 && rect.top < activationLine + 80,
+      );
+      const inViewport = rows.filter(({ rect }) => rect.bottom > 0 && rect.top < window.innerHeight);
+      const candidates = inReadingBand.length
+        ? inReadingBand
+        : inViewport.length
+          ? inViewport
+          : rows;
+
+      return candidates.sort((a, b) => {
+        const aCenter = a.rect.top + a.rect.height / 2;
+        const bCenter = b.rect.top + b.rect.height / 2;
+        return Math.abs(aCenter - activationLine) - Math.abs(bCenter - activationLine);
+      })[0]?.trigger;
+    };
+
+    const syncFromScroll = () => {
+      frame = 0;
+      if (performance.now() < autoSuppressedUntilRef.current) return;
+      const targetSlug = getTargetTrigger()?.dataset.nutrientSlug;
+      const currentSlug = activeSlugRef.current;
+      if (targetSlug && targetSlug !== currentSlug) onAutoSelectRef.current(targetSlug);
+    };
+
+    const requestSync = () => {
+      if (!frame) frame = window.requestAnimationFrame(syncFromScroll);
+    };
+
+    // Scroll is the source of truth for the reading sequence. Unlike a
+    // view-timeline animation, this also works when the user drags the bar or
+    // jumps several rows with a trackpad.
+    requestSync();
+    window.addEventListener("scroll", requestSync, { passive: true });
+    window.addEventListener("resize", requestSync);
+
+    // A manual toggle can change the document height and make the next row
+    // intersect the reading band without any user scroll. Keep that toggle
+    // authoritative for a short handoff window; wheel/touch/keyboard input
+    // immediately returns control to scroll-driven selection.
+    const resumeAutoSelection = () => {
+      autoSuppressedUntilRef.current = 0;
+    };
+    window.addEventListener("wheel", resumeAutoSelection, { passive: true });
+    window.addEventListener("touchmove", resumeAutoSelection, { passive: true });
+    window.addEventListener("keydown", resumeAutoSelection);
+
+    const observer = "IntersectionObserver" in window
+      ? new IntersectionObserver(
+        (entries) => {
+          if (performance.now() < autoSuppressedUntilRef.current) return;
+          const candidates = entries
+            .filter((entry) => entry.isIntersecting)
+            .map((entry) => entry.target as HTMLElement)
+            .sort((a, b) => {
+              const viewportCenter = window.innerHeight / 2;
+              const aRect = a.getBoundingClientRect();
+              const bRect = b.getBoundingClientRect();
+              return (
+                Math.abs(aRect.top + aRect.height / 2 - viewportCenter)
+                - Math.abs(bRect.top + bRect.height / 2 - viewportCenter)
+              );
+            });
+          const targetSlug = candidates[0]?.dataset.nutrientSlug;
+          if (targetSlug && targetSlug !== activeSlugRef.current) {
+            onAutoSelectRef.current(targetSlug);
+          }
+        },
+        { rootMargin: "-42% 0px -42% 0px", threshold: 0 },
+      )
+      : null;
+
+    triggers.forEach((trigger) => observer?.observe(trigger));
+    return () => {
+      window.removeEventListener("scroll", requestSync);
+      window.removeEventListener("resize", requestSync);
+      window.removeEventListener("wheel", resumeAutoSelection);
+      window.removeEventListener("touchmove", resumeAutoSelection);
+      window.removeEventListener("keydown", resumeAutoSelection);
+      if (frame) window.cancelAnimationFrame(frame);
+      observer?.disconnect();
+    };
+  }, [revealKey]);
+
   return (
     <div ref={listRef} className="atlas-mobile-list" aria-label="Nutrients to explore">
       {visibleNutrients.map((nutrient) => {
@@ -154,13 +264,19 @@ function MobileNutrientList({
         const detailId = `mobile-nutrient-detail-${nutrient.slug}`;
 
         return (
-          <article className={`atlas-mobile-item${isExpanded ? " is-active" : ""}`} key={nutrient.slug}>
+          <article
+            className={`atlas-mobile-item${isExpanded ? " is-active" : ""}`}
+            data-nutrient-slug={nutrient.slug}
+            key={nutrient.slug}
+          >
             <button
               className="atlas-mobile-trigger"
               type="button"
+              data-nutrient-slug={nutrient.slug}
               aria-expanded={isExpanded}
               aria-controls={detailId}
               onClick={() => {
+                autoSuppressedUntilRef.current = performance.now() + 450;
                 onSelect(nutrient.slug);
                 onToggle(nutrient.slug);
               }}
@@ -318,6 +434,11 @@ export function NutrientAtlas() {
     setExpandedSlug((currentSlug) => (currentSlug === slug ? null : slug));
   };
 
+  const autoSelectNutrient = (slug: string) => {
+    selectNutrient(slug);
+    setExpandedSlug(slug);
+  };
+
   return (
     <div className="nutrient-atlas" aria-label="Nutrient atlas">
       <div className="atlas-toolbar">
@@ -370,9 +491,11 @@ export function NutrientAtlas() {
       </div>
       <MobileNutrientList
         nutrients={visibleNutrients}
+        activeSlug={activeNutrient.slug}
         expandedSlug={expandedSlug}
         onSelect={selectNutrient}
         onToggle={toggleMobileNutrient}
+        onAutoSelect={autoSelectNutrient}
       />
     </div>
   );

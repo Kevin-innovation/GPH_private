@@ -190,7 +190,11 @@ test("Phase 5 lens content uses vertical lists and connected handoffs", async ()
   assert.match(micronutrients, /expandedSlug/, "Micronutrient rows should track their expanded detail independently");
   assert.match(micronutrients, /toggleMobileNutrient/, "Micronutrient minus controls should collapse an open detail");
   assert.match(micronutrients, /IntersectionObserver/, "Micronutrient scroll reveals should have a browser-safe fallback");
+  assert.match(micronutrients, /onAutoSelect/, "Micronutrient rows should advance the expanded detail from scroll position");
+  assert.match(micronutrients, /rootMargin: "-42% 0px -42% 0px"/, "Micronutrient auto-expansion should use a stable viewport reading band");
+  assert.match(micronutrients, /autoSuppressedUntilRef/, "Manual nutrient toggles should not be overridden by layout-triggered observer callbacks");
   assert.match(css, /\.micronutrient-shell \.atlas-mobile-item\.is-reveal-visible/, "Micronutrient rows should animate into view without hiding by default");
+  assert.match(css, /phase5-nutrient-detail-in/, "The active nutrient detail should enter with a smooth scroll-linked transition");
 });
 
 test("Phase 6 keeps evidence, contact, and typography connected", async () => {
@@ -226,4 +230,6 @@ test("Phase 7 makes typography and action targets unmistakable", async () => {
   assert.match(css, /\.desktop-nav > a,\s*\.desktop-nav \.nav-disclosure/, "primary navigation should expose outlined hit areas");
   assert.match(css, /\.country-spotlight-country-list button\s*\{[\s\S]*border-radius: 999px;/, "country selectors should read as pill controls");
   assert.match(css, /\.country-spotlight-country-list\s*\{\s*border-top: 0 !important;\s*border-bottom: 0 !important;/, "country selector rail should not duplicate wrapper borders");
+  assert.match(css, /\.desktop-nav > a\.nav-direct-nutrition-app[\s\S]*backdrop-filter: blur\(16px\)/, "Nutrition App should be the only colored glass navigation destination");
+  assert.match(css, /\.desktop-nav > a\.nav-direct-country-spotlight,\s*\.desktop-nav > a\.nav-direct-contact\s*\{\s*border-color: rgba\(18, 49, 75, 0\.16\)/, "Country and Contact should remain neutral at rest");
 });
