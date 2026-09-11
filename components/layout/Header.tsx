@@ -98,7 +98,17 @@ export function Header() {
       <div className="header-inner">
         {/* Use a native home anchor here so the brand always exits a nested route, even before client navigation hydrates. */}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-        <a className="brand-lockup" href="/" aria-label="Global Public Health Lens home">
+        <a
+          className="brand-lockup"
+          href="/"
+          aria-label="Global Public Health Lens home"
+          onClick={(event) => {
+            if (window.location.pathname !== "/") {
+              event.preventDefault();
+              window.location.assign("/");
+            }
+          }}
+        >
           <Image src="/brand/logo-mark-3d.webp" alt="" width={48} height={48} priority />
           <span>
             <strong>Global Public Health</strong>
