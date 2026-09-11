@@ -18,6 +18,7 @@ export function Header() {
   const firstInteractiveRef = useRef<HTMLButtonElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
+  const didMountPathRef = useRef(false);
   const pathname = usePathname();
   const isHome = pathname === "/";
 
@@ -94,12 +95,16 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      setOpenGroup(null);
-      setMobileOpen(false);
-      setMobileGroup(null);
-    });
-    return () => window.cancelAnimationFrame(frame);
+    // Do not let the first pathname hydration frame close a menu that was
+    // opened immediately after the header became interactive on mobile.
+    if (!didMountPathRef.current) {
+      didMountPathRef.current = true;
+      return;
+    }
+
+    setOpenGroup(null);
+    setMobileOpen(false);
+    setMobileGroup(null);
   }, [pathname]);
 
   const closeMenu = () => {
@@ -194,8 +199,9 @@ export function Header() {
 
         <button
           ref={triggerRef}
-          className="menu-toggle"
+          className={`menu-toggle${mobileOpen ? " is-open" : ""}`}
           type="button"
+          aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={mobileOpen}
           aria-controls="mobile-navigation"
           onClick={() => setMobileOpen((open) => !open)}

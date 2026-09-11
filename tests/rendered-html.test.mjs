@@ -94,6 +94,7 @@ test("multi-page information architecture exposes canonical destinations", async
   const directory = await readProjectFile("components/home/HomeDirectory.tsx");
   const globalLens = await readProjectFile("components/global-lens/GlobalLensSection.tsx");
   const solutionsPage = await readProjectFile("components/global-lens/SolutionsPageSection.tsx");
+  const css = await readProjectFile("app/globals.css");
 
   for (const route of expectedRoutes) {
     const routeFile = join(projectRoot, "app", route.slice(1), "page.tsx");
@@ -105,6 +106,11 @@ test("multi-page information architecture exposes canonical destinations", async
 
   assert.doesNotMatch(header, /Explore the Map/, "the header must not duplicate Country Spotlight with a map CTA");
   assert.match(header, /href="\/"/, "the brand lockup should have a native home destination");
+  assert.match(header, /className=\{`menu-toggle\$\{mobileOpen/, "mobile navigation should expose a stateful hamburger control");
+  assert.match(header, /aria-controls="mobile-navigation"/, "hamburger control should own the mobile navigation surface");
+  assert.match(header, /didMountPathRef/, "initial pathname hydration should not close an immediately opened mobile menu");
+  assert.match(css, /filtered header becomes the fixed-position containing block/, "mobile menu should document the filtered-header positioning fix");
+  assert.match(css, /\.menu-toggle\.is-open \.menu-lines i:nth-child\(1\)/, "hamburger should show an explicit open state");
   assert.ok(
     navigation.indexOf('label: "About"') < navigation.indexOf('label: "The Lens"')
       && navigation.indexOf('label: "The Lens"') < navigation.indexOf('label: "Country Spotlight"')
