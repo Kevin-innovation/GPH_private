@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 5 시작 대기**
+> 상태: **Phase 6 시작 대기**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  
@@ -439,10 +439,12 @@ Country/Lens 및 Mission 공백 보정 완료 기록: [`docs/audits/PHASE_4_COUN
 
 ### Phase 5 — Micronutrients, Solutions, Nutrition App
 
-- [ ] Micronutrients 세로형 탐색 흐름
-- [ ] Solutions 6개와 Case Studies 세로형 구성
-- [ ] Nutrition App 화면과 Workflow 순차 구성
-- [ ] 안전 문구와 기존 콘텐츠 보존
+- [x] Micronutrients 세로형 탐색 흐름
+- [x] Solutions 6개와 Case Studies 세로형 구성
+- [x] Nutrition App 화면과 Workflow 순차 구성
+- [x] 안전 문구와 기존 콘텐츠 보존
+
+완료 기록: [`docs/audits/PHASE_5_LENS_CONTENT.md`](audits/PHASE_5_LENS_CONTENT.md)
 
 종료 커밋: `feat: rebuild lens content and nutrition app pages`
 

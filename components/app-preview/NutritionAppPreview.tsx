@@ -12,7 +12,7 @@ export function NutritionAppPreview() {
   const isLive = siteConfig.nutritionApp.status === "live" && siteConfig.nutritionApp.webUrl;
 
   return (
-    <SectionShell id="app" surface="cloud" labelledBy="app-title">
+    <SectionShell id="app" surface="cloud" labelledBy="app-title" className="nutrition-app-section">
       <div className="page-width app-grid">
         <div className="app-copy">
           <Eyebrow>First tool · Nutrition</Eyebrow>

@@ -160,3 +160,23 @@ test("Country and Lens routes keep the vertical interactive story", async () => 
     "Country Spotlight should not force a desktop split layout");
   assert.match(css, /\.global-lens-hero/, "How the Lens Works should have a dedicated interactive hero surface");
 });
+
+test("Phase 5 lens content uses vertical lists and connected handoffs", async () => {
+  const micronutrients = await readProjectFile("components/micronutrients/NutrientAtlas.tsx");
+  const micronutrientsPage = await readProjectFile("app/lens/micronutrients/page.tsx");
+  const solutions = await readProjectFile("components/global-lens/SolutionsPageSection.tsx");
+  const solutionsList = await readProjectFile("components/global-lens/SolutionsList.tsx");
+  const appPreview = await readProjectFile("components/app-preview/NutritionAppPreview.tsx");
+  const appPage = await readProjectFile("app/nutrition-app/page.tsx");
+  const css = await readProjectFile("app/globals.css");
+
+  assert.match(micronutrients, /MobileNutrientList/, "Micronutrients should keep the inline vertical detail list");
+  assert.match(micronutrientsPage, /RelatedPages/, "Micronutrients should hand off to Nutrition App");
+  assert.match(solutions, /SolutionsList/, "Solutions should own the conditions list");
+  assert.match(solutionsList, /solutions\.map/, "Solutions should retain all six action conditions");
+  assert.match(appPreview, /nutrition-app-section/, "Nutrition App should expose a scoped vertical layout hook");
+  assert.match(appPage, /RelatedPages/, "Nutrition App should hand off to Micronutrients");
+  assert.match(css, /\.micronutrient-shell \.atlas-mobile-list/, "Micronutrients should render a desktop vertical list");
+  assert.match(css, /\.solutions-page-section \.solutions-wrap/, "Solutions should remove the desktop split");
+  assert.match(css, /\.nutrition-app-section \.app-grid/, "Nutrition App should remove the desktop split");
+});

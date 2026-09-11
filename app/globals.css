@@ -6180,3 +6180,505 @@ details[open] .summary-mark b { transform: rotate(45deg); }
     grid-template-columns: 1fr;
   }
 }
+
+/* ---- Phase 5: lens content as one vertical reading surface ----------------
+   Micronutrients, Solutions, and the Nutrition App used to reserve a second
+   desktop column for a sticky panel. That pattern made the lower half of each
+   page look unfinished once the short intro ended. The content is now a single
+   editorial column: context first, then the interactive list, then the handoff. */
+
+/* Micronutrients: the selected nutrient detail travels with its list item so
+   the reader never has to compare a fixed panel with a distant card. */
+.micronutrient-shell .micronutrient-intro {
+  display: block;
+  max-width: 820px;
+  margin-bottom: clamp(48px, 6vw, 76px);
+}
+
+.micronutrient-shell .micronutrient-intro-copy {
+  max-width: 700px;
+  margin-top: 28px;
+}
+
+.micronutrient-shell .nutrient-atlas {
+  max-width: 1000px;
+  margin-inline: auto;
+}
+
+@media (min-width: 901px) {
+  .micronutrient-shell .atlas-layout {
+    display: none;
+  }
+
+  .micronutrient-shell .atlas-mobile-list {
+    display: block;
+    border-top: 1px solid var(--color-navy);
+  }
+
+  .micronutrient-shell .atlas-mobile-item {
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  .micronutrient-shell .atlas-mobile-trigger {
+    display: grid;
+    grid-template-columns: 54px 76px minmax(0, 1fr) 34px;
+    gap: 22px;
+    width: 100%;
+    min-height: 132px;
+    align-items: center;
+    border: 0;
+    background: transparent;
+    color: var(--color-ink);
+    padding: 24px 0;
+    text-align: left;
+  }
+
+  .micronutrient-shell .atlas-mobile-trigger:hover,
+  .micronutrient-shell .atlas-mobile-trigger:focus-visible {
+    background: var(--color-cloud);
+  }
+
+  .micronutrient-shell .atlas-mobile-item.is-active .atlas-mobile-trigger {
+    background: var(--color-white);
+  }
+
+  .micronutrient-shell .atlas-mobile-index {
+    align-self: start;
+    padding-top: 4px;
+    color: var(--color-gold-text);
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .micronutrient-shell .atlas-mobile-thumb {
+    width: 76px;
+    height: 76px;
+    overflow: hidden;
+    border: 1px solid var(--color-hairline);
+    border-radius: 50%;
+  }
+
+  .micronutrient-shell .atlas-mobile-thumb-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .micronutrient-shell .atlas-mobile-trigger-copy {
+    min-width: 0;
+  }
+
+  .micronutrient-shell .atlas-mobile-trigger-copy .atlas-card-type {
+    margin-bottom: 7px;
+    font-size: var(--t-label);
+  }
+
+  .micronutrient-shell .atlas-mobile-trigger-copy strong {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--color-navy);
+    font-size: clamp(1.25rem, 2vw, 1.65rem);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+  }
+
+  .micronutrient-shell .atlas-mobile-trigger-copy .atlas-card-summary {
+    display: block;
+    max-width: 58ch;
+    color: rgba(23, 37, 46, 0.68);
+    font-size: 0.92rem;
+    line-height: 1.48;
+  }
+
+  .micronutrient-shell .atlas-mobile-trigger-arrow {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    justify-self: end;
+    border: 1px solid rgba(17, 126, 118, 0.35);
+    border-radius: 50%;
+    background: var(--color-white);
+    color: var(--color-teal-text);
+    font-size: 1.3rem;
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  .micronutrient-shell .atlas-mobile-item.is-active .atlas-mobile-trigger-arrow {
+    border-color: var(--color-navy);
+    background: var(--color-navy);
+    color: var(--color-white);
+  }
+
+  .micronutrient-shell .atlas-mobile-detail {
+    border-top: 1px solid var(--color-hairline);
+    padding: 30px 0 38px 152px;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-head {
+    display: grid;
+    grid-template-columns: 176px minmax(0, 1fr);
+    gap: 34px;
+    align-items: start;
+    max-width: 760px;
+    padding-bottom: 28px;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-visual {
+    width: 176px;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 1px solid var(--color-hairline);
+    border-radius: 50%;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-copy {
+    min-width: 0;
+    padding-top: 8px;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-copy .atlas-detail-title {
+    gap: 12px;
+    padding: 0 0 12px;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-copy .atlas-detail-title .atlas-icon {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-copy .atlas-detail-title h3 {
+    font-size: clamp(1.7rem, 3vw, 2.45rem);
+    line-height: 1.05;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-copy .atlas-detail-summary {
+    max-width: 42ch;
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  .micronutrient-shell .atlas-mobile-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 28px;
+    max-width: 760px;
+  }
+
+  .micronutrient-shell .atlas-mobile-facts > div {
+    border-top: 1px solid var(--color-hairline);
+    padding: 17px 0;
+  }
+
+  .micronutrient-shell .atlas-mobile-facts > div:nth-child(3),
+  .micronutrient-shell .atlas-mobile-facts > div:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+
+  .micronutrient-shell .atlas-mobile-facts > div span {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-teal-text);
+    font-size: var(--t-label);
+    font-weight: 600;
+  }
+
+  .micronutrient-shell .atlas-mobile-facts > div p {
+    max-width: 56ch;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+
+  .micronutrient-shell .atlas-mobile-facts .atlas-detail-safety {
+    border-top-color: var(--color-gold);
+  }
+
+  .micronutrient-shell .atlas-mobile-detail > a {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--color-teal-text);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes phase5-list-enter {
+      from { opacity: 0.45; transform: translateY(18px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .micronutrient-shell .atlas-mobile-item,
+    .solutions-page-section .solution-row,
+    .solutions-page-section .case-row,
+    .nutrition-app-section .workflow-row {
+      animation: phase5-list-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 20%;
+    }
+  }
+}
+
+/* Solutions: intro, six conditions, then the case-study pathway. Both lists
+   use the same full-width measure, so no lower-left column can go empty. */
+.solutions-page-section .solutions-wrap,
+.solutions-page-section .case-studies {
+  display: block;
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.solutions-page-section .solutions-intro,
+.solutions-page-section .case-studies > div:first-child {
+  position: static;
+  max-width: 760px;
+  margin-bottom: clamp(42px, 5vw, 68px);
+}
+
+.solutions-page-section .case-studies > div:first-child {
+  margin-bottom: 40px;
+}
+
+.solutions-page-section .solution-list,
+.solutions-page-section .case-list {
+  max-width: 100%;
+}
+
+.solutions-page-section .solution-row {
+  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-areas:
+    "index title"
+    "index body";
+  gap: 10px 28px;
+  min-height: 0;
+  align-items: start;
+  padding: 28px 0;
+}
+
+.solutions-page-section .solution-row .row-index {
+  grid-area: index;
+  padding-top: 2px;
+}
+
+.solutions-page-section .solution-row h4 {
+  grid-area: title;
+  max-width: 28ch;
+  font-size: clamp(1.22rem, 2vw, 1.7rem);
+  line-height: 1.2;
+}
+
+.solutions-page-section .solution-row p {
+  grid-area: body;
+  max-width: 70ch;
+  margin: 0;
+  font-size: clamp(0.94rem, 1.1vw, 1.08rem);
+  line-height: 1.55;
+}
+
+.solutions-page-section .case-row summary {
+  min-height: 84px;
+  padding-block: 24px;
+}
+
+.solutions-page-section .case-detail {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 760px;
+  padding-bottom: 28px;
+}
+
+.solutions-page-section .case-detail-copy {
+  max-width: 68ch;
+}
+
+/* Nutrition App: product statement → workflow → feature list → screenshots.
+   The screens stay in an even sequence instead of a decorative fan, which
+   keeps the reading order legible at every breakpoint. */
+.nutrition-app-section .app-grid {
+  display: block;
+  max-width: 1080px;
+}
+
+.nutrition-app-section .app-copy {
+  max-width: 760px;
+  margin-bottom: clamp(52px, 7vw, 88px);
+}
+
+.nutrition-app-section .app-copy > p {
+  max-width: 68ch;
+}
+
+.nutrition-app-section .workflow-list {
+  max-width: 760px;
+  margin-top: 42px;
+}
+
+.nutrition-app-section .workflow-row {
+  grid-template-columns: 56px minmax(0, 1fr);
+  grid-template-areas:
+    "step title"
+    "step body";
+  gap: 8px 24px;
+  align-items: start;
+  padding: 22px 0;
+}
+
+.nutrition-app-section .workflow-row > span {
+  grid-area: step;
+  padding-top: 3px;
+}
+
+.nutrition-app-section .workflow-row h3 {
+  grid-area: title;
+  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+}
+
+.nutrition-app-section .workflow-row p {
+  grid-area: body;
+  max-width: 62ch;
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.nutrition-app-section .app-art-wrap {
+  max-width: 960px;
+  margin-inline: auto;
+  padding-left: 0;
+}
+
+.nutrition-app-section .app-stage {
+  position: static;
+  max-width: 960px;
+}
+
+.nutrition-app-section .app-stage-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(14px, 3vw, 34px);
+  padding: 8px 0 22px;
+}
+
+.nutrition-app-section .app-phone,
+.nutrition-app-section .app-phone[data-phone="1"],
+.nutrition-app-section .app-phone[data-phone="2"],
+.nutrition-app-section .app-phone[data-phone="3"] {
+  z-index: 1;
+  flex: 1 1 0;
+  width: min(220px, 31%);
+  margin: 0 !important;
+  transform: none !important;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes phase5-phone-enter {
+      from { opacity: 0.45; transform: translateY(22px) !important; }
+      to { opacity: 1; transform: none !important; }
+    }
+
+    .nutrition-app-section .app-phone {
+      animation: phase5-phone-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 24%;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .micronutrient-shell .micronutrient-intro-copy {
+    margin-top: 24px;
+  }
+
+  .solutions-page-section .solution-row {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 8px 14px;
+  }
+
+  .nutrition-app-section .workflow-row {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 8px 14px;
+  }
+
+  .nutrition-app-section .app-copy {
+    margin-bottom: 48px;
+  }
+
+  .nutrition-app-section .app-phone {
+    width: 32%;
+  }
+}
+
+@media (max-width: 560px) {
+  .micronutrient-shell .atlas-mobile-trigger {
+    grid-template-columns: 30px 56px minmax(0, 1fr) 30px;
+    gap: 10px;
+    min-height: 96px;
+    padding-block: 16px;
+  }
+
+  .micronutrient-shell .atlas-mobile-thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .micronutrient-shell .atlas-mobile-trigger-copy strong {
+    font-size: 1.02rem;
+  }
+
+  .micronutrient-shell .atlas-mobile-trigger-copy .atlas-card-summary {
+    font-size: 0.76rem;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail {
+    padding-left: 40px;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-head {
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-visual {
+    width: 84px;
+  }
+
+  .nutrition-app-section .app-stage-inner {
+    gap: 8px;
+  }
+
+  .nutrition-app-section .app-phone {
+    width: 32%;
+    padding: 4px;
+    border-radius: 22px;
+  }
+
+  .nutrition-app-section .app-phone img {
+    border-radius: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .micronutrient-shell .atlas-mobile-item,
+  .solutions-page-section .solution-row,
+  .solutions-page-section .case-row,
+  .nutrition-app-section .workflow-row,
+  .nutrition-app-section .app-phone {
+    animation: none !important;
+    animation-timeline: auto !important;
+    animation-range: normal !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
