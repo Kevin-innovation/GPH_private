@@ -6,9 +6,9 @@ import { lensChain } from "@/content/global-lens";
 // rather than three interchangeable cards.
 export function LensChain() {
   return (
-    <div className="lens-chain" aria-label="Three connected levels of public health understanding">
+    <div className="lens-chain lens-chain-editorial" aria-label="Three connected levels of public health understanding">
       {lensChain.map((item, index) => (
-        <div key={item.step}>
+        <div key={item.step} className={`lens-chain-entry lens-chain-entry-${index + 1}`}>
           <div className="lens-step">
             <span className="step-number">{item.step}</span>
             <div>

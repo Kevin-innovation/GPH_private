@@ -1,6 +1,7 @@
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SectionShell } from "@/components/ui/SectionShell";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { HeroVisual } from "@/components/hero/HeroVisual";
 import { LensChain } from "./LensChain";
 
 export function GlobalLensSection() {
@@ -14,6 +15,9 @@ export function GlobalLensSection() {
             intro={<>Using iron as a worked example, follow one question from the body to community conditions and <span className="no-orphan">public-health systems.</span></>}
             id="global-lens-title"
           />
+        </div>
+        <div className="global-lens-hero">
+          <HeroVisual />
         </div>
         <LensChain />
         <div className="lens-next-step">

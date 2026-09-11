@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 4 시작 대기**
+> 상태: **Phase 5 시작 대기**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  
@@ -425,12 +425,15 @@ About 완료 기록: [`docs/audits/PHASE_3_ABOUT.md`](audits/PHASE_3_ABOUT.md)
 
 ### Phase 4 — Country Spotlight와 How the Lens Works
 
-- [ ] 지구본 중심 Country Hero 구성
-- [ ] 국가 선택과 세로형 상세 콘텐츠 동기화
-- [ ] 수도 marker 크기·투명도·pulse 수정
-- [ ] Body / Environment / Systems 시각 언어 분리
-- [ ] Systems 직선 네트워크 구성
-- [ ] 키보드와 reduced-motion 대응
+- [x] 지구본 중심 Country Hero 구성
+- [x] 국가 선택과 세로형 상세 콘텐츠 동기화
+- [x] 수도 marker 크기·투명도·pulse 수정
+- [x] Body / Environment / Systems 시각 언어 분리
+- [x] Systems 직선 네트워크 구성
+- [x] 키보드와 reduced-motion 대응
+- [x] Mission 데스크톱 좌측 공백 제거 및 스크롤 챕터 reveal 보강
+
+Country/Lens 및 Mission 공백 보정 완료 기록: [`docs/audits/PHASE_4_COUNTRY_LENS.md`](audits/PHASE_4_COUNTRY_LENS.md)
 
 종료 커밋: `feat: rebuild country and lens experiences`
 

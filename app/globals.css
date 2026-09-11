@@ -5940,3 +5940,209 @@ details[open] .summary-mark b { transform: rotate(45deg); }
     transition: none;
   }
 }
+
+/* -------------------------------------------------------------------------
+   Phase 4 — Country atlas + lens journey
+   -------------------------------------------------------------------------
+   Country Spotlight is a single vertical editorial sequence: the globe is the
+   opening scene, the selector is its caption rail, and the selected profile is
+   the reading chapter below. The Lens page uses the same rhythm and gives its
+   three scales a real interactive stage before the written chain.
+*/
+.country-spotlight-layout {
+  display: block;
+  max-width: 1080px;
+  margin-inline: auto;
+  padding-top: clamp(42px, 6vw, 76px);
+}
+
+.country-spotlight-map-column {
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.country-spotlight-globe-wrap {
+  min-height: clamp(430px, 50vw, 620px);
+}
+
+.country-spotlight-country-list {
+  margin-top: 16px;
+}
+
+.country-spotlight-detail {
+  max-width: 960px;
+  margin: clamp(60px, 8vw, 112px) auto 0;
+  padding-top: 25px;
+}
+
+.country-spotlight-detail-heading h3 {
+  max-width: 18ch;
+}
+
+.country-capital-label {
+  min-height: 24px;
+  padding: 4px 8px;
+  border-color: rgba(255, 255, 255, 0.46);
+  background: rgba(248, 251, 250, 0.62);
+  box-shadow: 0 4px 12px rgba(18, 49, 75, 0.08);
+  font-size: 0.58rem;
+  letter-spacing: 0.075em;
+  backdrop-filter: blur(6px);
+}
+
+.global-lens-hero {
+  margin: clamp(38px, 6vw, 72px) auto 0;
+  padding: clamp(20px, 4vw, 42px) 0 clamp(12px, 2vw, 22px);
+  border-top: 1px solid var(--color-navy);
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.global-lens-hero .hero-lens-visual {
+  width: min(100%, 980px);
+  min-height: clamp(410px, 44vw, 560px);
+}
+
+.lens-chain-editorial {
+  max-width: 980px;
+  margin: clamp(52px, 7vw, 92px) auto clamp(58px, 8vw, 104px);
+}
+
+.lens-chain-editorial > .lens-chain-entry {
+  position: relative;
+}
+
+.lens-chain-editorial .lens-step {
+  min-height: clamp(150px, 19vw, 220px);
+  padding: clamp(22px, 3vw, 34px) 0;
+  border-top: 1px solid var(--color-hairline);
+}
+
+.lens-chain-editorial > .lens-chain-entry:last-child .lens-step {
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.lens-chain-editorial .lens-step .eyebrow {
+  margin-bottom: 10px;
+  color: var(--color-teal-text);
+}
+
+.lens-chain-editorial .lens-step h3 {
+  max-width: 28ch;
+}
+
+.lens-chain-editorial .lens-connector {
+  position: relative;
+  z-index: 1;
+  width: clamp(84px, 8.5vw, 130px);
+  margin-top: -1px;
+  margin-bottom: -1px;
+  padding: 0;
+}
+
+.lens-chain-editorial .lens-connector-line {
+  width: 1px;
+  height: clamp(44px, 5vw, 64px);
+  background: linear-gradient(to bottom, var(--color-teal-text), rgba(17, 126, 118, 0.22));
+}
+
+.lens-chain-editorial .lens-connector-arrow {
+  margin-top: -1px;
+  color: var(--color-teal-text);
+  font-size: 1rem;
+}
+
+@media (max-width: 900px) {
+  .country-spotlight-layout {
+    padding-top: 34px;
+  }
+
+  .country-spotlight-globe-wrap {
+    min-height: min(92vw, 520px);
+  }
+
+  .country-spotlight-detail {
+    margin-top: 54px;
+  }
+
+  .global-lens-hero .hero-lens-visual {
+    min-height: 420px;
+  }
+
+  .lens-chain-editorial {
+    margin-top: 48px;
+  }
+}
+
+@media (max-width: 560px) {
+  .country-spotlight-globe-wrap {
+    min-height: 340px;
+  }
+
+  .country-spotlight-detail {
+    margin-top: 42px;
+  }
+
+  .global-lens-hero {
+    margin-top: 34px;
+  }
+
+  .global-lens-hero .hero-lens-visual {
+    min-height: 370px;
+  }
+
+  .lens-chain-editorial .lens-step {
+    min-height: 0;
+    padding-block: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .country-capital-label,
+  .lens-chain-editorial .lens-step,
+  .lens-chain-editorial .lens-connector-line {
+    transition: none;
+  }
+}
+
+/* Mission correction: the statement and its interactive rail are one vertical
+   chapter. Keeping the heading sticky in a desktop split left a large, empty
+   lower-left field while the determinant story continued on the right. Stack
+   the reading order instead so scroll reveals use the full page width. */
+#about.mission-signature .mission-stage {
+  display: block;
+  max-width: 1080px;
+}
+
+#about.mission-signature .mission-heading-column {
+  position: static;
+  max-width: 760px;
+  margin-bottom: clamp(48px, 7vw, 88px);
+}
+
+#about.mission-signature .mission-copy {
+  max-width: 960px;
+  margin-inline-start: 0;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes mission-chapter-enter {
+      from { opacity: 0.2; transform: translateY(26px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    #about.mission-signature .mission-copy > * {
+      animation: mission-chapter-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 4% cover 22%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #about.mission-signature .mission-copy > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

@@ -229,9 +229,9 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
 
       // The visible marker stays deliberately small at the closest country
       // zoom. A separate invisible hit sphere preserves an easy click target.
-      const markerGeometry = new THREE.SphereGeometry(0.01, 18, 14);
+      const markerGeometry = new THREE.SphereGeometry(0.035, 18, 14);
       const hitGeometry = new THREE.SphereGeometry(0.25, 12, 10);
-      const ringGeometry = new THREE.RingGeometry(0.02, 0.024, 28);
+      const ringGeometry = new THREE.RingGeometry(0.052, 0.064, 28);
       geometries.push(markerGeometry, hitGeometry, ringGeometry);
 
       const markerEntries = countrySpotlights.map((country, index) => {
@@ -239,13 +239,13 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         const markerMaterial = new THREE.MeshBasicMaterial({
           color: accentPalette[index % accentPalette.length],
           transparent: true,
-          opacity: country.id === selectedIdRef.current ? 0.9 : 0,
+          opacity: country.id === selectedIdRef.current ? 0.72 : 0,
         });
         const hitMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
         const ringMaterial = new THREE.MeshBasicMaterial({
           color: accentPalette[index % accentPalette.length],
           transparent: true,
-          opacity: country.id === selectedIdRef.current ? 0.9 : 0.28,
+          opacity: country.id === selectedIdRef.current ? 0.38 : 0.16,
           side: THREE.DoubleSide,
           depthWrite: false,
         });
@@ -273,10 +273,10 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         markerEntries.forEach(({ country, marker, markerMaterial, ring, ringMaterial }) => {
           const isSelected = country.id === countryId;
           marker.scale.setScalar(isSelected ? 1 : 0.82);
-          markerMaterial.opacity = isSelected ? 0.92 : showAll ? 0.5 : 0;
+          markerMaterial.opacity = isSelected ? 0.74 : showAll ? 0.28 : 0;
           markerMaterial.needsUpdate = true;
           ring.scale.setScalar(isSelected ? 1 : 0.9);
-          ringMaterial.opacity = isSelected && reducedMotion ? 0.32 : 0;
+          ringMaterial.opacity = isSelected && reducedMotion ? 0.3 : 0;
           ringMaterial.needsUpdate = true;
         });
       };
@@ -357,18 +357,18 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         if (activeEntry && !reducedMotion && time < pulseUntil) {
           const phase = (time % 720) / 720;
           const blink = 0.5 - Math.cos(phase * Math.PI * 2) * 0.5;
-          activeEntry.marker.scale.setScalar(0.94 + blink * 0.12);
-          activeEntry.markerMaterial.opacity = 0.52 + blink * 0.46;
+          activeEntry.marker.scale.setScalar(0.9 + blink * 0.18);
+          activeEntry.markerMaterial.opacity = 0.38 + blink * 0.4;
           activeEntry.markerMaterial.needsUpdate = true;
-          activeEntry.ring.scale.setScalar(1 + blink * 0.14);
-          activeEntry.ringMaterial.opacity = 0.18 + blink * 0.48;
+          activeEntry.ring.scale.setScalar(1 + blink * 0.2);
+          activeEntry.ringMaterial.opacity = 0.14 + blink * 0.34;
           activeEntry.ringMaterial.needsUpdate = true;
         } else if (activeEntry && !reducedMotion) {
           activeEntry.marker.scale.setScalar(1);
-          activeEntry.markerMaterial.opacity = 0.92;
+          activeEntry.markerMaterial.opacity = 0.74;
           activeEntry.markerMaterial.needsUpdate = true;
           activeEntry.ring.scale.setScalar(1);
-          activeEntry.ringMaterial.opacity = 0.26;
+          activeEntry.ringMaterial.opacity = 0.3;
           activeEntry.ringMaterial.needsUpdate = true;
         }
         render();

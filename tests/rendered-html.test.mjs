@@ -141,3 +141,22 @@ test("About pages keep the mission rail and founder pathways distinct", async ()
   assert.match(missionPage, /RelatedPages/, "Mission should link to the next About page");
   assert.match(teamPage, /RelatedPages/, "Team should expose related About/contact paths");
 });
+
+test("Country and Lens routes keep the vertical interactive story", async () => {
+  const country = await readProjectFile("components/global-lens/CountrySpotlight.tsx");
+  const countryPage = await readProjectFile("app/country-spotlight/page.tsx");
+  const lens = await readProjectFile("components/global-lens/GlobalLensSection.tsx");
+  const chain = await readProjectFile("components/global-lens/LensChain.tsx");
+  const css = await readProjectFile("app/globals.css");
+
+  assert.match(country, /SphereGeometry\(0\.035/,
+    "capital markers should stay compact at country zoom");
+  assert.match(country, /RingGeometry\(0\.052, 0\.064/,
+    "capital pulse rings should stay compact and readable");
+  assert.match(countryPage, /RelatedPages/, "Country Spotlight should hand off to the Lens story");
+  assert.match(lens, /HeroVisual/, "How the Lens Works should open with the interactive lens stage");
+  assert.match(chain, /lens-chain-editorial/, "Lens levels should use the vertical editorial chain");
+  assert.match(css, /\.country-spotlight-layout\s*\{\s*display:\s*block;/,
+    "Country Spotlight should not force a desktop split layout");
+  assert.match(css, /\.global-lens-hero/, "How the Lens Works should have a dedicated interactive hero surface");
+});
