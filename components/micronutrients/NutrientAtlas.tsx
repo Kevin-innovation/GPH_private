@@ -39,7 +39,15 @@ function NutrientIcon({ nutrient }: { nutrient: Nutrient }) {
   );
 }
 
-function NutrientVisual({ nutrient, className }: { nutrient: Nutrient; className: string }) {
+function NutrientVisual({
+  nutrient,
+  className,
+  loading = "lazy",
+}: {
+  nutrient: Nutrient;
+  className: string;
+  loading?: "eager" | "lazy";
+}) {
   return (
     <Image
       className={className}
@@ -47,6 +55,7 @@ function NutrientVisual({ nutrient, className }: { nutrient: Nutrient; className
       alt=""
       width={512}
       height={512}
+      loading={loading}
     />
   );
 }
@@ -351,7 +360,7 @@ function MobileNutrientList({
               <div className="atlas-mobile-detail" id={detailId} aria-live={isExpanded ? "polite" : "off"}>
                 <div className="atlas-mobile-detail-head">
                   <div className="atlas-mobile-detail-visual">
-                    <NutrientVisual nutrient={nutrient} className="atlas-mobile-detail-image" />
+                    <NutrientVisual nutrient={nutrient} className="atlas-mobile-detail-image" loading="eager" />
                   </div>
                   <div className="atlas-mobile-detail-copy">
                     <div className="atlas-detail-title">

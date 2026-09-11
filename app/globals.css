@@ -7747,3 +7747,17 @@ textarea {
     transition: none !important;
   }
 }
+
+/* The nutrient list is already driven by the reading-line hand-off above.
+   Running a second view-timeline entrance on the whole article at the same
+   time as the detail shell expands makes the row appear to hitch. Keep the
+   row itself stable and reserve motion for the detail content and nutrient
+   visual, which are both compositor-friendly. */
+.micronutrient-shell .atlas-mobile-item,
+.micronutrient-shell .atlas-mobile-item.is-reveal-visible {
+  animation: none !important;
+  animation-timeline: auto !important;
+  animation-range: normal !important;
+  opacity: 1;
+  transform: none;
+}
