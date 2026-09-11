@@ -7379,3 +7379,51 @@ textarea {
     animation: none !important;
   }
 }
+
+/* Home is the one immersive entry point: its header overlays the hero while
+   the reader is at the top, then resolves into a quiet raised surface after
+   the first scroll threshold. Keeping the header fixed in both states avoids
+   a layout jump when the overlay becomes a persistent navigation control. */
+.site-header {
+  transition:
+    background-color var(--duration-normal) ease,
+    border-color var(--duration-normal) ease,
+    box-shadow var(--duration-normal) ease,
+    -webkit-backdrop-filter var(--duration-normal) ease,
+    backdrop-filter var(--duration-normal) ease;
+}
+
+.site-header.is-home {
+  position: fixed;
+  inset: 0 0 auto;
+}
+
+.site-header.is-home:not(.is-scrolled) {
+  border-bottom-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.site-header.is-home.is-scrolled {
+  border-bottom-color: var(--header-border);
+  background: var(--header-background-scrolled);
+  box-shadow: 0 1px 0 rgba(18, 49, 75, 0.08), 0 8px 24px rgba(18, 49, 75, 0.06);
+}
+
+.hero-section-home .hero-grid {
+  padding-top: calc(56px + var(--header-height));
+}
+
+@media (max-width: 900px) {
+  .hero-section-home .hero-grid {
+    padding-top: calc(60px + var(--header-height));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none !important;
+  }
+}

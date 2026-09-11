@@ -132,6 +132,8 @@ test("vertical shell foundations stay in place", async () => {
   assert.match(css, /\.route-main\s*\{\s*min-height:\s*0;/, "route main should not force a viewport-sized blank area");
   assert.match(css, /\.page-hero-inner/, "page hero shell styles should exist");
   assert.match(css, /\.related-pages/, "related page shell styles should exist");
+  assert.match(header, /is-home/, "home header should expose its immersive overlay state");
+  assert.match(css, /\.site-header\.is-home:not\(\.is-scrolled\)/, "home header should transition from overlay to raised surface");
   assert.match(header, /data-scrolled/, "header should expose its scroll state");
 });
 

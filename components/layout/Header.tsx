@@ -19,6 +19,7 @@ export function Header() {
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
+  const isHome = pathname === "/";
 
   useEffect(() => {
     let frame = 0;
@@ -110,7 +111,10 @@ export function Header() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className={`site-header${scrolled ? " is-scrolled" : ""}`} data-scrolled={scrolled ? "true" : "false"}>
+    <header
+      className={`site-header${isHome ? " is-home" : ""}${scrolled ? " is-scrolled" : ""}`}
+      data-scrolled={scrolled ? "true" : "false"}
+    >
       <div className="header-inner">
         {/* Use a native home anchor here so the brand always exits a nested route, even before client navigation hydrates. */}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}

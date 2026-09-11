@@ -462,7 +462,7 @@ Country/Lens 및 Mission 공백 보정 완료 기록: [`docs/audits/PHASE_4_COUN
 
 ### Phase 7 — 애니메이션·반응형·접근성 QA
 
-- [ ] Header scroll transition
+- [x] Header scroll transition
 - [ ] 이미지 `clip-path` reveal
 - [ ] Section chapter reveal
 - [ ] selector 상태 전환 안정화
