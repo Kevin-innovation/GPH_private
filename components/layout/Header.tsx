@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { navigation, type NavigationItem } from "@/content/navigation";
@@ -69,6 +68,15 @@ export function Header() {
   }, []);
 
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenGroup(null);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       setOpenGroup(null);
       setMobileOpen(false);
@@ -88,13 +96,15 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Link className="brand-lockup" href="/" aria-label="Global Public Health Lens home">
+        {/* Use a native home anchor here so the brand always exits a nested route, even before client navigation hydrates. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a className="brand-lockup" href="/" aria-label="Global Public Health Lens home">
           <Image src="/brand/logo-mark-3d.webp" alt="" width={48} height={48} priority />
           <span>
             <strong>Global Public Health</strong>
             <span>Lens</span>
           </span>
-        </Link>
+        </a>
 
         <nav ref={navRef} className="desktop-nav" aria-label="Primary navigation">
           {navigation.map((item) => {

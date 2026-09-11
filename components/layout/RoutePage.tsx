@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 
@@ -18,7 +17,8 @@ export function RoutePage({
       <Header />
       <main id="main-content" className="route-main">
         <div className="page-width route-breadcrumb" aria-label="Breadcrumb">
-          <Link href="/">Brand / Home</Link>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a href="/">Brand / Home</a>
           <span aria-hidden="true">/</span>
           <span>{breadcrumb}</span>
         </div>

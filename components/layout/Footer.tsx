@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { orphanSafeText } from "@/components/ui/orphanSafeText";
 import { legal } from "@/content/legal";
@@ -27,14 +26,15 @@ export function Footer() {
     <footer className="site-footer">
       <div className="page-width footer-grid">
         <div className="footer-mission">
-          <Link className="footer-brand" href="/">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a className="footer-brand" href="/">
             <Image src="/brand/logo-mark-3d.webp" alt="" width={64} height={64} />
             <span>
               Global Public Health
               <br />
               Lens
             </span>
-          </Link>
+          </a>
           <p>
             Global Public Health Lens connects individual experiences with the places, environments, policies, and
             <span className="no-orphan"> systems that shape health.</span>
