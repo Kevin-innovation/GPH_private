@@ -105,6 +105,14 @@ test("multi-page information architecture exposes canonical destinations", async
 
   assert.doesNotMatch(header, /Explore the Map/, "the header must not duplicate Country Spotlight with a map CTA");
   assert.match(header, /href="\/"/, "the brand lockup should have a native home destination");
+  assert.ok(
+    navigation.indexOf('label: "About"') < navigation.indexOf('label: "The Lens"')
+      && navigation.indexOf('label: "The Lens"') < navigation.indexOf('label: "Country Spotlight"')
+      && navigation.indexOf('label: "Country Spotlight"') < navigation.indexOf('label: "Nutrition App"')
+      && navigation.indexOf('label: "Nutrition App"') < navigation.indexOf('label: "Contact"'),
+    "primary navigation should follow the approved About → Lens → Country → App → Contact order",
+  );
+  assert.match(header, /nav-direct-link/, "direct destinations should expose a themed navigation class");
   assert.match(directory, /className="home-pathways"/, "home should expose a concise pathway navigation");
   assert.match(directory, /href=\{pathway\.href\}/, "home pathway rows should expose real href values");
   assert.doesNotMatch(directory, /directory-groups|One project, several ways/, "home must not repeat the full sitemap");
@@ -179,6 +187,10 @@ test("Phase 5 lens content uses vertical lists and connected handoffs", async ()
   assert.match(css, /\.micronutrient-shell \.atlas-mobile-list/, "Micronutrients should render a desktop vertical list");
   assert.match(css, /\.solutions-page-section \.solutions-wrap/, "Solutions should remove the desktop split");
   assert.match(css, /\.nutrition-app-section \.app-grid/, "Nutrition App should remove the desktop split");
+  assert.match(micronutrients, /expandedSlug/, "Micronutrient rows should track their expanded detail independently");
+  assert.match(micronutrients, /toggleMobileNutrient/, "Micronutrient minus controls should collapse an open detail");
+  assert.match(micronutrients, /IntersectionObserver/, "Micronutrient scroll reveals should have a browser-safe fallback");
+  assert.match(css, /\.micronutrient-shell \.atlas-mobile-item\.is-reveal-visible/, "Micronutrient rows should animate into view without hiding by default");
 });
 
 test("Phase 6 keeps evidence, contact, and typography connected", async () => {
@@ -213,4 +225,5 @@ test("Phase 7 makes typography and action targets unmistakable", async () => {
   assert.match(css, /h1,\s*h2,\s*h3,\s*h4\s*\{\s*font-weight: 700 !important;/, "all display headings should use a bold Satoshi weight");
   assert.match(css, /\.desktop-nav > a,\s*\.desktop-nav \.nav-disclosure/, "primary navigation should expose outlined hit areas");
   assert.match(css, /\.country-spotlight-country-list button\s*\{[\s\S]*border-radius: 999px;/, "country selectors should read as pill controls");
+  assert.match(css, /\.country-spotlight-country-list\s*\{\s*border-top: 0 !important;\s*border-bottom: 0 !important;/, "country selector rail should not duplicate wrapper borders");
 });

@@ -102,28 +102,68 @@ function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
 
 function MobileNutrientList({
   nutrients: visibleNutrients,
-  activeSlug,
+  expandedSlug,
   onSelect,
+  onToggle,
 }: {
   nutrients: Nutrient[];
-  activeSlug: string;
+  expandedSlug: string | null;
   onSelect: (slug: string) => void;
+  onToggle: (slug: string) => void;
 }) {
+  const listRef = useRef<HTMLDivElement>(null);
+  const revealKey = visibleNutrients.map((nutrient) => nutrient.slug).join("|");
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const items = Array.from(list.querySelectorAll<HTMLElement>(".atlas-mobile-item"));
+    if (!items.length) return;
+
+    const reveal = (item: HTMLElement) => item.classList.add("is-reveal-visible");
+
+    // Keep the rows visible when the browser does not support Intersection
+    // Observer (or when motion is reduced). The reveal class only adds an
+    // entrance animation; it never controls layout or content visibility.
+    if (!("IntersectionObserver" in window)) {
+      items.forEach(reveal);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          reveal(entry.target as HTMLElement);
+          observer.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.01 },
+    );
+
+    items.forEach((item) => observer.observe(item));
+    return () => observer.disconnect();
+  }, [revealKey]);
+
   return (
-    <div className="atlas-mobile-list" aria-label="Nutrients to explore">
+    <div ref={listRef} className="atlas-mobile-list" aria-label="Nutrients to explore">
       {visibleNutrients.map((nutrient) => {
         const index = nutrients.findIndex((item) => item.slug === nutrient.slug);
-        const isActive = nutrient.slug === activeSlug;
+        const isExpanded = nutrient.slug === expandedSlug;
         const detailId = `mobile-nutrient-detail-${nutrient.slug}`;
 
         return (
-          <article className={`atlas-mobile-item${isActive ? " is-active" : ""}`} key={nutrient.slug}>
+          <article className={`atlas-mobile-item${isExpanded ? " is-active" : ""}`} key={nutrient.slug}>
             <button
               className="atlas-mobile-trigger"
               type="button"
-              aria-expanded={isActive}
+              aria-expanded={isExpanded}
               aria-controls={detailId}
-              onClick={() => onSelect(nutrient.slug)}
+              onClick={() => {
+                onSelect(nutrient.slug);
+                onToggle(nutrient.slug);
+              }}
             >
               <span className="atlas-mobile-index">0{index + 1}</span>
               <div className="atlas-mobile-thumb">
@@ -135,11 +175,11 @@ function MobileNutrientList({
                 <span className="atlas-card-summary">{orphanSafeText(nutrient.summary)}</span>
               </div>
               <span className="atlas-mobile-trigger-arrow" aria-hidden="true">
-                {isActive ? "−" : "+"}
+                {isExpanded ? "−" : "+"}
               </span>
             </button>
 
-            {isActive ? (
+            {isExpanded ? (
               <div className="atlas-mobile-detail" id={detailId} aria-live="polite">
                 <div className="atlas-mobile-detail-head">
                   <div className="atlas-mobile-detail-visual">
@@ -189,6 +229,7 @@ function MobileNutrientList({
 export function NutrientAtlas() {
   const [filter, setFilter] = useState<Filter>("all");
   const [activeSlug, setActiveSlug] = useState(nutrients[0].slug);
+  const [expandedSlug, setExpandedSlug] = useState<string | null>(nutrients[0].slug);
   const activeSlugRef = useRef(nutrients[0].slug);
   const cardGridRef = useRef<HTMLDivElement>(null);
   const visibleNutrients = filter === "all" ? nutrients : nutrients.filter((nutrient) => nutrient.category === filter);
@@ -266,8 +307,15 @@ export function NutrientAtlas() {
     setFilter(nextFilter);
     if (nextFilter !== "all" && activeNutrient.category !== nextFilter) {
       const firstMatch = nutrients.find((nutrient) => nutrient.category === nextFilter);
-      if (firstMatch) selectNutrient(firstMatch.slug);
+      if (firstMatch) {
+        selectNutrient(firstMatch.slug);
+        setExpandedSlug(firstMatch.slug);
+      }
     }
+  };
+
+  const toggleMobileNutrient = (slug: string) => {
+    setExpandedSlug((currentSlug) => (currentSlug === slug ? null : slug));
   };
 
   return (
@@ -322,8 +370,9 @@ export function NutrientAtlas() {
       </div>
       <MobileNutrientList
         nutrients={visibleNutrients}
-        activeSlug={activeNutrient.slug}
+        expandedSlug={expandedSlug}
         onSelect={selectNutrient}
+        onToggle={toggleMobileNutrient}
       />
     </div>
   );

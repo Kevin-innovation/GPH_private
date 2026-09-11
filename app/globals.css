@@ -7225,3 +7225,105 @@ textarea {
     transition: none !important;
   }
 }
+
+/* Direct destinations use the three project accents so they read as actions
+   at rest; grouped destinations stay neutral because their disclosure chevron
+   already communicates the next interaction. */
+.desktop-nav > a.nav-direct-country-spotlight {
+  border-color: rgba(17, 126, 118, 0.38);
+  background: rgba(159, 215, 205, 0.2);
+}
+
+.desktop-nav > a.nav-direct-nutrition-app {
+  border-color: rgba(212, 155, 47, 0.46);
+  background: rgba(242, 184, 75, 0.17);
+}
+
+.desktop-nav > a.nav-direct-contact {
+  border-color: rgba(18, 49, 75, 0.3);
+  background: rgba(18, 49, 75, 0.08);
+}
+
+.desktop-nav > a.nav-direct-country-spotlight:hover,
+.desktop-nav > a.nav-direct-country-spotlight:focus-visible,
+.desktop-nav > a.nav-direct-nutrition-app:hover,
+.desktop-nav > a.nav-direct-nutrition-app:focus-visible,
+.desktop-nav > a.nav-direct-contact:hover,
+.desktop-nav > a.nav-direct-contact:focus-visible {
+  border-color: var(--color-teal-text);
+  background: var(--color-white);
+  color: var(--color-navy);
+}
+
+.desktop-nav > a.nav-direct-country-spotlight.is-active,
+.desktop-nav > a.nav-direct-nutrition-app.is-active,
+.desktop-nav > a.nav-direct-contact.is-active {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+@media (max-width: 900px) {
+  .mobile-nav a.nav-direct-country-spotlight {
+    border-left-color: var(--color-teal-text);
+    background: rgba(159, 215, 205, 0.18);
+  }
+
+  .mobile-nav a.nav-direct-nutrition-app {
+    border-left-color: var(--color-gold-text);
+    background: rgba(242, 184, 75, 0.16);
+  }
+
+  .mobile-nav a.nav-direct-contact {
+    border-left-color: var(--color-navy);
+    background: rgba(18, 49, 75, 0.08);
+  }
+
+  .mobile-nav a.nav-direct-link.is-active {
+    border-color: var(--color-navy);
+    background: var(--color-navy);
+    color: var(--color-white);
+  }
+}
+
+/* The country controls already have their own pill boundaries. Keeping a
+   second rule on the list container created the doubled top/bottom lines in
+   the selector rail, so the wrapper remains borderless at every breakpoint. */
+.country-spotlight-country-list {
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+}
+
+/* Scroll reveal fallback for the micronutrient reading list. The previous
+   view-timeline animation could leave rows at its initial opacity in browsers
+   that expose the API but do not advance the timeline reliably. Rows stay
+   fully readable by default, and IntersectionObserver adds a one-shot entry
+   motion as each row reaches the viewport. */
+@keyframes phase5-list-enter {
+  from { opacity: 0.45; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
+.micronutrient-shell .atlas-mobile-item {
+  animation: none;
+  animation-timeline: auto;
+  animation-range: normal;
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .micronutrient-shell .atlas-mobile-item.is-reveal-visible {
+    animation: phase5-list-enter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .micronutrient-shell .atlas-mobile-item {
+    animation: none !important;
+    animation-timeline: auto !important;
+    animation-range: normal !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

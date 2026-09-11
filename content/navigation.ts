@@ -21,7 +21,6 @@ export const navigation = [
       { label: "Our Team", href: "/about/team" },
     ],
   },
-  { label: "Country Spotlight", href: "/country-spotlight" },
   {
     label: "The Lens",
     items: [
@@ -30,6 +29,7 @@ export const navigation = [
       { label: "Solutions & Action", href: "/lens/solutions" },
     ],
   },
+  { label: "Country Spotlight", href: "/country-spotlight" },
   { label: "Nutrition App", href: "/nutrition-app" },
   { label: "Contact", href: "/contact" },
 ] as const satisfies readonly NavigationItem[];

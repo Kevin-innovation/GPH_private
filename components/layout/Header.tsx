@@ -135,8 +135,14 @@ export function Header() {
         <nav ref={navRef} className="desktop-nav" aria-label="Primary navigation">
           {navigation.map((item) => {
             if (!isGroup(item)) {
+              const directClass = `nav-direct-link nav-direct-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
               return (
-                <a key={item.href} className={isActive(item.href) ? "is-active" : undefined} href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>
+                <a
+                  key={item.href}
+                  className={`${directClass}${isActive(item.href) ? " is-active" : ""}`}
+                  href={item.href}
+                  aria-current={isActive(item.href) ? "page" : undefined}
+                >
                   {item.label}
                 </a>
               );
@@ -204,8 +210,15 @@ export function Header() {
           <nav aria-label="Mobile navigation">
             {navigation.map((item, index) => {
               if (!isGroup(item)) {
+                const directClass = `nav-direct-link nav-direct-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
                 return (
-                  <a key={item.href} className={isActive(item.href) ? "is-active" : undefined} href={item.href} onClick={closeMenu} aria-current={isActive(item.href) ? "page" : undefined}>
+                  <a
+                    key={item.href}
+                    className={`${directClass}${isActive(item.href) ? " is-active" : ""}`}
+                    href={item.href}
+                    onClick={closeMenu}
+                    aria-current={isActive(item.href) ? "page" : undefined}
+                  >
                     {item.label}
                   </a>
                 );
