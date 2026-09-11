@@ -7427,3 +7427,42 @@ textarea {
     transition: none !important;
   }
 }
+
+/* Phase 7 media reveal: the app screens enter as one composed image band when
+   the stage reaches the reading window. The resting state remains fully
+   visible so content is never hidden when script, IntersectionObserver, or
+   clip-path is unavailable. */
+@keyframes phase7-media-clip-reveal {
+  from {
+    clip-path: inset(12% 8% 12% 8% round 32px);
+    opacity: 0.72;
+    transform: translateY(16px);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 0);
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.media-clip-reveal {
+  clip-path: inset(0 0 0 0 round 0);
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .media-clip-reveal.is-visible {
+    animation: phase7-media-clip-reveal 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media-clip-reveal,
+  .media-clip-reveal.is-visible {
+    animation: none !important;
+    clip-path: inset(0 0 0 0 round 0) !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

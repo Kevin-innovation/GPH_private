@@ -223,6 +223,7 @@ test("Phase 7 makes typography and action targets unmistakable", async () => {
   const home = await readProjectFile("components/home/HomeDirectory.tsx");
   const lens = await readProjectFile("components/global-lens/GlobalLensSection.tsx");
   const related = await readProjectFile("components/layout/RelatedPages.tsx");
+  const appScreenshots = await readProjectFile("components/app-preview/AppScreenshots.tsx");
   const css = await readProjectFile("app/globals.css");
 
   assert.match(home, /button button-secondary button-cta/, "home evidence handoff should use the shared button treatment");
@@ -234,4 +235,8 @@ test("Phase 7 makes typography and action targets unmistakable", async () => {
   assert.match(css, /\.country-spotlight-country-list\s*\{\s*border-top: 0 !important;\s*border-bottom: 0 !important;/, "country selector rail should not duplicate wrapper borders");
   assert.match(css, /\.desktop-nav > a\.nav-direct-nutrition-app[\s\S]*backdrop-filter: blur\(16px\)/, "Nutrition App should be the only colored glass navigation destination");
   assert.match(css, /\.desktop-nav > a\.nav-direct-country-spotlight,\s*\.desktop-nav > a\.nav-direct-contact\s*\{\s*border-color: rgba\(18, 49, 75, 0\.16\)/, "Country and Contact should remain neutral at rest");
+  assert.match(appScreenshots, /media-clip-reveal/, "app imagery should expose a stable scroll-reveal hook");
+  assert.match(appScreenshots, /IntersectionObserver/, "app imagery reveal should have a browser fallback");
+  assert.match(css, /@keyframes phase7-media-clip-reveal/, "app imagery should define a clip-path reveal animation");
+  assert.match(css, /\.media-clip-reveal\s*\{[\s\S]*clip-path:\s*inset\(0 0 0 0 round 0\)/, "app imagery should remain visible before the reveal observer runs");
 });
