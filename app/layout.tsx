@@ -1,15 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-// Single family, three roles (display / body / label) separated by weight and tracking.
-// Weight 300 carries display sizes; 400 body; 500-600 labels and buttons.
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  display: "swap",
-  variable: "--font-inter",
-});
 
 const title = "Global Public Health Lens | See Health in Context";
 const description =
@@ -29,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en">
       <body>{children}</body>
     </html>
   );

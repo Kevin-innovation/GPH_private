@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 6 시작 대기**
+> 상태: **Phase 7 시작 대기**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  
@@ -450,11 +450,13 @@ Country/Lens 및 Mission 공백 보정 완료 기록: [`docs/audits/PHASE_4_COUN
 
 ### Phase 6 — Evidence Base, Contact, 내부 연결, Footer
 
-- [ ] Evidence Base 명칭과 출처 그룹 통일
-- [ ] Contact Form 세로형 구성
-- [ ] Related Page 경로 전수 구현
-- [ ] Footer 정보 밴드 정리
-- [ ] 고아 페이지와 중복 CTA 제거
+- [x] Evidence Base 명칭과 출처 그룹 통일
+- [x] Contact Form 세로형 구성
+- [x] Related Page 경로 전수 구현
+- [x] Footer 정보 밴드 정리
+- [x] 고아 페이지와 중복 CTA 제거
+
+완료 기록: [`docs/audits/PHASE_6_EVIDENCE_CONTACT.md`](audits/PHASE_6_EVIDENCE_CONTACT.md)
 
 종료 커밋: `feat: connect evidence contact and related-page pathways`
 

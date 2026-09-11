@@ -26,7 +26,7 @@ export function SourcesSection() {
     <SectionShell id="sources" surface="white" labelledBy="sources-title" className="sources-section">
       <div className="page-width sources-grid">
         <SectionHeading
-          eyebrow="Evidence base"
+          eyebrow="Evidence Base"
           title={<>Sources behind <span className="no-orphan">the lens.</span></>}
           id="sources-title"
         />

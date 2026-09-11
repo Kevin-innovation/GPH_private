@@ -1,3 +1,4 @@
+@import url("https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap");
 @import "tailwindcss";
 
 /* Brand tokens. Accent values below are contrast-measured: the raw brand teal
@@ -48,12 +49,14 @@
   --surface-inverse: var(--color-navy);
   --text-primary: var(--color-ink);
   --text-strong: var(--color-navy);
-  --text-muted: rgba(23, 37, 46, 0.7);
+  --text-muted: rgba(23, 37, 46, 0.78);
   --space-page-gutter: clamp(1rem, 4vw, 2rem);
   --space-section-y: clamp(4rem, 8vw, 7.25rem);
   --content-width: 1280px;
   --reading-width: 65ch;
   --header-height: 72px;
+  --font-satoshi: "Satoshi";
+  --font-sans: var(--font-satoshi), "Helvetica Neue", Arial, sans-serif;
 
   /* Component tokens — stable shell and control contracts. */
   --header-background: color-mix(in srgb, var(--surface-page) 92%, transparent);
@@ -62,7 +65,7 @@
   --button-radius: var(--radius-control);
   --focus-ring: 0 0 0 3px rgba(17, 126, 118, 0.22);
 }
-@theme inline { --color-background: var(--color-cloud); --color-foreground: var(--color-ink); --font-sans: var(--font-inter), Inter, "Helvetica Neue", Arial, sans-serif; }
+@theme inline { --color-background: var(--color-cloud); --color-foreground: var(--color-ink); --font-sans: var(--font-satoshi), "Helvetica Neue", Arial, sans-serif; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; font-family: var(--font-sans); }
 body { margin: 0; overflow-x: clip; background: var(--color-cloud); color: var(--color-ink); font-family: inherit; font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
@@ -6680,5 +6683,91 @@ details[open] .summary-mark b { transform: rotate(45deg); }
     animation-range: normal !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+}
+
+/* ---- Phase 6: Contact shell + typography ---------------------------------
+   Short routes used to end before the viewport, leaving the body's Cloud
+   background visible below the navy Footer. Let the main column absorb the
+   remaining viewport height so the Footer is always the final visible band. */
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body > main.route-main {
+  flex: 1 0 auto;
+}
+
+/* The new family is intentionally weight-forward: large claims use 700 and
+   subheads use 600, while body copy stays at a readable 400. This removes the
+   hairline feel caused by the old 300 display defaults without turning every
+   label into a heavy block. */
+h1,
+h2 {
+  font-weight: 700 !important;
+}
+
+h3,
+h4 {
+  font-weight: 600 !important;
+}
+
+.contact-section .contact-grid {
+  display: block;
+  max-width: 1080px;
+}
+
+.contact-section .contact-intro {
+  max-width: 760px;
+  margin-bottom: clamp(48px, 6vw, 76px);
+}
+
+.contact-section .contact-intro > p {
+  max-width: 68ch;
+  color: rgba(23, 37, 46, 0.84);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.contact-section .contact-form {
+  max-width: 960px;
+  padding-top: 0;
+}
+
+.sources-section .sources-grid {
+  display: block;
+  max-width: 1080px;
+}
+
+.sources-section .section-heading {
+  max-width: 760px;
+  margin-bottom: clamp(48px, 6vw, 76px);
+}
+
+.sources-section .source-list {
+  max-width: 960px;
+}
+
+.contact-section .contact-form label {
+  color: var(--color-navy);
+  font-weight: 600;
+}
+
+.contact-section .consent-label span,
+.contact-section .form-note {
+  color: rgba(23, 37, 46, 0.8);
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .contact-section .contact-intro {
+    margin-bottom: 44px;
   }
 }

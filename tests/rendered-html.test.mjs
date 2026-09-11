@@ -180,3 +180,23 @@ test("Phase 5 lens content uses vertical lists and connected handoffs", async ()
   assert.match(css, /\.solutions-page-section \.solutions-wrap/, "Solutions should remove the desktop split");
   assert.match(css, /\.nutrition-app-section \.app-grid/, "Nutrition App should remove the desktop split");
 });
+
+test("Phase 6 keeps evidence, contact, and typography connected", async () => {
+  const contact = await readProjectFile("app/contact/page.tsx");
+  const contactSection = await readProjectFile("components/contact/ContactSection.tsx");
+  const evidence = await readProjectFile("app/evidence-base/page.tsx");
+  const sources = await readProjectFile("components/sources/SourcesSection.tsx");
+  const lensPage = await readProjectFile("app/lens/how-it-works/page.tsx");
+  const layout = await readProjectFile("app/layout.tsx");
+  const css = await readProjectFile("app/globals.css");
+
+  assert.match(contact, /RelatedPages/, "Contact should expose meaningful next paths");
+  assert.match(contactSection, /className="contact-section"/, "Contact should keep a scoped vertical layout hook");
+  assert.match(evidence, /RelatedPages/, "Evidence Base should connect back to action and contact");
+  assert.match(sources, /eyebrow="Evidence Base"/, "Evidence Base label should match the route name");
+  assert.match(lensPage, /RelatedPages/, "How the Lens Works should expose its next lens paths");
+  assert.match(layout, /globals\.css/, "The root layout should load the shared typography stylesheet");
+  assert.match(css, /api\.fontshare\.com\/v2\/css\?f\[\]=satoshi/, "Typography should load Satoshi from Fontshare");
+  assert.match(css, /body > main\.route-main\s*\{\s*flex: 1 0 auto;/, "short routes should keep the footer at the viewport floor");
+  assert.match(css, /h1,\s*h2\s*\{\s*font-weight: 700 !important;/, "display headings should not render as hairline text");
+});
