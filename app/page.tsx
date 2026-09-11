@@ -3,8 +3,8 @@ import { Hero } from "@/components/hero/Hero";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 
-// Server component. Only Header (mobile nav state) and ContactForm (form state)
-// cross the client boundary, so the landing page ships almost no JavaScript.
+// The landing page keeps its content server-rendered; Header and the small
+// project-directory navigation cross the client boundary for reliable routing.
 export default function Home() {
   return (
     <>

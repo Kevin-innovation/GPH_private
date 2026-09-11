@@ -1,3 +1,5 @@
+"use client";
+
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { SectionShell } from "@/components/ui/SectionShell";
 
@@ -47,7 +49,13 @@ export function HomeDirectory() {
               <ul>
                 {group.links.map((link) => (
                   <li key={link.href}>
-                    <a href={link.href}>
+                    <a
+                      href={link.href}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        window.location.assign(link.href);
+                      }}
+                    >
                       <span className="directory-link-title">{link.title}</span>
                       <span className="directory-link-body">{link.body}</span>
                       <span className="directory-link-arrow" aria-hidden="true">→</span>
