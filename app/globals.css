@@ -53,6 +53,8 @@ p + p { margin-top: 1.15em; }
 .site-header { position: sticky; z-index: 20; top: 0; background: var(--color-cloud); border-bottom: 1px solid var(--color-hairline); }
 .header-inner { width: min(1440px, calc(100% - 48px)); min-height: var(--header-height); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .brand-lockup, .footer-brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; line-height: 1.05; }
+.brand-lockup { cursor: pointer; }
+.brand-lockup:hover strong, .brand-lockup:focus-visible strong { color: var(--color-teal-text); }
 .brand-lockup img, .footer-brand img { flex: 0 0 auto; }
 .brand-lockup strong, .brand-lockup span span { display: block; font-size: 0.85rem; font-weight: 500; letter-spacing: -0.02em; }
 .brand-lockup strong { color: var(--color-navy); }

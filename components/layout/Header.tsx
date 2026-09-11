@@ -16,6 +16,7 @@ export function Header() {
   const [mobileGroup, setMobileGroup] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const firstInteractiveRef = useRef<HTMLButtonElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
 
@@ -29,9 +30,22 @@ export function Header() {
         triggerRef.current?.focus();
       }
 
-      if (event.key === "Tab" && event.shiftKey && document.activeElement === firstInteractiveRef.current) {
-        event.preventDefault();
-        triggerRef.current?.focus();
+      if (event.key === "Tab") {
+        const focusableElements = Array.from(
+          mobileNavRef.current?.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])',
+          ) ?? [],
+        ).filter((element) => !element.closest("[hidden]"));
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey && document.activeElement === firstFocusable) {
+          event.preventDefault();
+          lastFocusable?.focus();
+        } else if (!event.shiftKey && document.activeElement === lastFocusable) {
+          event.preventDefault();
+          firstFocusable?.focus();
+        }
       }
     };
 
@@ -149,7 +163,7 @@ export function Header() {
       </div>
 
       {mobileOpen ? (
-        <div className="mobile-nav" id="mobile-navigation">
+        <div ref={mobileNavRef} className="mobile-nav" id="mobile-navigation">
           <nav aria-label="Mobile navigation">
             {navigation.map((item, index) => {
               if (!isGroup(item)) {
