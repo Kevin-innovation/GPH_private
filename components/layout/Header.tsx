@@ -11,6 +11,7 @@ function isGroup(item: NavigationItem): item is Extract<NavigationItem, { items:
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileGroup, setMobileGroup] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -18,6 +19,21 @@ export function Header() {
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    let frame = 0;
+    const updateScrollState = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => setScrolled(window.scrollY > 12));
+    };
+
+    updateScrollState();
+    window.addEventListener("scroll", updateScrollState, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", updateScrollState);
+    };
+  }, []);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -94,7 +110,7 @@ export function Header() {
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className="site-header">
+    <header className={`site-header${scrolled ? " is-scrolled" : ""}`} data-scrolled={scrolled ? "true" : "false"}>
       <div className="header-inner">
         {/* Use a native home anchor here so the brand always exits a nested route, even before client navigation hydrates. */}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}

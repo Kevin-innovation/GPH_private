@@ -105,3 +105,18 @@ test("multi-page information architecture exposes canonical destinations", async
   assert.match(header, /href="\/"/, "the brand lockup should have a native home destination");
   assert.match(directory, /href=\{link\.href\}/, "project directory rows should expose real href values");
 });
+
+test("vertical shell foundations stay in place", async () => {
+  const routePage = await readProjectFile("components/layout/RoutePage.tsx");
+  const header = await readProjectFile("components/layout/Header.tsx");
+  const css = await readProjectFile("app/globals.css");
+
+  assert.match(routePage, /route-main route-frame/, "detail routes should use the vertical shell frame");
+  assert.match(css, /--primitive-navy:/, "primitive design tokens should be declared");
+  assert.match(css, /--surface-page:/, "semantic surface tokens should be declared");
+  assert.match(css, /--header-background-scrolled:/, "header component tokens should be declared");
+  assert.match(css, /\.route-main\s*\{\s*min-height:\s*0;/, "route main should not force a viewport-sized blank area");
+  assert.match(css, /\.page-hero-inner/, "page hero shell styles should exist");
+  assert.match(css, /\.related-pages/, "related page shell styles should exist");
+  assert.match(header, /data-scrolled/, "header should expose its scroll state");
+});

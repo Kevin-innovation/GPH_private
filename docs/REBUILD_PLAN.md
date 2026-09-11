@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 1 시작 대기**  
+> 상태: **Phase 2 시작 대기**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  
@@ -386,14 +386,16 @@ Evidence Base → Country Spotlight
 
 ### Phase 1 — 전역 디자인 시스템과 사이트 셸
 
-- [ ] 전역 CSS를 토큰·reset·공통 shell 중심으로 정리
-- [ ] 섹션 스타일을 충돌하지 않는 단위로 분리
-- [ ] Overlay / Scrolled Header 상태 구현
-- [ ] 모바일 메뉴와 focus trap 재검수
-- [ ] Breadcrumb를 콘텐츠에 통합
-- [ ] `route-main`의 불필요한 `min-height`와 spacer 제거
-- [ ] `PageHero`, `ContentBand`, `PageIntro`, `RelatedPages` 구현
-- [ ] Footer 즉시 접합 확인
+- [x] 전역 CSS를 토큰·reset·공통 shell 중심으로 정리
+- [x] 섹션 스타일을 충돌하지 않는 단위로 분리
+- [x] Overlay / Scrolled Header 상태 구현
+- [x] 모바일 메뉴와 focus trap 재검수
+- [x] Breadcrumb를 콘텐츠에 통합
+- [x] `route-main`의 불필요한 `min-height`와 spacer 제거
+- [x] `PageHero`, `ContentBand`, `PageIntro`, `RelatedPages` 구현
+- [x] Footer 즉시 접합 확인
+
+셸 완료 기록: [`docs/audits/PHASE_1_SHELL.md`](audits/PHASE_1_SHELL.md)
 
 종료 커밋: `refactor: rebuild global shell and vertical layout system`
 
