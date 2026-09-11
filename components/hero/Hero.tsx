@@ -21,8 +21,8 @@ export function Hero() {
             what <span className="no-orphan">public-health action can change.</span>
           </p>
           <div className="button-row">
-            <ButtonLink href="#country-spotlight">Explore Country Spotlights</ButtonLink>
-            <ButtonLink href="#about" variant="secondary">
+            <ButtonLink href="/country-spotlight">Explore Country Spotlight</ButtonLink>
+            <ButtonLink href="/lens/how-it-works" variant="secondary">
               See the Public-Health Lens
             </ButtonLink>
           </div>

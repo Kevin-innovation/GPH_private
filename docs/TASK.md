@@ -1,8 +1,10 @@
 # TASK.md — Global Public Health Lens 랜딩 웹사이트
 
 > 작성일: 2026-08-20
-> 상태: **계획 확정. 구현 미착수.**
+> 상태: **Phase 1 진행 중.**
 > 근거 문서: `Website Design and Development Brief.docx`, `Global_Public_Health_Lens_Website_Starter_Pack.docx` (둘 다 전문 분석 완료)
+
+> **2026-09-11 IA addendum:** 클라이언트 피드백에 따라 기존 단일 랜딩·앵커 내비 가정을 폐기한다. 최신 네비게이션과 독립 페이지 매핑은 [`docs/IA.md`](./IA.md)를 기준으로 하며, 이 부록이 §3·§4의 기존 단일 페이지 설명보다 우선한다. `Explore the Map`은 `Country Spotlight`와 중복되어 제거하고, `Evidence Base`는 푸터 유틸리티로 유지한다.
 
 ---
 
@@ -714,6 +716,15 @@ cp /tmp/gphl-assets/word/media/image4.png public/brand/app-preview.png
 9. `content/` 8개 파일에 스타터팩 원문 카피 전량 입력 + 타입 정의
 10. `SectionShell` · `Rule` · `Eyebrow` · `ButtonLink` · `ExternalLink` 작성
 11. §6.5 파생 토큰(`--color-teal-text` 등 3종) 정의 — 실측 완료, 재조사 불필요
+
+### Phase 1 IA addendum — 2026-09-11
+
+- [x] Primary navigation grouped into `About` and `The Lens` disclosures
+- [x] Canonical route map implemented for each primary destination
+- [x] Homepage reduced to Hero + editorial project directory
+- [x] `Explore the Map` duplicate removed; `Country Spotlight` is the sole map destination
+- [x] `Evidence Base` terminology and footer utility route aligned
+- [x] Shared route wrapper with breadcrumb and independent page sections added
 
 ### Phase 2 — 뼈대
 

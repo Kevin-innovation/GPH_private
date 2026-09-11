@@ -1,18 +1,18 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { orphanSafeText } from "@/components/ui/orphanSafeText";
 import { legal } from "@/content/legal";
 import { siteConfig } from "@/content/site-config";
 
 const exploreLinks = [
-  { label: "Country Spotlights", href: "#country-spotlight" },
-  { label: "How the Lens Works", href: "#global-lens" },
-  { label: "Micronutrient Guide", href: "#micronutrients" },
-  { label: "Nutrition App", href: "#app" },
-  { label: "About", href: "#about" },
-  { label: "Meet the Founder", href: "#founder" },
-  { label: "Sources", href: "#sources" },
-  { label: "Contact", href: "#contact" },
+  { label: "Country Spotlight", href: "/country-spotlight" },
+  { label: "Micronutrients", href: "/lens/micronutrients" },
+  { label: "How the Lens Works", href: "/lens/how-it-works" },
+  { label: "Solutions & Action", href: "/lens/solutions" },
+  { label: "Nutrition App", href: "/nutrition-app" },
+  { label: "Evidence Base", href: "/evidence-base" },
+  { label: "Contact", href: "/contact" },
 ];
 
 // Owner-supplied values are still placeholders, so these render as plain text
@@ -27,14 +27,14 @@ export function Footer() {
     <footer className="site-footer">
       <div className="page-width footer-grid">
         <div className="footer-mission">
-          <a className="footer-brand" href="#hero">
+          <Link className="footer-brand" href="/">
             <Image src="/brand/logo-mark-3d.webp" alt="" width={64} height={64} />
             <span>
               Global Public Health
               <br />
               Lens
             </span>
-          </a>
+          </Link>
           <p>
             Global Public Health Lens connects individual experiences with the places, environments, policies, and
             <span className="no-orphan"> systems that shape health.</span>

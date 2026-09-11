@@ -1,0 +1,23 @@
+import { CaseStudyList } from "./CaseStudyList";
+import { SolutionsList } from "./SolutionsList";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { SectionShell } from "@/components/ui/SectionShell";
+
+export function SolutionsPageSection() {
+  return (
+    <SectionShell id="solutions" surface="white" labelledBy="solutions-page-title" className="solutions-page-section">
+      <div className="page-width">
+        <div className="global-intro">
+          <SectionHeading
+            eyebrow="Solutions & action"
+            title={<>Health changes when <span className="no-orphan">conditions change.</span></>}
+            intro={<>Explore practical public-health responses across food, services, environments, policy, and <span className="no-orphan">accountability.</span></>}
+            id="solutions-page-title"
+          />
+        </div>
+        <SolutionsList />
+        <CaseStudyList />
+      </div>
+    </SectionShell>
+  );
+}

@@ -1,13 +1,23 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { navigation } from "@/content/navigation";
+import { navigation, type NavigationItem } from "@/content/navigation";
+
+function isGroup(item: NavigationItem): item is Extract<NavigationItem, { items: readonly { label: string; href: string }[] }> {
+  return "items" in item;
+}
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const [mobileGroup, setMobileGroup] = useState<string | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const firstLinkRef = useRef<HTMLAnchorElement>(null);
+  const firstInteractiveRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -15,10 +25,11 @@ export function Header() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setMobileOpen(false);
+        setMobileGroup(null);
         triggerRef.current?.focus();
       }
 
-      if (event.key === "Tab" && event.shiftKey && document.activeElement === firstLinkRef.current) {
+      if (event.key === "Tab" && event.shiftKey && document.activeElement === firstInteractiveRef.current) {
         event.preventDefault();
         triggerRef.current?.focus();
       }
@@ -26,7 +37,7 @@ export function Header() {
 
     document.addEventListener("keydown", handleKeyDown);
     document.body.style.overflow = "hidden";
-    firstLinkRef.current?.focus();
+    firstInteractiveRef.current?.focus();
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -34,31 +45,90 @@ export function Header() {
     };
   }, [mobileOpen]);
 
+  useEffect(() => {
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!navRef.current?.contains(event.target as Node)) setOpenGroup(null);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, []);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setOpenGroup(null);
+      setMobileOpen(false);
+      setMobileGroup(null);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [pathname]);
+
   const closeMenu = () => {
     setMobileOpen(false);
+    setMobileGroup(null);
     triggerRef.current?.focus();
   };
+
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <header className="site-header">
       <div className="header-inner">
-        <a className="brand-lockup" href="#hero" aria-label="Global Public Health Lens home">
+        <Link className="brand-lockup" href="/" aria-label="Global Public Health Lens home">
           <Image src="/brand/logo-mark-3d.webp" alt="" width={48} height={48} priority />
           <span>
             <strong>Global Public Health</strong>
             <span>Lens</span>
           </span>
-        </a>
+        </Link>
 
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          {navigation.map((item) => (
-            <a key={item.href} href={item.href}>
-              {item.label}
-            </a>
-          ))}
-          <a className="nav-cta" href="#country-spotlight">
-            Explore the Map
-          </a>
+        <nav ref={navRef} className="desktop-nav" aria-label="Primary navigation">
+          {navigation.map((item) => {
+            if (!isGroup(item)) {
+              return (
+                <a key={item.href} className={isActive(item.href) ? "is-active" : undefined} href={item.href} aria-current={isActive(item.href) ? "page" : undefined}>
+                  {item.label}
+                </a>
+              );
+            }
+
+            const groupIsActive = item.items.some((child) => isActive(child.href));
+            const isOpen = openGroup === item.label;
+            const menuId = `nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+
+            return (
+              <div
+                key={item.label}
+                className={`nav-group${isOpen ? " is-open" : ""}${groupIsActive ? " is-active" : ""}`}
+                onMouseEnter={() => setOpenGroup(item.label)}
+                onFocus={() => setOpenGroup(item.label)}
+              >
+                <button
+                  type="button"
+                  className="nav-disclosure"
+                  aria-expanded={isOpen}
+                  aria-controls={menuId}
+                  onClick={() => setOpenGroup(item.label)}
+                >
+                  {item.label}
+                  <span className="nav-chevron" aria-hidden="true" />
+                </button>
+                <div className="nav-dropdown" id={menuId} hidden={!isOpen}>
+                  {item.items.map((child) => (
+                    <a
+                      key={child.href}
+                      className={isActive(child.href) ? "is-active" : undefined}
+                      href={child.href}
+                      aria-current={isActive(child.href) ? "page" : undefined}
+                      onClick={() => setOpenGroup(null)}
+                    >
+                      {child.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </nav>
 
         <button
@@ -81,14 +151,40 @@ export function Header() {
       {mobileOpen ? (
         <div className="mobile-nav" id="mobile-navigation">
           <nav aria-label="Mobile navigation">
-            {navigation.map((item, index) => (
-              <a key={item.href} ref={index === 0 ? firstLinkRef : undefined} href={item.href} onClick={closeMenu}>
-                {item.label}
-              </a>
-            ))}
-            <a className="mobile-cta" href="#country-spotlight" onClick={closeMenu}>
-              Explore the Map
-            </a>
+            {navigation.map((item, index) => {
+              if (!isGroup(item)) {
+                return (
+                  <a key={item.href} className={isActive(item.href) ? "is-active" : undefined} href={item.href} onClick={closeMenu} aria-current={isActive(item.href) ? "page" : undefined}>
+                    {item.label}
+                  </a>
+                );
+              }
+
+              const isOpen = mobileGroup === item.label;
+              const menuId = `mobile-nav-${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+              return (
+                <div key={item.label} className={`mobile-nav-group${isOpen ? " is-open" : ""}`}>
+                  <button
+                    ref={index === 0 ? firstInteractiveRef : undefined}
+                    type="button"
+                    className="mobile-nav-disclosure"
+                    aria-expanded={isOpen}
+                    aria-controls={menuId}
+                    onClick={() => setMobileGroup((current) => (current === item.label ? null : item.label))}
+                  >
+                    {item.label}
+                    <span className="nav-chevron" aria-hidden="true" />
+                  </button>
+                  <div className="mobile-nav-submenu" id={menuId} hidden={!isOpen}>
+                    {item.items.map((child) => (
+                      <a key={child.href} className={isActive(child.href) ? "is-active" : undefined} href={child.href} onClick={closeMenu} aria-current={isActive(child.href) ? "page" : undefined}>
+                        {child.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </nav>
         </div>
       ) : null}
