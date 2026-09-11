@@ -6146,3 +6146,37 @@ details[open] .summary-mark b { transform: rotate(45deg); }
     transform: none !important;
   }
 }
+
+/* Related links should occupy the number of columns they actually contain.
+   A fixed three-column grid left an empty third track on Mission and Team,
+   making the arrows look detached from their cards. */
+.related-pages-count-1 ul {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.related-pages-count-2 ul {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.related-pages-count-3 ul {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.related-pages li {
+  min-width: 0;
+}
+
+.related-pages a {
+  padding-inline: 0;
+}
+
+.related-page-arrow {
+  justify-self: end;
+}
+
+@media (max-width: 900px) {
+  .related-pages-count-2 ul,
+  .related-pages-count-3 ul {
+    grid-template-columns: 1fr;
+  }
+}
