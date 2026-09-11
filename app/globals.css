@@ -7466,3 +7466,157 @@ textarea {
     transform: none !important;
   }
 }
+
+/* Phase 7 chapter reveal: every SectionShell enters the reading order once,
+   giving long routes a clear editorial beat without hiding any content before
+   JavaScript has mounted. The observer owns the trigger; the CSS only supplies
+   the motion and keeps a static, visible fallback. */
+@keyframes phase7-chapter-reveal {
+  from {
+    opacity: 0.78;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.chapter-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chapter-reveal.is-chapter-visible {
+    animation: phase7-chapter-reveal 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chapter-reveal,
+  .chapter-reveal.is-chapter-visible {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Editorial section visuals: the SVGs sit behind the reading column as a
+   translucent glass atmosphere, never as isolated cards. The gradient veil
+   gives headings a clean field while the edges dissolve into the section
+   surface. */
+.section-visual {
+  position: absolute;
+  z-index: 0;
+  top: clamp(24px, 5vw, 76px);
+  right: 0;
+  width: min(70%, 860px);
+  height: clamp(460px, 42vw, 680px);
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.3;
+  clip-path: inset(0 round 44px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 11%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 11%, #000 84%, transparent 100%);
+}
+
+.section-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--color-white) 0%, rgba(255, 255, 255, 0.9) 15%, rgba(255, 255, 255, 0) 70%);
+}
+
+.section-visual svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.section-visual-team {
+  top: clamp(28px, 4vw, 64px);
+  right: auto;
+  left: 0;
+  width: min(68%, 820px);
+}
+
+.section-visual-team::after {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 28%, rgba(255, 255, 255, 0.84) 82%, var(--color-white) 100%);
+}
+
+.section-visual-solutions {
+  top: 8%;
+  right: 0;
+  width: min(66%, 820px);
+}
+
+@keyframes phase7-section-visual-reveal {
+  from {
+    opacity: 0;
+    clip-path: inset(10% 0 10% 16% round 52px);
+    transform: translateY(28px) scale(0.97);
+  }
+  to {
+    opacity: 0.3;
+    clip-path: inset(0 round 44px);
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chapter-reveal.is-chapter-visible .section-visual {
+    animation: phase7-section-visual-reveal 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@media (max-width: 900px) {
+  .section-visual,
+  .section-visual-team,
+  .section-visual-solutions {
+    top: auto;
+    right: 0;
+    bottom: 2%;
+    left: auto;
+    width: 100%;
+    height: clamp(360px, 76vw, 520px);
+    opacity: 0.16;
+    clip-path: inset(0 round 32px);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 82%, transparent 100%);
+  }
+
+  .section-visual::after,
+  .section-visual-team::after {
+    background: linear-gradient(to bottom, var(--color-white) 0%, rgba(255, 255, 255, 0.84) 26%, rgba(255, 255, 255, 0) 74%);
+  }
+
+  @keyframes phase7-section-visual-reveal-mobile {
+    from {
+      opacity: 0;
+      clip-path: inset(8% 0 8% 8% round 36px);
+      transform: translateY(20px) scale(0.98);
+    }
+    to {
+      opacity: 0.16;
+      clip-path: inset(0 round 32px);
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .chapter-reveal.is-chapter-visible .section-visual {
+      animation-name: phase7-section-visual-reveal-mobile;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-visual,
+  .chapter-reveal.is-chapter-visible .section-visual {
+    animation: none !important;
+    opacity: 0.18 !important;
+    clip-path: inset(0 round 32px) !important;
+    transform: none !important;
+  }
+}

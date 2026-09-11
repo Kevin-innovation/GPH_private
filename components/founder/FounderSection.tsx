@@ -1,6 +1,7 @@
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ExternalLink } from "@/components/ui/ExternalLink";
 import { SectionShell } from "@/components/ui/SectionShell";
+import { SectionVisual } from "@/components/ui/SectionVisual";
 import { orphanSafeText } from "@/components/ui/orphanSafeText";
 import { founder } from "@/content/founder";
 import { siteConfig } from "@/content/site-config";
@@ -14,6 +15,7 @@ const appIsLive = siteConfig.nutritionApp.status === "live" && siteConfig.nutrit
 export function FounderSection() {
   return (
     <SectionShell id="founder" surface="white" labelledBy="founder-title" className="founder-section">
+      <SectionVisual variant="team" />
       <div className="page-width founder-grid">
         <div className="founder-identity">
           <Eyebrow>Our team · Founder</Eyebrow>

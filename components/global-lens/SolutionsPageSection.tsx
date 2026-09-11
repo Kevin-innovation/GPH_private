@@ -2,10 +2,12 @@ import { CaseStudyList } from "./CaseStudyList";
 import { SolutionsList } from "./SolutionsList";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SectionShell } from "@/components/ui/SectionShell";
+import { SectionVisual } from "@/components/ui/SectionVisual";
 
 export function SolutionsPageSection() {
   return (
     <SectionShell id="solutions" surface="white" labelledBy="solutions-page-title" className="solutions-page-section">
+      <SectionVisual variant="solutions" />
       <div className="page-width">
         <div className="global-intro">
           <SectionHeading

@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { SectionShell } from "@/components/ui/SectionShell";
+import { SectionVisual } from "@/components/ui/SectionVisual";
 
 const determinants = [
   {
@@ -79,6 +80,7 @@ export function MissionSection() {
 
   return (
     <SectionShell id="about" surface="white" labelledBy="about-title" className="mission-signature">
+      <SectionVisual variant="mission" />
       <div className="page-width mission-grid mission-stage">
         <div className="mission-heading-column">
           <Eyebrow>Our mission</Eyebrow>

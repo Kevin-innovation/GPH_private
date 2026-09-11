@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 7 진행 중 — 타이포그래피·인터랙션·이미지 리빌 slice 완료**
+> 상태: **Phase 7 진행 중 — 타이포그래피·인터랙션·코드 네이티브 비주얼 slice 완료**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  
@@ -464,7 +464,8 @@ Country/Lens 및 Mission 공백 보정 완료 기록: [`docs/audits/PHASE_4_COUN
 
 - [x] Header scroll transition
 - [x] 이미지 `clip-path` reveal — Nutrition App 미디어 스테이지가 뷰포트 진입 시 한 번만 리빌되며, 미지원·모션 감소 환경에서는 즉시 노출
-- [ ] Section chapter reveal
+- [x] Section chapter reveal — 공통 SectionShell이 뷰포트 진입 시 한 번만 챕터를 열고 정적 fallback 유지
+- [x] About·Solutions 섹션별 SVG 글래스모피즘 시각화 — 사진·생성 이미지 없이 콘텐츠 배경에 페이드 처리
 - [ ] selector 상태 전환 안정화
 - [ ] `prefers-reduced-motion`
 - [ ] WebGL fallback

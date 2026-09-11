@@ -224,6 +224,11 @@ test("Phase 7 makes typography and action targets unmistakable", async () => {
   const lens = await readProjectFile("components/global-lens/GlobalLensSection.tsx");
   const related = await readProjectFile("components/layout/RelatedPages.tsx");
   const appScreenshots = await readProjectFile("components/app-preview/AppScreenshots.tsx");
+  const sectionShell = await readProjectFile("components/ui/SectionShell.tsx");
+  const sectionVisual = await readProjectFile("components/ui/SectionVisual.tsx");
+  const mission = await readProjectFile("components/mission/MissionSection.tsx");
+  const founder = await readProjectFile("components/founder/FounderSection.tsx");
+  const solutionsPage = await readProjectFile("components/global-lens/SolutionsPageSection.tsx");
   const css = await readProjectFile("app/globals.css");
 
   assert.match(home, /button button-secondary button-cta/, "home evidence handoff should use the shared button treatment");
@@ -239,4 +244,14 @@ test("Phase 7 makes typography and action targets unmistakable", async () => {
   assert.match(appScreenshots, /IntersectionObserver/, "app imagery reveal should have a browser fallback");
   assert.match(css, /@keyframes phase7-media-clip-reveal/, "app imagery should define a clip-path reveal animation");
   assert.match(css, /\.media-clip-reveal\s*\{[\s\S]*clip-path:\s*inset\(0 0 0 0 round 0\)/, "app imagery should remain visible before the reveal observer runs");
+  assert.match(sectionShell, /chapter-reveal/, "shared sections should expose a chapter reveal hook");
+  assert.match(sectionShell, /IntersectionObserver/, "chapter reveal should have a browser fallback");
+  assert.match(css, /@keyframes phase7-chapter-reveal/, "sections should define a chapter entrance animation");
+  assert.match(css, /\.chapter-reveal\s*\{[\s\S]*opacity:\s*1;[\s\S]*transform:\s*none;/, "sections should remain visible before the reveal observer runs");
+  assert.match(sectionVisual, /variant === "mission"[\s\S]*variant === "team"[\s\S]*variant === "solutions"/, "section visuals should provide the three editorial variants");
+  assert.match(mission, /SectionVisual variant="mission"/, "Our Mission should carry its own visual atmosphere");
+  assert.match(founder, /SectionVisual variant="team"/, "Our Team should carry its own visual atmosphere");
+  assert.match(solutionsPage, /SectionVisual variant="solutions"/, "Solutions & Action should carry its own visual atmosphere");
+  assert.match(css, /@keyframes phase7-section-visual-reveal/, "section visuals should reveal as a background atmosphere");
+  assert.match(css, /\.section-visual::after\s*\{[\s\S]*linear-gradient\(90deg/, "section visuals should fade into the content background");
 });
