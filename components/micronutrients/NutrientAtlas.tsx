@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { nutrients } from "@/content/nutrients";
 import type { Nutrient } from "@/content/types";
@@ -128,6 +128,10 @@ function MobileNutrientList({
   const activeSlugRef = useRef(activeSlug);
   const onAutoSelectRef = useRef(onAutoSelect);
   const autoSuppressedUntilRef = useRef(0);
+  const autoAlignSlugRef = useRef<string | null>(null);
+  const autoAlignFrameRef = useRef<number | null>(null);
+  const autoAligningRef = useRef(false);
+  const autoAlignScrollYRef = useRef(0);
   const revealKey = visibleNutrients.map((nutrient) => nutrient.slug).join("|");
 
   useEffect(() => {
@@ -137,6 +141,55 @@ function MobileNutrientList({
   useEffect(() => {
     onAutoSelectRef.current = onAutoSelect;
   }, [onAutoSelect]);
+
+  useLayoutEffect(() => {
+    const slug = autoAlignSlugRef.current;
+    if (!slug || slug !== expandedSlug) return;
+
+    autoAligningRef.current = true;
+    const alignUntil = performance.now() + 720;
+    const alignDetailHead = () => {
+      const item = listRef.current?.querySelector<HTMLElement>(
+        `.atlas-mobile-item[data-nutrient-slug="${slug}"]`,
+      );
+      const detailHead = item?.querySelector<HTMLElement>(".atlas-mobile-detail-head");
+      if (!detailHead || autoAlignSlugRef.current !== slug) {
+        autoAligningRef.current = false;
+        autoAlignScrollYRef.current = window.scrollY;
+        return;
+      }
+
+      const headerHeight = document.querySelector<HTMLElement>(".site-header")?.getBoundingClientRect().height ?? 72;
+      const readingTop = headerHeight + 24;
+      const delta = detailHead.getBoundingClientRect().top - readingTop;
+      if (Math.abs(delta) > 1 && Math.abs(delta) < window.innerHeight * 2) {
+        // The closing panel moves the new head while its grid row animates.
+        // Follow that movement frame-by-frame so the image stays at the
+        // reading top instead of appearing only after the body has opened.
+        window.scrollTo({ top: window.scrollY + delta, behavior: "instant" });
+      }
+
+      if (performance.now() < alignUntil && autoAlignSlugRef.current === slug) {
+        autoAlignFrameRef.current = window.requestAnimationFrame(alignDetailHead);
+      } else {
+        autoAligningRef.current = false;
+        autoAlignScrollYRef.current = window.scrollY;
+        autoAlignFrameRef.current = null;
+      }
+    };
+
+    autoAlignFrameRef.current = window.requestAnimationFrame(alignDetailHead);
+
+    return () => {
+      autoAlignSlugRef.current = null;
+      autoAligningRef.current = false;
+      autoAlignScrollYRef.current = window.scrollY;
+      if (autoAlignFrameRef.current !== null) {
+        window.cancelAnimationFrame(autoAlignFrameRef.current);
+        autoAlignFrameRef.current = null;
+      }
+    };
+  }, [expandedSlug]);
 
   useEffect(() => {
     const list = listRef.current;
@@ -182,7 +235,6 @@ function MobileNutrientList({
     let scrollVersion = 0;
     const pendingSlugRef = { current: null as string | null };
     let waitForInputAfterHandoff = false;
-    let handoffScrollY = 0;
     const settleDelay = 360;
     const handoffDuration = 620;
     const getTargetTrigger = () => {
@@ -274,8 +326,10 @@ function MobileNutrientList({
           // jump when the reader has stopped.
           const now = performance.now();
           autoSuppressedUntilRef.current = now + handoffDuration;
-          handoffScrollY = window.scrollY;
+          autoAlignScrollYRef.current = window.scrollY;
+          autoAligningRef.current = true;
           waitForInputAfterHandoff = true;
+          autoAlignSlugRef.current = nextSlug;
           onAutoSelectRef.current(nextSlug);
         }
       }, settleDelay);
@@ -284,11 +338,12 @@ function MobileNutrientList({
     const syncFromScroll = () => {
       frame = 0;
       if (performance.now() < autoSuppressedUntilRef.current) return;
+      if (autoAligningRef.current) return;
       if (waitForInputAfterHandoff) {
         // Do not chain another hand-off merely because the expanding panel
         // caused a layout event. The reader must actually move the page past
         // the completed hand-off before the next row can win.
-        if (Math.abs(window.scrollY - handoffScrollY) < 72) return;
+        if (Math.abs(window.scrollY - autoAlignScrollYRef.current) < 72) return;
         waitForInputAfterHandoff = false;
       }
       const atTop = window.scrollY <= 2;
@@ -335,6 +390,13 @@ function MobileNutrientList({
     // authoritative for a short handoff window. User input still requests a
     // fresh sync, but never interrupts a transition that is already running.
     const resumeAutoSelection = () => {
+      autoAlignSlugRef.current = null;
+      autoAligningRef.current = false;
+      autoAlignScrollYRef.current = window.scrollY;
+      if (autoAlignFrameRef.current !== null) {
+        window.cancelAnimationFrame(autoAlignFrameRef.current);
+        autoAlignFrameRef.current = null;
+      }
       requestSync();
     };
     const resumeAfterScrollEnd = () => {

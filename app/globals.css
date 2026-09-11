@@ -7688,10 +7688,9 @@ textarea {
    previous detail close while the next one opens, preserving the reader's
    reading flow and giving the vitamin visual a calm hand-off. */
 .micronutrient-shell .atlas-mobile-list {
-  /* Keep scroll position under the reader's control while the previous
-     detail closes and the next one opens. Native anchoring reacts to the
-     changing grid height by moving the whole document in one frame, which
-     feels like a jump during a hand-off. */
+  /* Keep scroll position under the reader's control. The hand-off aligns the
+     new detail head explicitly, so native anchoring must not move the page a
+     second time while the grid rows animate. */
   overflow-anchor: none;
 }
 
