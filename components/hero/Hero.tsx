@@ -3,7 +3,7 @@ import { HeroVisual } from "./HeroVisual";
 
 export function Hero() {
   return (
-    <section className="hero-section" id="hero" aria-labelledby="hero-title">
+    <section className="hero-section hero-section-home" id="hero" aria-labelledby="hero-title">
       <div className="page-width hero-grid">
         <div className="hero-heading">
           <p className="hero-wordmark">

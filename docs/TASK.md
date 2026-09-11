@@ -1,12 +1,13 @@
 # TASK.md — Global Public Health Lens 랜딩 웹사이트
 
 > 작성일: 2026-08-20
-> 상태: **Vertical Editorial Rebuild Phase 2 시작 대기.**
+> 상태: **Vertical Editorial Rebuild Phase 3 시작 대기.**
 > 근거 문서: `Website Design and Development Brief.docx`, `Global_Public_Health_Lens_Website_Starter_Pack.docx` (둘 다 전문 분석 완료)
 
 > **2026-09-11 rebuild addendum:** 최신 레이아웃, 페이지별 세로 구성, PangeaSeed 참고 원칙, 애니메이션, QA 및 실행 페이즈는 [`docs/REBUILD_PLAN.md`](./REBUILD_PLAN.md)를 단일 기준으로 사용한다. 해당 문서가 이 파일의 기존 단일 랜딩 페이지 설명과 Phase 2~4보다 우선한다.
 > **Phase 0 완료 기록:** 기준선 측정과 리스크 감사는 [`docs/audits/PHASE_0_BASELINE.md`](./audits/PHASE_0_BASELINE.md)에 기록했다. 다음 구현 단계는 Phase 1이다.
 > **Phase 1 완료 기록:** 전역 토큰·셸·Footer 접합 검수는 [`docs/audits/PHASE_1_SHELL.md`](./audits/PHASE_1_SHELL.md)에 기록했다. 다음 구현 단계는 Phase 2 Home 재구성이다.
+> **Phase 2 완료 기록:** 홈 핵심 경로·Evidence strip·중복 섹션 제거 검수는 [`docs/audits/PHASE_2_HOME.md`](./audits/PHASE_2_HOME.md)에 기록했다. 다음 구현 단계는 Phase 3 About 재구성이다.
 
 > **2026-09-11 IA addendum:** 클라이언트 피드백에 따라 기존 단일 랜딩·앵커 내비 가정을 폐기한다. 최신 네비게이션과 독립 페이지 매핑은 [`docs/IA.md`](./IA.md)를 기준으로 하며, 이 부록이 §3·§4의 기존 단일 페이지 설명보다 우선한다. `Explore the Map`은 `Country Spotlight`와 중복되어 제거하고, `Evidence Base`는 푸터 유틸리티로 유지한다.
 

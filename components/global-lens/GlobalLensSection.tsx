@@ -1,8 +1,7 @@
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { SectionShell } from "@/components/ui/SectionShell";
-import { CaseStudyList } from "./CaseStudyList";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { LensChain } from "./LensChain";
-import { SolutionsList } from "./SolutionsList";
 
 export function GlobalLensSection() {
   return (
@@ -17,8 +16,17 @@ export function GlobalLensSection() {
           />
         </div>
         <LensChain />
-        <SolutionsList />
-        <CaseStudyList />
+        <div className="lens-next-step">
+          <div>
+            <Eyebrow>Continue the lens</Eyebrow>
+            <h3>From understanding to <span className="no-orphan">action.</span></h3>
+            <p>See the conditions and public-health responses that can change outcomes.</p>
+          </div>
+          <a href="/lens/solutions">
+            <span>Solutions &amp; Action</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
       </div>
     </SectionShell>
   );

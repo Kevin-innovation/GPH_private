@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 2 시작 대기**
+> 상태: **Phase 3 시작 대기**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  
@@ -401,12 +401,14 @@ Evidence Base → Country Spotlight
 
 ### Phase 2 — 핵심형 Home
 
-- [ ] 큰 프로젝트 디렉터리 제거 또는 축소
-- [ ] Immersive Hero 재구성
-- [ ] Body / Environment / Systems 핵심 인터랙션 배치
-- [ ] 짧은 프로젝트 정의 배치
-- [ ] Country Spotlight / Nutrition App 경로 배치
-- [ ] Evidence strip과 Footer 즉시 연결
+- [x] 큰 프로젝트 디렉터리 제거 또는 축소
+- [x] Immersive Hero 재구성
+- [x] Body / Environment / Systems 핵심 인터랙션 배치
+- [x] 짧은 프로젝트 정의 배치
+- [x] Country Spotlight / Nutrition App 경로 배치
+- [x] Evidence strip과 Footer 즉시 연결
+
+홈 및 중복 섹션 완료 기록: [`docs/audits/PHASE_2_HOME.md`](audits/PHASE_2_HOME.md)
 
 종료 커밋: `feat: rebuild home as a concise public-health statement`
 

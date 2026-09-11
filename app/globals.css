@@ -658,6 +658,270 @@ details[open] .summary-mark { transform: rotate(45deg); }
   .atlas-card-visual { width: 68px; height: 68px; }
 }
 
+/* -------------------------------------------------------------------------
+   Phase 2 — concise home statement
+   -------------------------------------------------------------------------
+   The homepage is an entry point, not a second sitemap. Keep the interactive
+   lens and a small number of meaningful next steps in the first three screens.
+*/
+.hero-section-home {
+  min-height: clamp(38rem, 78svh, 50rem);
+  display: grid;
+}
+
+.hero-section-home .hero-grid {
+  min-height: inherit;
+}
+
+.home-directory {
+  padding-block: clamp(4.75rem, 9vw, 8rem) 0;
+}
+
+.home-definition {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(280px, 0.92fr);
+  gap: clamp(2rem, 8vw, 8rem);
+  align-items: end;
+  padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
+  border-bottom: 1px solid var(--color-navy);
+}
+
+.home-definition h2 {
+  max-width: 16ch;
+  margin-bottom: 0;
+}
+
+.home-definition > p {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: clamp(1.05rem, 1.45vw, 1.22rem);
+  line-height: 1.55;
+}
+
+.home-pathways {
+  padding-block: clamp(2.75rem, 5vw, 4.5rem) clamp(3rem, 6vw, 5.5rem);
+}
+
+.home-pathways > .eyebrow {
+  margin-bottom: 1.1rem;
+  color: var(--color-gold-text);
+}
+
+.home-pathways ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 clamp(2rem, 7vw, 7rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--color-hairline);
+}
+
+.home-pathways li {
+  min-width: 0;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.home-pathways a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.2rem 1rem;
+  min-height: 10.5rem;
+  align-content: center;
+  padding: 1.25rem 0;
+  color: var(--color-navy);
+  text-decoration: none;
+  transition: color var(--duration-fast) ease, background-color var(--duration-fast) ease;
+}
+
+.home-pathways a:hover,
+.home-pathways a:focus-visible {
+  color: var(--color-teal-text);
+  background: linear-gradient(90deg, rgba(223, 240, 237, 0.36), transparent 82%);
+}
+
+.home-pathway-kicker {
+  grid-column: 1 / -1;
+  color: var(--color-gold-text);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.home-pathway-title {
+  min-width: 0;
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+}
+
+.home-pathway-body {
+  grid-column: 1;
+  max-width: 34ch;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.home-pathway-arrow {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  align-self: center;
+  color: var(--color-teal-text);
+  font-size: 1.4rem;
+  transition: transform var(--duration-fast) ease;
+}
+
+.home-pathways a:hover .home-pathway-arrow,
+.home-pathways a:focus-visible .home-pathway-arrow {
+  transform: translateX(3px);
+}
+
+.home-evidence-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2rem clamp(2rem, 7vw, 8rem);
+  align-items: end;
+  padding-block: clamp(2.5rem, 5vw, 4rem) clamp(3.5rem, 7vw, 6rem);
+  border-top: 1px solid var(--color-navy);
+}
+
+.home-evidence-strip .eyebrow {
+  margin-bottom: 0.7rem;
+  color: var(--color-gold-text);
+}
+
+.home-evidence-strip p {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.home-evidence-strip > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding-bottom: 0.28rem;
+  border-bottom: 1px solid var(--color-teal-text);
+  color: var(--color-teal-text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.home-evidence-strip > a > span:last-child {
+  font-size: 1.2rem;
+  transition: transform var(--duration-fast) ease;
+}
+
+.home-evidence-strip > a:hover > span:last-child,
+.home-evidence-strip > a:focus-visible > span:last-child {
+  transform: translateX(3px);
+}
+
+/* The lens story ends with one unambiguous hand-off. Solutions live on their
+   own route so the Conditions for health list is never printed twice. */
+.lens-next-step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2rem clamp(2rem, 7vw, 8rem);
+  align-items: end;
+  margin-top: clamp(3.5rem, 7vw, 6rem);
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+  border-top: 1px solid var(--color-navy);
+}
+
+.lens-next-step .eyebrow {
+  margin-bottom: 0.7rem;
+  color: var(--color-gold-text);
+}
+
+.lens-next-step h3 {
+  margin-bottom: 0.75rem;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 500;
+}
+
+.lens-next-step p {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.lens-next-step > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding-bottom: 0.28rem;
+  border-bottom: 1px solid var(--color-teal-text);
+  color: var(--color-teal-text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.lens-next-step > a > span:last-child {
+  font-size: 1.2rem;
+  transition: transform var(--duration-fast) ease;
+}
+
+.lens-next-step > a:hover > span:last-child,
+.lens-next-step > a:focus-visible > span:last-child {
+  transform: translateX(3px);
+}
+
+@media (max-width: 900px) {
+  .hero-section-home {
+    min-height: auto;
+  }
+
+  .home-definition {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .home-definition > p {
+    max-width: 58ch;
+  }
+
+  .home-evidence-strip {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 1.5rem;
+  }
+
+  .lens-next-step {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+}
+
+@media (max-width: 560px) {
+  .home-directory {
+    padding-top: 4rem;
+  }
+
+  .home-pathways ul {
+    grid-template-columns: 1fr;
+  }
+
+  .home-pathways a {
+    min-height: 9rem;
+  }
+
+  .home-evidence-strip > a {
+    white-space: normal;
+  }
+}
+
 @media (min-width: 901px) {
   .atlas-detail { max-width: 600px; min-height: 0; }
   .atlas-detail-visual { width: min(100%, 220px); margin-top: 16px; }

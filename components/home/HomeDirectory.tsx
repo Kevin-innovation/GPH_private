@@ -1,32 +1,18 @@
-"use client";
-
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { SectionShell } from "@/components/ui/SectionShell";
 
-const destinations = [
+const pathways = [
   {
-    label: "About",
-    links: [
-      { title: "Our Mission", body: "Why health has to be understood in context.", href: "/about/mission" },
-      { title: "Our Team", body: "The people and questions behind the lens.", href: "/about/team" },
-    ],
+    kicker: "Start with a place",
+    title: "Country Spotlight",
+    body: "Compare five public-health starting points and the local conditions behind them.",
+    href: "/country-spotlight",
   },
   {
-    label: "The Lens",
-    links: [
-      { title: "Country Spotlight", body: "Five places, five public-health starting points.", href: "/country-spotlight" },
-      { title: "Micronutrients", body: "A nutrition entry point for a wider system.", href: "/lens/micronutrients" },
-      { title: "How the Lens Works", body: "From bodies to communities to systems.", href: "/lens/how-it-works" },
-      { title: "Solutions & Action", body: "Conditions and interventions that can change outcomes.", href: "/lens/solutions" },
-    ],
-  },
-  {
-    label: "Continue",
-    links: [
-      { title: "Nutrition App", body: "Explore the first practical tool.", href: "/nutrition-app" },
-      { title: "Evidence Base", body: "Read the public sources behind the project.", href: "/evidence-base" },
-      { title: "Contact", body: "Questions, feedback, or collaboration.", href: "/contact" },
-    ],
+    kicker: "Start with a daily pattern",
+    title: "Nutrition App",
+    body: "Explore the first practical tool built from the same body–environment–systems lens.",
+    href: "/nutrition-app",
   },
 ] as const;
 
@@ -34,37 +20,47 @@ export function HomeDirectory() {
   return (
     <SectionShell id="home-directory" surface="white" labelledBy="home-directory-title" className="home-directory">
       <div className="page-width">
-        <div className="directory-intro">
+        <div className="home-definition">
           <div>
-            <Eyebrow>Explore the project</Eyebrow>
-            <h2 id="home-directory-title">One project, several ways <span className="no-orphan">in.</span></h2>
+            <Eyebrow>Project in brief</Eyebrow>
+            <h2 id="home-directory-title">
+              A public-health lens for <span className="no-orphan">the conditions around us.</span>
+            </h2>
           </div>
-          <p>Start with a place, a nutrient, a story, or the evidence. Each page follows one question and gives it room to breathe.</p>
+          <p>
+            Global Public Health Lens connects what happens in the body with place, environment, inequality, policy,
+            and access to care. Nutrition is our first lens — <span className="no-orphan">not our last.</span>
+          </p>
         </div>
 
-        <div className="directory-groups">
-          {destinations.map((group) => (
-            <div className="directory-group" key={group.label}>
-              <Eyebrow>{group.label}</Eyebrow>
-              <ul>
-                {group.links.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        window.location.assign(link.href);
-                      }}
-                    >
-                      <span className="directory-link-title">{link.title}</span>
-                      <span className="directory-link-body">{link.body}</span>
-                      <span className="directory-link-arrow" aria-hidden="true">→</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <nav className="home-pathways" aria-label="Start exploring the project">
+          <Eyebrow>Choose a starting point</Eyebrow>
+          <ul>
+            {pathways.map((pathway) => (
+              <li key={pathway.href}>
+                <a href={pathway.href}>
+                  <span className="home-pathway-kicker">{pathway.kicker}</span>
+                  <span className="home-pathway-title">{pathway.title}</span>
+                  <span className="home-pathway-body">{pathway.body}</span>
+                  <span className="home-pathway-arrow" aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="home-evidence-strip">
+          <div>
+            <Eyebrow>Evidence base</Eyebrow>
+            <p>
+              The lens starts with public sources and stays open to review. See the organisations and references behind
+              <span className="no-orphan"> each page.</span>
+            </p>
+          </div>
+          <a href="/evidence-base">
+            <span>Read the evidence base</span>
+            <span aria-hidden="true">→</span>
+          </a>
         </div>
       </div>
     </SectionShell>

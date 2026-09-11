@@ -92,6 +92,8 @@ test("multi-page information architecture exposes canonical destinations", async
   const navigation = await readProjectFile("content/navigation.ts");
   const header = await readProjectFile("components/layout/Header.tsx");
   const directory = await readProjectFile("components/home/HomeDirectory.tsx");
+  const globalLens = await readProjectFile("components/global-lens/GlobalLensSection.tsx");
+  const solutionsPage = await readProjectFile("components/global-lens/SolutionsPageSection.tsx");
 
   for (const route of expectedRoutes) {
     const routeFile = join(projectRoot, "app", route.slice(1), "page.tsx");
@@ -103,7 +105,11 @@ test("multi-page information architecture exposes canonical destinations", async
 
   assert.doesNotMatch(header, /Explore the Map/, "the header must not duplicate Country Spotlight with a map CTA");
   assert.match(header, /href="\/"/, "the brand lockup should have a native home destination");
-  assert.match(directory, /href=\{link\.href\}/, "project directory rows should expose real href values");
+  assert.match(directory, /className="home-pathways"/, "home should expose a concise pathway navigation");
+  assert.match(directory, /href=\{pathway\.href\}/, "home pathway rows should expose real href values");
+  assert.doesNotMatch(directory, /directory-groups|One project, several ways/, "home must not repeat the full sitemap");
+  assert.doesNotMatch(globalLens, /SolutionsList|CaseStudyList|Conditions for health/, "How the Lens Works must not duplicate the Solutions content");
+  assert.match(solutionsPage, /SolutionsList/, "Solutions & Action should own the Conditions for health list");
 });
 
 test("vertical shell foundations stay in place", async () => {
