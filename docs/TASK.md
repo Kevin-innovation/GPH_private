@@ -733,6 +733,17 @@ cp /tmp/gphl-assets/word/media/image4.png public/brand/app-preview.png
 14. `Footer`
 15. 앵커 스크롤 + `scroll-margin-top`(sticky 헤더 보정) + 활성 섹션 하이라이트
 
+### Phase 2 progress — 2026-09-11
+
+- [x] Shared `RoutePage` shell with breadcrumb, sticky header, and footer
+- [x] Desktop disclosure menus with hover, focus, click, outside-click, and ESC behavior
+- [x] Mobile disclosure menu with focus loop and body scroll lock
+- [x] Native home navigation for the brand lockup and breadcrumb
+- [x] Independent route links smoke-tested against the canonical IA map
+- [x] Phase 2 route and duplicate-CTA assertions added to `tests/rendered-html.test.mjs`
+
+The original anchor-scroll line above is superseded by the multi-page IA addendum: `scroll-margin-top` remains for any in-page sections, but primary navigation always resolves to a page route.
+
 ### Phase 3 — 콘텐츠 섹션
 
 16. `Hero` + `HeroVisual` — 비대칭 배치

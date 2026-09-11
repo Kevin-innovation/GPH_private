@@ -76,3 +76,32 @@ test("Three.js remains lazy-loaded and the globe uses the compact texture", asyn
   assert.match(countryGlobe, /\/brand\/earth-atmos-2048\.jpg/);
   assert.doesNotMatch(countryGlobe, /earth-clear-8192/);
 });
+
+test("multi-page information architecture exposes canonical destinations", async () => {
+  const expectedRoutes = [
+    "/about/mission",
+    "/about/team",
+    "/country-spotlight",
+    "/lens/micronutrients",
+    "/lens/how-it-works",
+    "/lens/solutions",
+    "/nutrition-app",
+    "/evidence-base",
+    "/contact",
+  ];
+  const navigation = await readProjectFile("content/navigation.ts");
+  const header = await readProjectFile("components/layout/Header.tsx");
+  const directory = await readProjectFile("components/home/HomeDirectory.tsx");
+
+  for (const route of expectedRoutes) {
+    const routeFile = join(projectRoot, "app", route.slice(1), "page.tsx");
+    await stat(routeFile);
+    if (route !== "/evidence-base") {
+      assert.match(navigation, new RegExp(route.replaceAll("/", "\\/")), `navigation should include ${route}`);
+    }
+  }
+
+  assert.doesNotMatch(header, /Explore the Map/, "the header must not duplicate Country Spotlight with a map CTA");
+  assert.match(header, /href="\/"/, "the brand lockup should have a native home destination");
+  assert.match(directory, /href=\{link\.href\}/, "project directory rows should expose real href values");
+});
