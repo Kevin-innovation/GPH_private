@@ -467,6 +467,7 @@ Country/Lens 및 Mission 공백 보정 완료 기록: [`docs/audits/PHASE_4_COUN
 - [x] Section chapter reveal — 공통 SectionShell이 뷰포트 진입 시 한 번만 챕터를 열고 정적 fallback 유지
 - [x] About·Solutions 섹션별 SVG 글래스모피즘 시각화 — 사진·생성 이미지 없이 콘텐츠 배경에 페이드 처리
 - [x] selector 상태 전환 안정화 — 영양소 자동 선택에 140ms settle과 32px hysteresis를 적용하고, 상세 패널은 grid-row로 열고 닫아 스크롤 점프를 완화
+- [x] 양방향 hand-off 안정화 — 빠른 스크롤에서도 인접 영양소를 한 단계씩 전환하고, 전환 직후 레이아웃 이벤트가 다음 항목을 연달아 열지 않도록 실제 스크롤 진행을 확인
 - [ ] `prefers-reduced-motion`
 - [ ] WebGL fallback
 - [ ] 6개 기준 폭 전수 검수

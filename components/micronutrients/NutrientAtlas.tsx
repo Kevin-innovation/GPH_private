@@ -180,6 +180,8 @@ function MobileNutrientList({
     let frame = 0;
     let settleTimer: number | null = null;
     const pendingSlugRef = { current: null as string | null };
+    let waitForInputAfterHandoff = false;
+    let handoffScrollY = 0;
     const settleDelay = 140;
     const handoffDuration = 620;
     const getTargetTrigger = () => {
@@ -217,13 +219,36 @@ function MobileNutrientList({
         return;
       }
 
+      const currentIndex = triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === currentSlug);
+      const targetIndex = triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === targetSlug);
+      if (currentIndex >= 0 && targetIndex >= 0 && Math.abs(targetIndex - currentIndex) > 1) {
+        // A fast wheel gesture can move several rows in a single frame. Keep
+        // the reading sequence one row at a time so each detail gets a
+        // complete, visible hand-off instead of jumping straight to a distant
+        // nutrient at the end of momentum.
+        const step = targetIndex > currentIndex ? 1 : -1;
+        targetSlug = triggers[currentIndex + step]?.dataset.nutrientSlug ?? targetSlug;
+      }
+      const pendingIndex = pendingSlugRef.current
+        ? triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === pendingSlugRef.current)
+        : -1;
+      const direction = targetIndex >= currentIndex ? 1 : -1;
+      const pendingDirection = pendingIndex >= currentIndex ? 1 : -1;
+
       // Wheel and trackpad momentum can cross two trigger boundaries in a
-      // handful of frames. Wait for the reading line to settle before
-      // changing the expanded row; otherwise every tiny delta causes a
-      // visible open/close/open flicker and makes the nutrient art feel
-      // unnaturally fast.
-      pendingSlugRef.current = targetSlug;
-      if (settleTimer !== null) window.clearTimeout(settleTimer);
+      // handful of frames. Once a hand-off starts, keep the first next row
+      // as the pending destination instead of replacing it every frame. This
+      // lets the current panel finish its close/open transition before the
+      // next destination is considered, so rapid scrolling never produces an
+      // open/close/open flicker.
+      if (pendingSlugRef.current === null || pendingDirection !== direction) {
+        pendingSlugRef.current = targetSlug;
+        if (settleTimer !== null) {
+          window.clearTimeout(settleTimer);
+          settleTimer = null;
+        }
+      }
+      if (settleTimer !== null) return;
       settleTimer = window.setTimeout(() => {
         settleTimer = null;
         const nextSlug = pendingSlugRef.current;
@@ -233,8 +258,13 @@ function MobileNutrientList({
           // Expanding one detail and collapsing the previous one can emit
           // layout-driven scroll events of its own. Give that hand-off the
           // duration of the visual transition so it cannot immediately pick
-          // the previous row again; real wheel/touch input clears this window.
-          autoSuppressedUntilRef.current = performance.now() + handoffDuration;
+          // another row again. A later wheel/touch/keyboard gesture explicitly
+          // resumes the sequence; layout reflow alone never causes a second
+          // jump when the reader has stopped.
+          const now = performance.now();
+          autoSuppressedUntilRef.current = now + handoffDuration;
+          handoffScrollY = window.scrollY;
+          waitForInputAfterHandoff = true;
           onAutoSelectRef.current(nextSlug);
         }
       }, settleDelay);
@@ -243,6 +273,13 @@ function MobileNutrientList({
     const syncFromScroll = () => {
       frame = 0;
       if (performance.now() < autoSuppressedUntilRef.current) return;
+      if (waitForInputAfterHandoff) {
+        // Do not chain another hand-off merely because the expanding panel
+        // caused a layout event. The reader must actually move the page past
+        // the completed hand-off before the next row can win.
+        if (Math.abs(window.scrollY - handoffScrollY) < 72) return;
+        waitForInputAfterHandoff = false;
+      }
       const targetSlug = getTargetTrigger()?.dataset.nutrientSlug;
       const currentSlug = activeSlugRef.current;
       if (!targetSlug || targetSlug === currentSlug) return;
@@ -276,10 +313,10 @@ function MobileNutrientList({
 
     // A manual toggle can change the document height and make the next row
     // intersect the reading band without any user scroll. Keep that toggle
-    // authoritative for a short handoff window; wheel/touch/keyboard input
-    // immediately returns control to scroll-driven selection.
+    // authoritative for a short handoff window. User input still requests a
+    // fresh sync, but never interrupts a transition that is already running.
     const resumeAutoSelection = () => {
-      autoSuppressedUntilRef.current = 0;
+      requestSync();
     };
     const resumeAfterScrollEnd = () => {
       autoSuppressedUntilRef.current = 0;
