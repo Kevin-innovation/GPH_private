@@ -7620,3 +7620,130 @@ textarea {
     transform: none !important;
   }
 }
+
+/* -------------------------------------------------------------------------
+   Micronutrient scroll settle
+   -------------------------------------------------------------------------
+   The list is a reading sequence, so the selected nutrient should follow the
+   reader's settled position instead of flashing on every wheel frame. The
+   small image lift makes that hand-off visible without moving the hit target
+   or changing document height.
+*/
+@keyframes phase5-nutrient-detail-settle {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes phase5-nutrient-detail-image-settle {
+  from {
+    opacity: 0.5;
+    transform: scale(0.92) rotate(-1.5deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.micronutrient-shell .atlas-mobile-thumb-image,
+.micronutrient-shell .atlas-mobile-detail-image {
+  transform-origin: center;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1), filter 700ms ease;
+}
+
+.micronutrient-shell .atlas-mobile-item.is-active .atlas-mobile-thumb-image {
+  transform: scale(1.045) rotate(0.8deg);
+  filter: saturate(1.04);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .micronutrient-shell .atlas-mobile-detail {
+    animation: phase5-nutrient-detail-settle 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-image {
+    animation: phase5-nutrient-detail-image-settle 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .micronutrient-shell .atlas-mobile-thumb-image,
+  .micronutrient-shell .atlas-mobile-detail-image,
+  .micronutrient-shell .atlas-mobile-detail {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* Keep each nutrient's detail shell in the document so switching focus does
+   not remove a large block in one frame. The grid-row transition lets the
+   previous detail close while the next one opens, preserving the reader's
+   reading flow and giving the vitamin visual a calm hand-off. */
+.micronutrient-shell .atlas-mobile-list {
+  overflow-anchor: none;
+}
+
+.micronutrient-shell .atlas-mobile-detail-shell {
+  display: grid;
+  grid-template-rows: 0fr;
+  min-height: 0;
+  overflow: hidden;
+  overflow-anchor: none;
+  transition: grid-template-rows 560ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.micronutrient-shell .atlas-mobile-detail-shell.is-expanded {
+  grid-template-rows: 1fr;
+}
+
+.micronutrient-shell .atlas-mobile-detail-shell > .atlas-mobile-detail {
+  min-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 360ms ease, transform 560ms cubic-bezier(0.22, 1, 0.36, 1), padding 560ms cubic-bezier(0.22, 1, 0.36, 1), border-color 560ms ease;
+}
+
+.micronutrient-shell .atlas-mobile-detail-shell:not(.is-expanded) > .atlas-mobile-detail {
+  border-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.micronutrient-shell .atlas-mobile-detail-shell.is-expanded > .atlas-mobile-detail {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .micronutrient-shell .atlas-mobile-detail-shell > .atlas-mobile-detail {
+    animation: none;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-shell.is-expanded > .atlas-mobile-detail {
+    animation: phase5-nutrient-detail-settle 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-shell > .atlas-mobile-detail .atlas-mobile-detail-image {
+    animation: none;
+  }
+
+  .micronutrient-shell .atlas-mobile-detail-shell.is-expanded > .atlas-mobile-detail .atlas-mobile-detail-image {
+    animation: phase5-nutrient-detail-image-settle 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .micronutrient-shell .atlas-mobile-detail-shell,
+  .micronutrient-shell .atlas-mobile-detail-shell > .atlas-mobile-detail {
+    transition: none !important;
+  }
+}

@@ -195,8 +195,13 @@ test("Phase 5 lens content uses vertical lists and connected handoffs", async ()
   assert.match(micronutrients, /onAutoSelect/, "Micronutrient rows should advance the expanded detail from scroll position");
   assert.match(micronutrients, /rootMargin: "-42% 0px -42% 0px"/, "Micronutrient auto-expansion should use a stable viewport reading band");
   assert.match(micronutrients, /autoSuppressedUntilRef/, "Manual nutrient toggles should not be overridden by layout-triggered observer callbacks");
+  assert.match(micronutrients, /settleDelay = 140/, "Scroll-driven nutrient selection should settle before changing focus");
+  assert.match(micronutrients, /currentDistance - targetDistance < 32/, "Nutrient focus should use hysteresis at row boundaries");
+  assert.match(micronutrients, /atlas-mobile-detail-shell/, "Nutrient details should keep a transition shell to avoid layout jumps");
   assert.match(css, /\.micronutrient-shell \.atlas-mobile-item\.is-reveal-visible/, "Micronutrient rows should animate into view without hiding by default");
   assert.match(css, /phase5-nutrient-detail-in/, "The active nutrient detail should enter with a smooth scroll-linked transition");
+  assert.match(css, /phase5-nutrient-detail-settle/, "Nutrient detail changes should use a settled transition");
+  assert.match(css, /grid-template-rows: 0fr/, "Nutrient detail shells should collapse without removing layout in one frame");
 });
 
 test("Phase 6 keeps evidence, contact, and typography connected", async () => {

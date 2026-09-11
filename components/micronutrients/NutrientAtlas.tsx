@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { nutrients } from "@/content/nutrients";
 import type { Nutrient } from "@/content/types";
@@ -169,6 +169,10 @@ function MobileNutrientList({
     if (!triggers.length) return;
 
     let frame = 0;
+    let settleTimer: number | null = null;
+    const pendingSlugRef = { current: null as string | null };
+    const settleDelay = 140;
+    const handoffDuration = 620;
     const getTargetTrigger = () => {
       const activationLine = Math.min(window.innerHeight * 0.52, window.innerHeight - 140);
       const rows = triggers.map((trigger) => ({ trigger, rect: trigger.getBoundingClientRect() }));
@@ -186,7 +190,45 @@ function MobileNutrientList({
         const aCenter = a.rect.top + a.rect.height / 2;
         const bCenter = b.rect.top + b.rect.height / 2;
         return Math.abs(aCenter - activationLine) - Math.abs(bCenter - activationLine);
-      })[0]?.trigger;
+        })[0]?.trigger;
+    };
+
+    const cancelPendingSelection = () => {
+      pendingSlugRef.current = null;
+      if (settleTimer !== null) {
+        window.clearTimeout(settleTimer);
+        settleTimer = null;
+      }
+    };
+
+    const scheduleAutoSelect = (targetSlug: string) => {
+      const currentSlug = activeSlugRef.current;
+      if (!targetSlug || targetSlug === currentSlug) {
+        cancelPendingSelection();
+        return;
+      }
+
+      // Wheel and trackpad momentum can cross two trigger boundaries in a
+      // handful of frames. Wait for the reading line to settle before
+      // changing the expanded row; otherwise every tiny delta causes a
+      // visible open/close/open flicker and makes the nutrient art feel
+      // unnaturally fast.
+      pendingSlugRef.current = targetSlug;
+      if (settleTimer !== null) window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(() => {
+        settleTimer = null;
+        const nextSlug = pendingSlugRef.current;
+        pendingSlugRef.current = null;
+        if (!nextSlug || performance.now() < autoSuppressedUntilRef.current) return;
+        if (nextSlug !== activeSlugRef.current) {
+          // Expanding one detail and collapsing the previous one can emit
+          // layout-driven scroll events of its own. Give that hand-off the
+          // duration of the visual transition so it cannot immediately pick
+          // the previous row again; real wheel/touch input clears this window.
+          autoSuppressedUntilRef.current = performance.now() + handoffDuration;
+          onAutoSelectRef.current(nextSlug);
+        }
+      }, settleDelay);
     };
 
     const syncFromScroll = () => {
@@ -194,7 +236,22 @@ function MobileNutrientList({
       if (performance.now() < autoSuppressedUntilRef.current) return;
       const targetSlug = getTargetTrigger()?.dataset.nutrientSlug;
       const currentSlug = activeSlugRef.current;
-      if (targetSlug && targetSlug !== currentSlug) onAutoSelectRef.current(targetSlug);
+      if (!targetSlug || targetSlug === currentSlug) return;
+
+      const activationLine = Math.min(window.innerHeight * 0.52, window.innerHeight - 140);
+      const currentTrigger = triggers.find((trigger) => trigger.dataset.nutrientSlug === currentSlug);
+      const targetTrigger = triggers.find((trigger) => trigger.dataset.nutrientSlug === targetSlug);
+      if (currentTrigger && targetTrigger) {
+        const currentRect = currentTrigger.getBoundingClientRect();
+        const targetRect = targetTrigger.getBoundingClientRect();
+        const currentDistance = Math.abs(currentRect.top + currentRect.height / 2 - activationLine);
+        const targetDistance = Math.abs(targetRect.top + targetRect.height / 2 - activationLine);
+        // Hysteresis keeps the active row stable at a boundary. The next row
+        // must be meaningfully closer to the reading line before it can win.
+        if (currentDistance - targetDistance < 32) return;
+      }
+
+      scheduleAutoSelect(targetSlug);
     };
 
     const requestSync = () => {
@@ -215,30 +272,19 @@ function MobileNutrientList({
     const resumeAutoSelection = () => {
       autoSuppressedUntilRef.current = 0;
     };
+    const resumeAfterScrollEnd = () => {
+      autoSuppressedUntilRef.current = 0;
+      requestSync();
+    };
     window.addEventListener("wheel", resumeAutoSelection, { passive: true });
     window.addEventListener("touchmove", resumeAutoSelection, { passive: true });
     window.addEventListener("keydown", resumeAutoSelection);
+    window.addEventListener("scrollend", resumeAfterScrollEnd);
 
     const observer = "IntersectionObserver" in window
       ? new IntersectionObserver(
         (entries) => {
-          if (performance.now() < autoSuppressedUntilRef.current) return;
-          const candidates = entries
-            .filter((entry) => entry.isIntersecting)
-            .map((entry) => entry.target as HTMLElement)
-            .sort((a, b) => {
-              const viewportCenter = window.innerHeight / 2;
-              const aRect = a.getBoundingClientRect();
-              const bRect = b.getBoundingClientRect();
-              return (
-                Math.abs(aRect.top + aRect.height / 2 - viewportCenter)
-                - Math.abs(bRect.top + bRect.height / 2 - viewportCenter)
-              );
-            });
-          const targetSlug = candidates[0]?.dataset.nutrientSlug;
-          if (targetSlug && targetSlug !== activeSlugRef.current) {
-            onAutoSelectRef.current(targetSlug);
-          }
+          if (entries.some((entry) => entry.isIntersecting)) requestSync();
         },
         { rootMargin: "-42% 0px -42% 0px", threshold: 0 },
       )
@@ -251,7 +297,9 @@ function MobileNutrientList({
       window.removeEventListener("wheel", resumeAutoSelection);
       window.removeEventListener("touchmove", resumeAutoSelection);
       window.removeEventListener("keydown", resumeAutoSelection);
+      window.removeEventListener("scrollend", resumeAfterScrollEnd);
       if (frame) window.cancelAnimationFrame(frame);
+      cancelPendingSelection();
       observer?.disconnect();
     };
   }, [revealKey]);
@@ -295,8 +343,12 @@ function MobileNutrientList({
               </span>
             </button>
 
-            {isExpanded ? (
-              <div className="atlas-mobile-detail" id={detailId} aria-live="polite">
+            <div
+              className={`atlas-mobile-detail-shell${isExpanded ? " is-expanded" : ""}`}
+              aria-hidden={!isExpanded}
+              inert={!isExpanded}
+            >
+              <div className="atlas-mobile-detail" id={detailId} aria-live={isExpanded ? "polite" : "off"}>
                 <div className="atlas-mobile-detail-head">
                   <div className="atlas-mobile-detail-visual">
                     <NutrientVisual nutrient={nutrient} className="atlas-mobile-detail-image" />
@@ -334,7 +386,7 @@ function MobileNutrientList({
                   {orphanSafeText(`Read the ${nutrient.source} fact sheet`)} <span aria-hidden="true">↗</span>
                 </ExternalLink>
               </div>
-            ) : null}
+            </div>
           </article>
         );
       })}
@@ -351,10 +403,10 @@ export function NutrientAtlas() {
   const visibleNutrients = filter === "all" ? nutrients : nutrients.filter((nutrient) => nutrient.category === filter);
   const activeNutrient = nutrients.find((nutrient) => nutrient.slug === activeSlug) ?? nutrients[0];
 
-  const selectNutrient = (nextSlug: string) => {
+  const selectNutrient = useCallback((nextSlug: string) => {
     activeSlugRef.current = nextSlug;
     setActiveSlug((currentSlug) => (currentSlug === nextSlug ? currentSlug : nextSlug));
-  };
+  }, []);
 
   useEffect(() => {
     // Mobile is a reading surface: selection changes by tap, not by the
@@ -417,7 +469,7 @@ export function NutrientAtlas() {
       window.removeEventListener("resize", requestSync);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [filter]);
+  }, [filter, selectNutrient]);
 
   const selectFilter = (nextFilter: Filter) => {
     setFilter(nextFilter);
