@@ -158,7 +158,8 @@ export function Header() {
                   className="nav-disclosure"
                   aria-expanded={isOpen}
                   aria-controls={menuId}
-                  onClick={() => setOpenGroup(item.label)}
+                  aria-haspopup="menu"
+                  onClick={() => setOpenGroup(isOpen ? null : item.label)}
                 >
                   {item.label}
                   <span className="nav-chevron" aria-hidden="true" />
