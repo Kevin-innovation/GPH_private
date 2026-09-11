@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 3 시작 대기**
+> 상태: **Phase 4 시작 대기**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  
@@ -414,10 +414,12 @@ Evidence Base → Country Spotlight
 
 ### Phase 3 — About
 
-- [ ] Our Mission 세로형 챕터 재구성
-- [ ] Six Determinants 인터랙션 재구성
-- [ ] Our Team에 Founder 정보 통합
-- [ ] About 페이지 간 Related Page 연결
+- [x] Our Mission 세로형 챕터 재구성
+- [x] Six Determinants 인터랙션 재구성
+- [x] Our Team에 Founder 정보 통합
+- [x] About 페이지 간 Related Page 연결
+
+About 완료 기록: [`docs/audits/PHASE_3_ABOUT.md`](audits/PHASE_3_ABOUT.md)
 
 종료 커밋: `feat: rebuild about pages as visual editorial stories`
 

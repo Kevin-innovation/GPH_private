@@ -126,3 +126,18 @@ test("vertical shell foundations stay in place", async () => {
   assert.match(css, /\.related-pages/, "related page shell styles should exist");
   assert.match(header, /data-scrolled/, "header should expose its scroll state");
 });
+
+test("About pages keep the mission rail and founder pathways distinct", async () => {
+  const mission = await readProjectFile("components/mission/MissionSection.tsx");
+  const founder = await readProjectFile("components/founder/FounderSection.tsx");
+  const missionPage = await readProjectFile("app/about/mission/page.tsx");
+  const teamPage = await readProjectFile("app/about/team/page.tsx");
+
+  assert.match(mission, /className="mission-storyline"/, "Mission should use the vertical determinant story rail");
+  assert.match(mission, /determinants\.map/, "Mission should retain all determinant controls");
+  assert.doesNotMatch(mission, /onMouseEnter/, "determinants should not switch state on hover");
+  assert.match(founder, /Our team · Founder/, "Team should identify the founder within the team page");
+  assert.match(founder, /founder\.facts/, "Team should render founder facts");
+  assert.match(missionPage, /RelatedPages/, "Mission should link to the next About page");
+  assert.match(teamPage, /RelatedPages/, "Team should expose related About/contact paths");
+});

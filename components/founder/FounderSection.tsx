@@ -16,7 +16,7 @@ export function FounderSection() {
     <SectionShell id="founder" surface="white" labelledBy="founder-title" className="founder-section">
       <div className="page-width founder-grid">
         <div className="founder-identity">
-          <Eyebrow>Meet the founder</Eyebrow>
+          <Eyebrow>Our team · Founder</Eyebrow>
           {/* Same circular letter-mark language as the nutrient icons, so the
               person who assembled the index appears inside its own system. */}
           <span className="founder-mark" aria-hidden="true">

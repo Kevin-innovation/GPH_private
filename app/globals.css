@@ -5768,3 +5768,175 @@ details[open] .summary-mark b { transform: rotate(45deg); }
   .related-pages > .eyebrow,
   .related-pages > ul { width: calc(100% - 2rem); }
 }
+
+/* -------------------------------------------------------------------------
+   Phase 3 — About story rail
+   -------------------------------------------------------------------------
+   Determinants are a reading sequence, not a collection of cards. A single
+   vertical rail keeps the six forces in order while the selected explanation
+   changes below it without moving neighboring controls.
+*/
+.mission-storyline {
+  position: relative;
+}
+
+.mission-signature .mission-storyline .determinants {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.mission-signature .mission-storyline .determinants::before {
+  content: "";
+  position: absolute;
+  top: 1.15rem;
+  bottom: 1.15rem;
+  left: 1.35rem;
+  width: 1px;
+  background: var(--color-hairline);
+  pointer-events: none;
+}
+
+.mission-signature .mission-storyline .determinants button {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 2.7rem minmax(0, 1fr) auto;
+  grid-template-rows: auto;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+  min-height: 4.75rem;
+  padding: 1rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--color-hairline);
+  border-left: 3px solid transparent;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(23, 37, 46, 0.68);
+  transform: none;
+  transition: color var(--duration-fast) ease, background-color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+}
+
+.mission-signature .mission-storyline .determinants button:hover,
+.mission-signature .mission-storyline .determinants button:focus-visible {
+  border-left-color: var(--color-teal-text);
+  background: rgba(255, 255, 255, 0.56);
+  box-shadow: none;
+  color: var(--color-navy);
+  transform: none;
+}
+
+.mission-signature .mission-storyline .determinants button.is-active {
+  border-left-color: var(--color-navy);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: none;
+  color: var(--color-navy);
+  transform: none;
+}
+
+.mission-signature .mission-storyline .determinants button:focus-visible {
+  outline: 3px solid var(--color-gold-text);
+  outline-offset: 3px;
+}
+
+.mission-signature .mission-storyline .determinants button .mission-determinant-index {
+  grid-column: 1;
+  grid-row: 1;
+  display: grid;
+  width: 2.7rem;
+  min-height: 2.7rem;
+  place-items: center;
+  border: 1px solid var(--color-hairline);
+  border-radius: 50%;
+  background: var(--color-white);
+  color: var(--color-gold-text);
+  font-size: 0.69rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.mission-signature .mission-storyline .determinants button.is-active .mission-determinant-index {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.mission-signature .mission-storyline .determinants button .mission-determinant-label {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  color: inherit;
+  font-size: clamp(1rem, 1.25vw, 1.18rem);
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.mission-signature .mission-storyline .determinants button .mission-determinant-state {
+  grid-column: 3;
+  grid-row: 1;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  color: var(--color-teal-text);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mission-signature .mission-storyline .determinants button.is-active .mission-determinant-state {
+  color: var(--color-gold-text);
+}
+
+.mission-signature .mission-storyline .mission-focus-panel {
+  min-height: 0;
+  padding: clamp(2rem, 4vw, 3rem) 0 clamp(1.75rem, 3vw, 2.5rem);
+  border-bottom: 1px solid var(--color-navy);
+}
+
+.mission-signature .mission-storyline .mission-focus-copy h3 {
+  max-width: 26ch;
+}
+
+@media (max-width: 640px) {
+  .mission-signature .mission-storyline .determinants button {
+    grid-template-columns: 2.4rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    min-height: 4.25rem;
+    padding: 0.85rem 0;
+  }
+
+  .mission-signature .mission-storyline .determinants::before {
+    left: 1.2rem;
+  }
+
+  .mission-signature .mission-storyline .determinants button .mission-determinant-index {
+    width: 2.4rem;
+    min-height: 2.4rem;
+  }
+
+  .mission-signature .mission-storyline .determinants button .mission-determinant-state {
+    font-size: 0.58rem;
+  }
+
+  .mission-signature .mission-storyline .mission-focus-panel {
+    grid-template-columns: 2.7rem minmax(0, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mission-signature .mission-storyline .determinants button {
+    transition: none;
+  }
+}

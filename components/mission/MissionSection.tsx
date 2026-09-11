@@ -112,10 +112,11 @@ export function MissionSection() {
           <div className="mission-interactive">
             <div className="mission-network-header" aria-hidden="true">
               <span>Explore the determinants</span>
-              <span>Choose a topic</span>
+              <span>Choose a topic · six forces</span>
             </div>
 
-            <div className="determinants" role="group" aria-label="Explore health determinants">
+            <div className="mission-storyline">
+              <div className="determinants" role="group" aria-label="Explore health determinants">
               {determinants.map((item, index) => {
                 const isActive = activeId === item.id;
                 return (
@@ -129,7 +130,6 @@ export function MissionSection() {
                     aria-pressed={isActive}
                     aria-controls="mission-determinant-detail"
                     onClick={() => setActiveId(item.id)}
-                    onMouseEnter={() => setActiveId(item.id)}
                     onFocus={() => setActiveId(item.id)}
                     onKeyDown={(event) => {
                       if (event.key === "ArrowRight" || event.key === "ArrowDown") {
@@ -161,26 +161,27 @@ export function MissionSection() {
                   </button>
                 );
               })}
-            </div>
-
-            <div
-              className="mission-focus-panel"
-              id="mission-determinant-detail"
-              role="status"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              <div className="mission-focus-index" aria-hidden="true">
-                0{determinants.findIndex((item) => item.id === activeId) + 1}
               </div>
-              <div className="mission-focus-copy" key={activeId}>
-                <span>{activeDeterminant.label}</span>
-                <h3>
-                  <ProtectedEnding text={activeDeterminant.title} />
-                </h3>
-                <p>
-                  {activeDeterminant.body} <span className="no-orphan">{activeDeterminant.ending}</span>
-                </p>
+
+              <div
+                className="mission-focus-panel"
+                id="mission-determinant-detail"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <div className="mission-focus-index" aria-hidden="true">
+                  0{determinants.findIndex((item) => item.id === activeId) + 1}
+                </div>
+                <div className="mission-focus-copy" key={activeId}>
+                  <span>{activeDeterminant.label}</span>
+                  <h3>
+                    <ProtectedEnding text={activeDeterminant.title} />
+                  </h3>
+                  <p>
+                    {activeDeterminant.body} <span className="no-orphan">{activeDeterminant.ending}</span>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
