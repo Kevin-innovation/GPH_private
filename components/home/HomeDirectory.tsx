@@ -57,9 +57,9 @@ export function HomeDirectory() {
               <span className="no-orphan"> each page.</span>
             </p>
           </div>
-          <a href="/evidence-base">
+          <a className="button button-secondary button-cta" href="/evidence-base">
             <span>Read the evidence base</span>
-            <span aria-hidden="true">→</span>
+            <span className="button-arrow" aria-hidden="true">→</span>
           </a>
         </div>
       </div>

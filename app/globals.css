@@ -6771,3 +6771,457 @@ h4 {
     margin-bottom: 44px;
   }
 }
+
+/* ---- Phase 7: weight-forward type + unmistakable controls ----------------
+   The interface should never make a reader guess what is interactive. Keep
+   editorial structure square, but give every action a stable hit area,
+   visible border/background state, and a keyboard-safe focus ring. */
+body {
+  font-weight: 500;
+}
+
+p,
+li,
+dt,
+dd,
+figcaption,
+blockquote {
+  font-weight: 500 !important;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700 !important;
+}
+
+strong,
+b {
+  font-weight: 700 !important;
+}
+
+a,
+button,
+summary {
+  font-weight: 700 !important;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  font-weight: 500 !important;
+}
+
+.eyebrow,
+.atlas-toolbar-label,
+.atlas-detail-topline,
+.atlas-detail-type,
+.atlas-card-type,
+.note-marker,
+.list-header,
+.row-index,
+.step-number,
+.nutrient-category,
+.nutrient-axis,
+.nutrient-story-header,
+.case-pathway-label,
+.case-pathway-dot,
+.workflow-row > span,
+.hero-lens-center span,
+.hero-lens-data,
+.hero-lens-node span,
+.hero-lens-hint {
+  font-weight: 700 !important;
+}
+
+/* Header links are compact outlined controls rather than hairline text. */
+.desktop-nav > a,
+.desktop-nav .nav-disclosure {
+  min-height: 42px;
+  padding: 9px 14px;
+  border: 1px solid rgba(18, 49, 75, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+  font-weight: 700;
+  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.desktop-nav > a::after,
+.desktop-nav .nav-disclosure::after {
+  display: none;
+}
+
+.desktop-nav > a:hover,
+.desktop-nav > a:focus-visible,
+.desktop-nav > a.is-active,
+.desktop-nav .nav-disclosure:hover,
+.desktop-nav .nav-disclosure:focus-visible,
+.desktop-nav .nav-group.is-active .nav-disclosure {
+  border-color: var(--color-teal-text);
+  background: rgba(159, 215, 205, 0.2);
+  color: var(--color-navy);
+}
+
+.nav-dropdown {
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: 0 14px 32px rgba(18, 49, 75, 0.12);
+}
+
+.nav-dropdown a {
+  border-radius: 7px;
+  font-weight: 600;
+}
+
+/* Every primary action shares one button silhouette and a directional cue. */
+.button {
+  min-height: 50px;
+  border-radius: 10px;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(18, 49, 75, 0.1);
+}
+
+.button:hover,
+.button:focus-visible {
+  box-shadow: 0 12px 26px rgba(18, 49, 75, 0.16);
+}
+
+.button-cta {
+  min-width: min(100%, 18rem);
+}
+
+.text-button {
+  border: 1px solid rgba(17, 126, 118, 0.35);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Homepage pathway rows and handoff links are now visibly actionable cards. */
+.home-pathways ul {
+  gap: 12px;
+  border-top: 0;
+}
+
+.home-pathways li {
+  border: 0;
+}
+
+.home-pathways a {
+  min-height: 9.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-hairline);
+  border-radius: 10px;
+  background: var(--color-white);
+  box-shadow: 0 7px 18px rgba(18, 49, 75, 0.05);
+  font-weight: 600;
+}
+
+.home-pathways a:hover,
+.home-pathways a:focus-visible {
+  border-color: var(--color-teal-text);
+  background: #f7fbfa;
+  box-shadow: 0 12px 26px rgba(18, 49, 75, 0.1);
+}
+
+.home-evidence-strip > a.button,
+.lens-next-step > a.button {
+  align-items: center;
+  min-height: 50px;
+  padding: 13px 18px;
+  border: 1px solid rgba(18, 49, 75, 0.28);
+  border-radius: 10px;
+  background: var(--color-white);
+  color: var(--color-navy);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.home-evidence-strip > a.button:hover,
+.home-evidence-strip > a.button:focus-visible,
+.lens-next-step > a.button:hover,
+.lens-next-step > a.button:focus-visible {
+  border-color: var(--color-teal-text);
+  background: #f7fbfa;
+  color: var(--color-navy);
+}
+
+/* Related routes use a card-like button target without changing the page's
+   square editorial section surfaces. */
+.related-pages ul {
+  gap: 12px;
+  border-top: 0;
+}
+
+.related-pages li {
+  border: 0;
+}
+
+.related-pages a.related-page-link {
+  min-height: 7rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--color-hairline);
+  border-radius: 10px;
+  background: var(--color-white);
+  box-shadow: 0 7px 18px rgba(18, 49, 75, 0.05);
+  font-weight: 600;
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.related-pages a.related-page-link:hover,
+.related-pages a.related-page-link:focus-visible {
+  border-color: var(--color-teal-text);
+  background: #f7fbfa;
+  box-shadow: 0 12px 26px rgba(18, 49, 75, 0.1);
+}
+
+/* Mission determinant controls retain their vertical rail while gaining a
+   stable button boundary and an explicit selected surface. */
+.mission-signature .mission-storyline .determinants button {
+  margin-block: 5px;
+  padding-inline: 1rem;
+  border: 1px solid var(--color-hairline);
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.74);
+  font-weight: 700;
+}
+
+.mission-signature .mission-storyline .determinants button:hover,
+.mission-signature .mission-storyline .determinants button:focus-visible {
+  border-color: var(--color-teal-text);
+  border-left-color: var(--color-teal-text);
+  background: var(--color-white);
+  box-shadow: 0 8px 20px rgba(18, 49, 75, 0.08);
+}
+
+.mission-signature .mission-storyline .determinants button.is-active {
+  border-color: var(--color-navy);
+  border-left-color: var(--color-navy);
+  background: var(--color-white);
+  box-shadow: 0 8px 20px rgba(18, 49, 75, 0.1);
+}
+
+.mission-signature .mission-storyline .determinants button .mission-determinant-label,
+.mission-signature .mission-storyline .determinants button .mission-determinant-state {
+  font-weight: 700;
+}
+
+/* Selector controls use a compact pill vocabulary so their click behavior is
+   visible before hover. */
+.country-spotlight-country-list button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-hairline);
+  border-radius: 999px;
+  background: var(--color-white);
+  font-weight: 700;
+}
+
+.country-spotlight-country-list button:hover,
+.country-spotlight-country-list button:focus-visible {
+  border-color: var(--color-teal-text);
+  background: #f7fbfa;
+}
+
+.country-spotlight-country-list button.is-active {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.hero-lens-controls {
+  gap: 10px;
+  border-top: 0;
+}
+
+.hero-lens-controls button {
+  min-height: 50px;
+  border: 1px solid var(--color-hairline);
+  border-top: 3px solid transparent;
+  border-radius: 10px;
+  background: var(--color-white);
+  font-weight: 700;
+}
+
+.hero-lens-controls button:hover,
+.hero-lens-controls button:focus-visible {
+  border-color: var(--color-teal-text);
+  border-top-color: var(--color-teal-text);
+  background: #f7fbfa;
+}
+
+.hero-lens-controls button.is-active {
+  border-color: var(--color-navy);
+  border-top-color: var(--color-gold);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.atlas-filters button,
+.nutrient-step-nav button {
+  font-weight: 700;
+}
+
+.nutrient-step-nav button {
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid var(--color-hairline);
+  border-radius: 8px;
+  background: var(--color-white);
+}
+
+.nutrient-step-nav button:hover,
+.nutrient-step-nav button:focus-visible {
+  border-color: var(--color-teal-text);
+  background: #f7fbfa;
+}
+
+.nutrient-step-nav button.is-active {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.atlas-card {
+  border-radius: 10px;
+}
+
+.case-row summary {
+  margin-block: 5px;
+  padding-inline: 1rem;
+  border: 1px solid var(--color-hairline);
+  border-radius: 10px;
+  background: var(--color-white);
+  font-weight: 700;
+}
+
+.case-row summary:hover,
+.case-row summary:focus-visible {
+  border-color: var(--color-teal-text);
+}
+
+.micronutrient-shell .atlas-mobile-trigger {
+  border: 1px solid var(--color-hairline);
+  border-radius: 10px;
+  background: var(--color-white);
+  font-weight: 700;
+}
+
+.micronutrient-shell .atlas-mobile-trigger:hover,
+.micronutrient-shell .atlas-mobile-trigger:focus-visible {
+  border-color: var(--color-teal-text);
+  background: #f7fbfa;
+}
+
+/* External source links remain compact text buttons, making every outbound
+   destination discoverable without turning informational copy into a card. */
+.source-row a,
+.atlas-detail > a,
+.atlas-detail-body > a,
+.atlas-mobile-detail > a,
+.nutrient-panel > a,
+.nutrient-detail > a,
+.case-detail-copy > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(17, 126, 118, 0.35);
+  border-radius: 999px;
+  background: var(--color-white);
+  color: var(--color-teal-text);
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.source-row a:hover,
+.source-row a:focus-visible,
+.atlas-detail > a:hover,
+.atlas-detail > a:focus-visible,
+.atlas-detail-body > a:hover,
+.atlas-detail-body > a:focus-visible,
+.atlas-mobile-detail > a:hover,
+.atlas-mobile-detail > a:focus-visible,
+.nutrient-panel > a:hover,
+.nutrient-panel > a:focus-visible,
+.nutrient-detail > a:hover,
+.nutrient-detail > a:focus-visible,
+.case-detail-copy > a:hover,
+.case-detail-copy > a:focus-visible {
+  border-color: var(--color-teal-text);
+  background: #f7fbfa;
+  color: var(--color-navy);
+}
+
+@media (max-width: 900px) {
+  .menu-toggle {
+    border-radius: 10px;
+    background: var(--color-white);
+    font-weight: 700;
+    box-shadow: 0 5px 14px rgba(18, 49, 75, 0.08);
+  }
+
+  .mobile-nav a,
+  .mobile-nav .mobile-nav-disclosure {
+    border: 1px solid transparent;
+    border-radius: 9px;
+    font-weight: 700;
+  }
+
+  .mobile-nav a:hover,
+  .mobile-nav a:focus-visible,
+  .mobile-nav .mobile-nav-disclosure:hover,
+  .mobile-nav .mobile-nav-disclosure:focus-visible,
+  .mobile-nav .mobile-nav-group.is-open .mobile-nav-disclosure {
+    border-color: var(--color-teal-text);
+    background: var(--color-white);
+  }
+
+  .mobile-nav-submenu a {
+    border: 0;
+    border-radius: 7px;
+    font-weight: 600;
+  }
+
+  .home-pathways a {
+    min-height: 8.5rem;
+  }
+
+  .related-pages a.related-page-link {
+    min-height: 6.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktop-nav > a,
+  .desktop-nav .nav-disclosure,
+  .button,
+  .home-pathways a,
+  .related-pages a.related-page-link,
+  .country-spotlight-country-list button,
+  .hero-lens-controls button,
+  .nutrient-step-nav button,
+  .case-row summary,
+  .micronutrient-shell .atlas-mobile-trigger,
+  .source-row a,
+  .atlas-detail > a,
+  .atlas-detail-body > a,
+  .atlas-mobile-detail > a,
+  .nutrient-panel > a,
+  .nutrient-detail > a,
+  .case-detail-copy > a {
+    transition: none !important;
+  }
+}

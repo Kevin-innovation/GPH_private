@@ -200,3 +200,17 @@ test("Phase 6 keeps evidence, contact, and typography connected", async () => {
   assert.match(css, /body > main\.route-main\s*\{\s*flex: 1 0 auto;/, "short routes should keep the footer at the viewport floor");
   assert.match(css, /h1,\s*h2\s*\{\s*font-weight: 700 !important;/, "display headings should not render as hairline text");
 });
+
+test("Phase 7 makes typography and action targets unmistakable", async () => {
+  const home = await readProjectFile("components/home/HomeDirectory.tsx");
+  const lens = await readProjectFile("components/global-lens/GlobalLensSection.tsx");
+  const related = await readProjectFile("components/layout/RelatedPages.tsx");
+  const css = await readProjectFile("app/globals.css");
+
+  assert.match(home, /button button-secondary button-cta/, "home evidence handoff should use the shared button treatment");
+  assert.match(lens, /button button-secondary button-cta/, "lens handoff should use the shared button treatment");
+  assert.match(related, /related-page-link/, "related routes should expose a stable button-like target");
+  assert.match(css, /h1,\s*h2,\s*h3,\s*h4\s*\{\s*font-weight: 700 !important;/, "all display headings should use a bold Satoshi weight");
+  assert.match(css, /\.desktop-nav > a,\s*\.desktop-nav \.nav-disclosure/, "primary navigation should expose outlined hit areas");
+  assert.match(css, /\.country-spotlight-country-list button\s*\{[\s\S]*border-radius: 999px;/, "country selectors should read as pill controls");
+});

@@ -13,7 +13,7 @@ export function RelatedPages({ pages, title = "Continue reading" }: { pages: rea
       <ul>
         {pages.map((page) => (
           <li key={page.href}>
-            <a href={page.href}>
+            <a className="related-page-link" href={page.href}>
               <span className="related-page-label">{page.label}</span>
               {page.description ? <span className="related-page-description">{page.description}</span> : null}
               <span className="related-page-arrow" aria-hidden="true">→</span>

@@ -1,7 +1,7 @@
 # TASK.md — Global Public Health Lens 랜딩 웹사이트
 
 > 작성일: 2026-08-20
-> 상태: **Vertical Editorial Rebuild Phase 7 시작 대기.**
+> 상태: **Vertical Editorial Rebuild Phase 7 진행 중 — 타이포그래피·인터랙션 affordance slice 완료.**
 > 근거 문서: `Website Design and Development Brief.docx`, `Global_Public_Health_Lens_Website_Starter_Pack.docx` (둘 다 전문 분석 완료)
 
 > **2026-09-11 rebuild addendum:** 최신 레이아웃, 페이지별 세로 구성, PangeaSeed 참고 원칙, 애니메이션, QA 및 실행 페이즈는 [`docs/REBUILD_PLAN.md`](./REBUILD_PLAN.md)를 단일 기준으로 사용한다. 해당 문서가 이 파일의 기존 단일 랜딩 페이지 설명과 Phase 2~4보다 우선한다.
