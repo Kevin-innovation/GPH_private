@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { nutrients } from "@/content/nutrients";
 import type { Nutrient } from "@/content/types";
@@ -39,15 +39,7 @@ function NutrientIcon({ nutrient }: { nutrient: Nutrient }) {
   );
 }
 
-function NutrientVisual({
-  nutrient,
-  className,
-  loading = "lazy",
-}: {
-  nutrient: Nutrient;
-  className: string;
-  loading?: "eager" | "lazy";
-}) {
+function NutrientVisual({ nutrient, className }: { nutrient: Nutrient; className: string }) {
   return (
     <Image
       className={className}
@@ -55,7 +47,6 @@ function NutrientVisual({
       alt=""
       width={512}
       height={512}
-      loading={loading}
     />
   );
 }
@@ -112,293 +103,27 @@ function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
 function MobileNutrientList({
   nutrients: visibleNutrients,
   activeSlug,
-  expandedSlug,
   onSelect,
-  onToggle,
-  onAutoSelect,
 }: {
   nutrients: Nutrient[];
   activeSlug: string;
-  expandedSlug: string | null;
   onSelect: (slug: string) => void;
-  onToggle: (slug: string) => void;
-  onAutoSelect: (slug: string) => void;
 }) {
-  const listRef = useRef<HTMLDivElement>(null);
-  const activeSlugRef = useRef(activeSlug);
-  const onAutoSelectRef = useRef(onAutoSelect);
-  const autoSuppressedUntilRef = useRef(0);
-  const lastAutoSelectScrollYRef = useRef(0);
-  const revealKey = visibleNutrients.map((nutrient) => nutrient.slug).join("|");
-
-  useEffect(() => {
-    activeSlugRef.current = activeSlug;
-  }, [activeSlug]);
-
-  useEffect(() => {
-    onAutoSelectRef.current = onAutoSelect;
-  }, [onAutoSelect]);
-
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-
-    const items = Array.from(list.querySelectorAll<HTMLElement>(".atlas-mobile-item"));
-    if (!items.length) return;
-
-    const reveal = (item: HTMLElement) => item.classList.add("is-reveal-visible");
-
-    // Keep the rows visible when the browser does not support Intersection
-    // Observer (or when motion is reduced). The reveal class only adds an
-    // entrance animation; it never controls layout or content visibility.
-    if (!("IntersectionObserver" in window)) {
-      items.forEach(reveal);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          reveal(entry.target as HTMLElement);
-          observer.unobserve(entry.target);
-        });
-      },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0.01 },
-    );
-
-    items.forEach((item) => observer.observe(item));
-    return () => observer.disconnect();
-  }, [revealKey]);
-
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-
-    const triggers = Array.from(list.querySelectorAll<HTMLElement>(".atlas-mobile-trigger"));
-    if (!triggers.length) return;
-
-    let frame = 0;
-    let settleTimer: number | null = null;
-    let scrollVersion = 0;
-    let scrollEndVersion = -1;
-    let gestureActive = false;
-    const pendingSlugRef = { current: null as string | null };
-    let waitForInputAfterHandoff = false;
-    // React to a settled reading position quickly, then let the CSS shell
-    // take its time opening downward. Keeping these two timings separate
-    // prevents a sluggish hand-off without making the detail feel abrupt.
-    const settleDelay = 220;
-    const handoffDuration = 480;
-    const getTargetTrigger = () => {
-      const activationLine = Math.min(window.innerHeight * 0.52, window.innerHeight - 140);
-      const rows = triggers.map((trigger) => ({ trigger, rect: trigger.getBoundingClientRect() }));
-      const inReadingBand = rows.filter(
-        ({ rect }) => rect.bottom > activationLine - 80 && rect.top < activationLine + 80,
-      );
-      const inViewport = rows.filter(({ rect }) => rect.bottom > 0 && rect.top < window.innerHeight);
-      const candidates = inReadingBand.length
-        ? inReadingBand
-        : inViewport.length
-          ? inViewport
-          : rows;
-
-      return candidates.sort((a, b) => {
-        const aCenter = a.rect.top + a.rect.height / 2;
-        const bCenter = b.rect.top + b.rect.height / 2;
-        return Math.abs(aCenter - activationLine) - Math.abs(bCenter - activationLine);
-        })[0]?.trigger;
-    };
-
-    const cancelPendingSelection = () => {
-      pendingSlugRef.current = null;
-      if (settleTimer !== null) {
-        window.clearTimeout(settleTimer);
-        settleTimer = null;
-      }
-    };
-
-    const scheduleAutoSelect = (targetSlug: string) => {
-      const currentSlug = activeSlugRef.current;
-      if (!targetSlug || targetSlug === currentSlug) {
-        cancelPendingSelection();
-        return;
-      }
-
-      const currentIndex = triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === currentSlug);
-      const targetIndex = triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === targetSlug);
-      const pendingIndex = pendingSlugRef.current
-        ? triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === pendingSlugRef.current)
-        : -1;
-      const direction = targetIndex >= currentIndex ? 1 : -1;
-      const pendingDirection = pendingIndex >= currentIndex ? 1 : -1;
-
-      // Track the card that is actually in the reading band at the end of the
-      // gesture. Never replay skipped intermediate rows: on a fast wheel or
-      // scrollbar move those rows are already above/below the viewport, and
-      // opening one late is perceived as content popping in backwards.
-      if (pendingSlugRef.current !== targetSlug || pendingDirection !== direction) {
-        pendingSlugRef.current = targetSlug;
-        if (settleTimer !== null) {
-          window.clearTimeout(settleTimer);
-          settleTimer = null;
-        }
-      }
-      if (settleTimer !== null) return;
-      const scheduledScrollVersion = scrollVersion;
-      settleTimer = window.setTimeout(() => {
-        settleTimer = null;
-        const settledByScrollEnd = scrollEndVersion === scrollVersion;
-        if (scheduledScrollVersion !== scrollVersion && !settledByScrollEnd) {
-          // The reader is still moving. Keep following the latest visible row,
-          // then wait for a quiet reading window before starting its transition.
-          requestSync();
-          return;
-        }
-        const nextSlug = pendingSlugRef.current;
-        pendingSlugRef.current = null;
-        if (!nextSlug || performance.now() < autoSuppressedUntilRef.current) return;
-        if (nextSlug !== activeSlugRef.current) {
-          // Expanding one detail and collapsing the previous one can emit
-          // layout-driven scroll events of its own. Give that hand-off the
-          // duration of the visual transition so it cannot immediately pick
-          // another row again. A later wheel/touch/keyboard gesture explicitly
-          // resumes the sequence; layout reflow alone never causes a second
-          // jump when the reader has stopped.
-          const now = performance.now();
-          autoSuppressedUntilRef.current = now + handoffDuration;
-          lastAutoSelectScrollYRef.current = window.scrollY;
-          waitForInputAfterHandoff = true;
-          onAutoSelectRef.current(nextSlug);
-        }
-      }, settleDelay);
-    };
-
-    const syncFromScroll = () => {
-      frame = 0;
-      if (performance.now() < autoSuppressedUntilRef.current) return;
-      if (waitForInputAfterHandoff) {
-        // Do not chain another hand-off merely because the expanding panel
-        // caused a layout event. The reader must actually move the page past
-        // the completed hand-off before the next row can win.
-        if (Math.abs(window.scrollY - lastAutoSelectScrollYRef.current) < 72) return;
-        waitForInputAfterHandoff = false;
-      }
-      const atTop = window.scrollY <= 2;
-      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
-      const boundaryTrigger = atTop ? triggers[0] : atBottom ? triggers[triggers.length - 1] : null;
-      const targetSlug = (boundaryTrigger ?? getTargetTrigger())?.dataset.nutrientSlug;
-      const currentSlug = activeSlugRef.current;
-      if (!targetSlug || targetSlug === currentSlug) return;
-
-      const activationLine = Math.min(window.innerHeight * 0.52, window.innerHeight - 140);
-      const currentTrigger = triggers.find((trigger) => trigger.dataset.nutrientSlug === currentSlug);
-      const targetTrigger = triggers.find((trigger) => trigger.dataset.nutrientSlug === targetSlug);
-      if (currentTrigger && targetTrigger) {
-        const currentRect = currentTrigger.getBoundingClientRect();
-        const targetRect = targetTrigger.getBoundingClientRect();
-        const currentDistance = Math.abs(currentRect.top + currentRect.height / 2 - activationLine);
-        const targetDistance = Math.abs(targetRect.top + targetRect.height / 2 - activationLine);
-        // Hysteresis keeps the active row stable at a boundary. The next row
-        // must be meaningfully closer to the reading line before it can win.
-        if (currentDistance - targetDistance < 32) return;
-      }
-
-      scheduleAutoSelect(targetSlug);
-    };
-
-    const requestSync = () => {
-      if (!frame) frame = window.requestAnimationFrame(syncFromScroll);
-    };
-
-    // Scroll is the source of truth for the reading sequence. Unlike a
-    // view-timeline animation, this also works when the user drags the bar or
-    // jumps several rows with a trackpad.
-    const handleScroll = () => {
-      scrollVersion += 1;
-      scrollEndVersion = -1;
-      requestSync();
-    };
-
-    requestSync();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", requestSync);
-
-    // A manual toggle can change the document height and make the next row
-    // intersect the reading band without any user scroll. Keep that toggle
-    // authoritative for a short handoff window. User input still requests a
-    // fresh sync, but never interrupts a transition that is already running.
-    const resumeAutoSelection = () => {
-      gestureActive = true;
-      // A real gesture is the explicit hand-off signal after an automatic
-      // reveal. Clear the guard so a new row can be scheduled promptly; the
-      // panel itself still opens through the CSS height transition below.
-      waitForInputAfterHandoff = false;
-      lastAutoSelectScrollYRef.current = window.scrollY;
-      requestSync();
-    };
-    const resumeAfterScrollEnd = () => {
-      scrollEndVersion = scrollVersion;
-      const userGestureEnded = gestureActive;
-      gestureActive = false;
-      // `scrollend` can also follow a layout-driven scroll caused by the
-      // expanding grid row. Only a real gesture may end the hand-off guard;
-      // otherwise that reflow would immediately chain into another nutrient.
-      if (userGestureEnded) autoSuppressedUntilRef.current = 0;
-      requestSync();
-    };
-    window.addEventListener("wheel", resumeAutoSelection, { passive: true });
-    window.addEventListener("touchmove", resumeAutoSelection, { passive: true });
-    window.addEventListener("keydown", resumeAutoSelection);
-    window.addEventListener("scrollend", resumeAfterScrollEnd);
-
-    const observer = "IntersectionObserver" in window
-      ? new IntersectionObserver(
-        (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) requestSync();
-        },
-        { rootMargin: "-42% 0px -42% 0px", threshold: 0 },
-      )
-      : null;
-
-    triggers.forEach((trigger) => observer?.observe(trigger));
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", requestSync);
-      window.removeEventListener("wheel", resumeAutoSelection);
-      window.removeEventListener("touchmove", resumeAutoSelection);
-      window.removeEventListener("keydown", resumeAutoSelection);
-      window.removeEventListener("scrollend", resumeAfterScrollEnd);
-      if (frame) window.cancelAnimationFrame(frame);
-      cancelPendingSelection();
-      observer?.disconnect();
-    };
-  }, [revealKey]);
-
   return (
-    <div ref={listRef} className="atlas-mobile-list" aria-label="Nutrients to explore">
+    <div className="atlas-mobile-list" aria-label="Nutrients to explore">
       {visibleNutrients.map((nutrient) => {
         const index = nutrients.findIndex((item) => item.slug === nutrient.slug);
-        const isExpanded = nutrient.slug === expandedSlug;
+        const isActive = nutrient.slug === activeSlug;
         const detailId = `mobile-nutrient-detail-${nutrient.slug}`;
 
         return (
-          <article
-            className={`atlas-mobile-item${isExpanded ? " is-active" : ""}`}
-            data-nutrient-slug={nutrient.slug}
-            key={nutrient.slug}
-          >
+          <article className={`atlas-mobile-item${isActive ? " is-active" : ""}`} key={nutrient.slug}>
             <button
               className="atlas-mobile-trigger"
               type="button"
-              data-nutrient-slug={nutrient.slug}
-              aria-expanded={isExpanded}
+              aria-expanded={isActive}
               aria-controls={detailId}
-              onClick={() => {
-                autoSuppressedUntilRef.current = performance.now() + 450;
-                onSelect(nutrient.slug);
-                onToggle(nutrient.slug);
-              }}
+              onClick={() => onSelect(nutrient.slug)}
             >
               <span className="atlas-mobile-index">0{index + 1}</span>
               <div className="atlas-mobile-thumb">
@@ -410,19 +135,15 @@ function MobileNutrientList({
                 <span className="atlas-card-summary">{orphanSafeText(nutrient.summary)}</span>
               </div>
               <span className="atlas-mobile-trigger-arrow" aria-hidden="true">
-                {isExpanded ? "−" : "+"}
+                {isActive ? "−" : "+"}
               </span>
             </button>
 
-            <div
-              className={`atlas-mobile-detail-shell${isExpanded ? " is-expanded" : ""}`}
-              aria-hidden={!isExpanded}
-              inert={!isExpanded}
-            >
-              <div className="atlas-mobile-detail" id={detailId} aria-live={isExpanded ? "polite" : "off"}>
+            {isActive ? (
+              <div className="atlas-mobile-detail" id={detailId} aria-live="polite">
                 <div className="atlas-mobile-detail-head">
                   <div className="atlas-mobile-detail-visual">
-                    <NutrientVisual nutrient={nutrient} className="atlas-mobile-detail-image" loading="eager" />
+                    <NutrientVisual nutrient={nutrient} className="atlas-mobile-detail-image" />
                   </div>
                   <div className="atlas-mobile-detail-copy">
                     <div className="atlas-detail-title">
@@ -457,7 +178,7 @@ function MobileNutrientList({
                   {orphanSafeText(`Read the ${nutrient.source} fact sheet`)} <span aria-hidden="true">↗</span>
                 </ExternalLink>
               </div>
-            </div>
+            ) : null}
           </article>
         );
       })}
@@ -468,16 +189,15 @@ function MobileNutrientList({
 export function NutrientAtlas() {
   const [filter, setFilter] = useState<Filter>("all");
   const [activeSlug, setActiveSlug] = useState(nutrients[0].slug);
-  const [expandedSlug, setExpandedSlug] = useState<string | null>(nutrients[0].slug);
   const activeSlugRef = useRef(nutrients[0].slug);
   const cardGridRef = useRef<HTMLDivElement>(null);
   const visibleNutrients = filter === "all" ? nutrients : nutrients.filter((nutrient) => nutrient.category === filter);
   const activeNutrient = nutrients.find((nutrient) => nutrient.slug === activeSlug) ?? nutrients[0];
 
-  const selectNutrient = useCallback((nextSlug: string) => {
+  const selectNutrient = (nextSlug: string) => {
     activeSlugRef.current = nextSlug;
     setActiveSlug((currentSlug) => (currentSlug === nextSlug ? currentSlug : nextSlug));
-  }, []);
+  };
 
   useEffect(() => {
     // Mobile is a reading surface: selection changes by tap, not by the
@@ -540,26 +260,14 @@ export function NutrientAtlas() {
       window.removeEventListener("resize", requestSync);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [filter, selectNutrient]);
+  }, [filter]);
 
   const selectFilter = (nextFilter: Filter) => {
     setFilter(nextFilter);
     if (nextFilter !== "all" && activeNutrient.category !== nextFilter) {
       const firstMatch = nutrients.find((nutrient) => nutrient.category === nextFilter);
-      if (firstMatch) {
-        selectNutrient(firstMatch.slug);
-        setExpandedSlug(firstMatch.slug);
-      }
+      if (firstMatch) selectNutrient(firstMatch.slug);
     }
-  };
-
-  const toggleMobileNutrient = (slug: string) => {
-    setExpandedSlug((currentSlug) => (currentSlug === slug ? null : slug));
-  };
-
-  const autoSelectNutrient = (slug: string) => {
-    selectNutrient(slug);
-    setExpandedSlug(slug);
   };
 
   return (
@@ -615,10 +323,7 @@ export function NutrientAtlas() {
       <MobileNutrientList
         nutrients={visibleNutrients}
         activeSlug={activeNutrient.slug}
-        expandedSlug={expandedSlug}
         onSelect={selectNutrient}
-        onToggle={toggleMobileNutrient}
-        onAutoSelect={autoSelectNutrient}
       />
     </div>
   );
