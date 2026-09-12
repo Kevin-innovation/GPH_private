@@ -332,3 +332,20 @@ test("Phase 7R-3 restores interactive selections from URL state", async () => {
   assert.match(country, /window\.history\[method\]/);
   assert.match(country, /Selected country:/);
 });
+
+test("Phase 7R-4 keeps responsive text and interaction targets usable", async () => {
+  const css = await readProjectFile("app/globals.css");
+
+  assert.match(
+    css,
+    /\.desktop-nav > a,[\s\S]*?\.button \{\s*min-height:\s*44px;/,
+    "primary controls and source links should share the 44px interaction floor",
+  );
+  assert.match(css, /\.mobile-nav > nav > a,[\s\S]*?min-height:\s*48px;/, "mobile navigation rows should have a comfortable touch height");
+  assert.match(css, /\.menu-toggle \{[\s\S]*?min-width:\s*44px;[\s\S]*?min-height:\s*44px;/, "the mobile menu trigger should be a 44px target");
+  assert.match(css, /\.atlas-filters button,[\s\S]*?\.button \{\s*min-height:\s*44px;/, "filter and action controls should retain a 44px target");
+  assert.match(css, /\.country-spotlight-country-action \{\s*font-size:\s*0\.72rem !important;/, "country action labels should not render as hairline metadata");
+  assert.match(css, /\.page-hero-intro > \*,[\s\S]*?max-width:\s*min\(var\(--reading-width\), 100%\);/, "wide shells should cap prose at the reading measure");
+  assert.match(css, /\.page-hero-inner,[\s\S]*?\.atlas-card-grid \{\s*min-width:\s*0;/, "grid and flex shells should be allowed to shrink at narrow widths");
+  assert.match(css, /button,\s*a,\s*summary\s*\{\s*touch-action:\s*manipulation;/, "touch controls should avoid the double-tap delay");
+});

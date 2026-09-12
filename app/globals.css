@@ -7884,3 +7884,250 @@ textarea {
   opacity: 1;
   transform: none;
 }
+
+/* -------------------------------------------------------------------------
+   Phase 7R-4: responsive type + interaction contracts
+   -------------------------------------------------------------------------
+   Keep every navigational or state-changing control easy to hit at touch
+   widths, then give editorial copy a predictable measure so a narrow column
+   never creates an orphan line or horizontal spill at 320px.
+*/
+button,
+a,
+summary {
+  touch-action: manipulation;
+}
+
+.desktop-nav > a,
+.desktop-nav .nav-disclosure,
+.nav-dropdown a,
+.mobile-nav > nav > a,
+.mobile-nav .mobile-nav-disclosure,
+.mobile-nav-submenu a,
+.menu-toggle,
+.route-breadcrumb a,
+.skip-link,
+.atlas-filters button,
+.nutrient-step-nav button,
+.micronutrient-shell .atlas-mobile-trigger,
+.country-spotlight-country-list button,
+.country-spotlight-overview-button,
+.hero-lens-controls button,
+.mission-signature .mission-storyline .determinants button,
+.case-row summary,
+.related-pages a.related-page-link,
+.source-row a,
+.atlas-detail > a,
+.atlas-detail-body > a,
+.atlas-mobile-detail > a,
+.nutrient-panel > a,
+.nutrient-detail > a,
+.case-detail-copy > a,
+.button {
+  min-height: 44px;
+}
+
+.desktop-nav > a,
+.desktop-nav .nav-disclosure {
+  min-height: 44px;
+}
+
+.nav-dropdown a,
+.mobile-nav > nav > a,
+.mobile-nav .mobile-nav-disclosure,
+.mobile-nav-submenu a {
+  display: flex;
+  align-items: center;
+}
+
+.nav-dropdown a {
+  padding-block: 11px;
+}
+
+.mobile-nav > nav > a,
+.mobile-nav .mobile-nav-disclosure {
+  min-height: 48px;
+  padding-block: 12px;
+}
+
+.mobile-nav-submenu a {
+  min-height: 44px;
+  padding-block: 10px;
+}
+
+.menu-toggle {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.route-breadcrumb a,
+.skip-link {
+  display: inline-flex;
+  align-items: center;
+}
+
+.contact-form .consent-label {
+  min-height: 44px;
+  align-items: center;
+}
+
+/* Small all-caps labels are structural signposts, not decorative metadata.
+   The 0.72rem floor keeps them legible at every route and viewport. */
+.eyebrow,
+.atlas-toolbar-label,
+.atlas-detail-topline,
+.atlas-detail-type,
+.atlas-card-type,
+.note-marker,
+.list-header,
+.row-index,
+.nutrient-category,
+.nutrient-axis,
+.nutrient-story-header,
+.case-pathway-label,
+.workflow-row > span,
+.hero-lens-heading span,
+.hero-lens-heading small,
+.hero-lens-active > span,
+.hero-lens-hint,
+.country-spotlight-country-action {
+  font-size: 0.72rem !important;
+  line-height: 1.3;
+}
+
+.country-spotlight-country-action {
+  white-space: nowrap;
+}
+
+/* Keep the reading measure independent from the wide route shell. Flex/grid
+   children explicitly allow shrinking, while paragraphs remain capped at a
+   comfortable line length instead of stretching into a single long ribbon. */
+.page-hero-inner,
+.page-hero-copy,
+.page-hero-intro,
+.section-heading,
+.section-intro,
+.global-intro,
+.solutions-intro,
+.micronutrient-intro,
+.micronutrient-intro-copy,
+.contact-intro,
+.app-copy,
+.mission-copy,
+.founder-story,
+.country-spotlight-intro,
+.country-spotlight-detail,
+.atlas-toolbar,
+.atlas-layout,
+.atlas-detail,
+.atlas-card-grid {
+  min-width: 0;
+}
+
+.page-hero-intro > *,
+.section-intro,
+.lead-copy,
+.global-intro .section-intro,
+.solutions-intro > p,
+.micronutrient-intro-copy > p,
+.contact-intro > p,
+.app-copy > p,
+.founder-standfirst,
+.country-spotlight-intro .section-intro {
+  max-width: min(var(--reading-width), 100%);
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+
+.micronutrient-intro-copy > p,
+.micronutrient-intro-copy .side-note {
+  max-width: min(65ch, 100%);
+}
+
+@media (min-width: 901px) {
+  .micronutrient-intro-copy .side-note {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+  }
+
+  .micronutrient-intro-copy .side-note p {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .page-width,
+  .route-breadcrumb {
+    width: min(var(--content-width), calc(100% - clamp(2rem, 8vw, 2.5rem)));
+  }
+
+  .page-hero-inner,
+  .directory-intro,
+  .micronutrient-intro,
+  .atlas-toolbar,
+  .global-intro,
+  .solutions-wrap,
+  .case-studies,
+  .app-grid,
+  .contact-grid,
+  .country-spotlight-layout {
+    min-width: 0;
+  }
+
+  .page-hero-copy h1,
+  .section-heading h1,
+  .section-heading h2,
+  .micronutrient-intro h1,
+  .app-copy h1,
+  .contact-intro h1 {
+    max-width: 100%;
+    overflow-wrap: break-word;
+    text-wrap: balance;
+  }
+
+  .country-spotlight-country-action {
+    font-size: 0 !important;
+  }
+
+  .country-spotlight-country-action b {
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .page-width,
+  .route-breadcrumb {
+    width: min(var(--content-width), calc(100% - 2rem));
+  }
+
+  .atlas-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .atlas-filters {
+    flex-wrap: wrap;
+  }
+
+  .atlas-filters button {
+    flex: 1 1 0;
+  }
+
+  .micronutrient-intro-copy .side-note {
+    align-items: flex-start;
+  }
+
+  .micronutrient-intro-copy .side-note p {
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  a,
+  summary {
+    scroll-behavior: auto;
+  }
+}
