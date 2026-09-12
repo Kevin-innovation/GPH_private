@@ -203,6 +203,7 @@ test("Phase 5 lens content uses vertical lists and connected handoffs", async ()
   assert.match(micronutrients, /autoSuppressedUntilRef/, "Manual nutrient toggles should not be overridden by layout-triggered observer callbacks");
   assert.match(micronutrients, /waitForInputAfterHandoff = false/, "A new scroll gesture should resume the nutrient hand-off sequence");
   assert.match(micronutrients, /settleDelay = 180/, "Scroll-driven nutrient selection should respond after a short quiet reading window");
+  assert.match(micronutrients, /shouldCatchUpToBoundary/, "A boundary scroll should reveal the visible endpoint instead of leaving collapsed rows");
   assert.match(micronutrients, /currentDistance - targetDistance < 32/, "Nutrient focus should use hysteresis at row boundaries");
   assert.match(micronutrients, /atlas-mobile-detail-shell/, "Nutrient details should keep a transition shell to avoid layout jumps");
   assert.match(micronutrients, /lastAutoSelectScrollYRef/, "Scroll hand-offs should remember the reader position without moving it");

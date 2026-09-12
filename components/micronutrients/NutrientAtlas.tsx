@@ -225,13 +225,18 @@ function MobileNutrientList({
 
       const currentIndex = triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === currentSlug);
       let targetIndex = triggers.findIndex((trigger) => trigger.dataset.nutrientSlug === targetSlug);
-      if (currentIndex >= 0 && targetIndex >= 0 && Math.abs(targetIndex - currentIndex) > 1) {
+      const atPageBoundary = window.scrollY <= 2 ||
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      const currentRect = currentIndex >= 0 ? triggers[currentIndex]?.getBoundingClientRect() : null;
+      const currentIsVisible = Boolean(currentRect && currentRect.bottom > 0 && currentRect.top < window.innerHeight);
+      const shouldCatchUpToBoundary = atPageBoundary && !currentIsVisible;
+      if (!shouldCatchUpToBoundary && currentIndex >= 0 && targetIndex >= 0 && Math.abs(targetIndex - currentIndex) > 1) {
         // A fast wheel gesture can move several rows in a single frame. Keep
         // the reading sequence one row at a time so each detail gets a
         // complete, visible hand-off instead of jumping straight to a distant
-        // nutrient. This also applies at the document boundaries: additional
-        // wheel/touch input there is still a deliberate request to continue
-        // the one-row hand-off sequence.
+        // nutrient. When the reader has already reached the top or bottom and
+        // the active row is no longer visible, catch up directly to that
+        // boundary row so the viewport never ends on a wall of collapsed cards.
         const step = targetIndex > currentIndex ? 1 : -1;
         targetSlug = triggers[currentIndex + step]?.dataset.nutrientSlug ?? targetSlug;
         targetIndex = currentIndex + step;
