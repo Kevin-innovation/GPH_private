@@ -7725,6 +7725,12 @@ textarea {
    sticky detail panel and card grid are the reference interaction. The
    vertical self-contained list remains the mobile layout only. */
 @media (min-width: 901px) {
+  .micronutrient-shell .nutrient-atlas {
+    /* Let the editorial scope breathe to the same broad register as the
+       route title while preserving the narrower reading measure above it. */
+    max-width: min(1200px, 100%);
+  }
+
   .micronutrient-shell .atlas-layout {
     display: grid;
   }
