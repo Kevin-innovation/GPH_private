@@ -7722,18 +7722,28 @@ textarea {
 }
 
 /* Keep each nutrient's detail shell in the document so switching focus does
-   not remove a large block in one frame. The grid-row transition lets the
-   previous detail close while the next one opens, preserving the reader's
-   reading flow and giving the vitamin visual a calm hand-off. */
+   not remove a large block in one frame. Native scroll anchoring holds the
+   active trigger in the reader's viewport while the preceding shell closes
+   and the next shell opens below it. No JavaScript scroll correction is used:
+   the reader's wheel/trackpad gesture remains the only source of movement. */
 .micronutrient-shell .atlas-mobile-list {
-  /* Keep scroll position under the reader's control. The hand-off aligns the
-     new detail head explicitly, so native anchoring must not move the page a
-     second time while the grid rows animate. */
-  overflow-anchor: none;
+  overflow-anchor: auto;
 }
 
 .micronutrient-shell .atlas-mobile-item {
+  /* Exclude idle rows from anchor selection. When a row becomes active it is
+     the sole eligible list anchor, so a height change above it cannot throw
+     its trigger toward the top or bottom of the viewport. */
+  overflow-anchor: none;
   scroll-margin-top: calc(var(--header-height) + 20px);
+}
+
+.micronutrient-shell .atlas-mobile-item.is-active {
+  overflow-anchor: auto;
+}
+
+.micronutrient-shell .atlas-mobile-item.is-active .atlas-mobile-trigger {
+  overflow-anchor: auto;
 }
 
 .micronutrient-shell .atlas-mobile-detail-shell {
@@ -7753,8 +7763,8 @@ textarea {
   min-height: 0;
   overflow: hidden;
   opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 360ms ease, transform 560ms cubic-bezier(0.22, 1, 0.36, 1), padding 560ms cubic-bezier(0.22, 1, 0.36, 1), border-color 560ms ease;
+  transform: none;
+  transition: opacity 280ms ease-out, padding 560ms cubic-bezier(0.22, 1, 0.36, 1), border-color 360ms ease;
 }
 
 .micronutrient-shell .atlas-mobile-detail-shell:not(.is-expanded) > .atlas-mobile-detail {
@@ -7774,7 +7784,7 @@ textarea {
   }
 
   .micronutrient-shell .atlas-mobile-detail-shell.is-expanded > .atlas-mobile-detail {
-    animation: phase5-nutrient-detail-settle 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: none;
   }
 
   .micronutrient-shell .atlas-mobile-detail-shell > .atlas-mobile-detail .atlas-mobile-detail-image {
@@ -7782,7 +7792,7 @@ textarea {
   }
 
   .micronutrient-shell .atlas-mobile-detail-shell.is-expanded > .atlas-mobile-detail .atlas-mobile-detail-image {
-    animation: phase5-nutrient-detail-image-settle 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: none;
   }
 }
 

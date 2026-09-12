@@ -204,19 +204,21 @@ test("Phase 5 lens content uses vertical lists and connected handoffs", async ()
   assert.match(micronutrients, /waitForInputAfterHandoff = false/, "A new scroll gesture should resume the nutrient hand-off sequence");
   assert.match(micronutrients, /settleDelay = 220/, "Scroll-driven nutrient selection should wait for a short quiet reading window");
   assert.match(micronutrients, /scrollEndVersion/, "Scroll-driven nutrient selection should use scrollend when the browser exposes it");
-  assert.match(micronutrients, /shouldCatchUpToBoundary/, "A boundary scroll should reveal the visible endpoint instead of leaving collapsed rows");
-  assert.match(micronutrients, /boundaryCatchUpChanged/, "A boundary reached during momentum should replace an earlier pending row");
+  assert.match(micronutrients, /pendingSlugRef\.current !== targetSlug/, "Momentum scrolling should keep the latest visible nutrient as its pending destination");
+  assert.doesNotMatch(micronutrients, /currentIndex \+ step/, "Fast scrolling must not replay nutrients that have already left the viewport");
   assert.match(micronutrients, /currentDistance - targetDistance < 32/, "Nutrient focus should use hysteresis at row boundaries");
   assert.match(micronutrients, /atlas-mobile-detail-shell/, "Nutrient details should keep a transition shell to avoid layout jumps");
   assert.match(micronutrients, /lastAutoSelectScrollYRef/, "Scroll hand-offs should remember the reader position without moving it");
-  assert.match(micronutrients, /autoAlignSlugRef/, "Automatic detail hand-offs should remember which panel needs header alignment");
-  assert.match(micronutrients, /behavior: reduceMotion \? "auto" : "smooth"/, "Header alignment should use one smooth correction after the detail settles");
+  assert.doesNotMatch(micronutrients, /window\.scrollTo/, "Automatic detail hand-offs must never fight the reader with a programmatic scroll");
+  assert.doesNotMatch(micronutrients, /autoAlignSlugRef|programmaticAlignmentRef/, "Automatic detail hand-offs should rely on a stable anchor instead of corrective scrolling");
   assert.match(css, /\.micronutrient-shell \.atlas-mobile-item\.is-reveal-visible/, "Micronutrient rows should animate into view without hiding by default");
   assert.match(css, /phase5-nutrient-detail-in/, "The active nutrient detail should enter with a smooth scroll-linked transition");
   assert.match(css, /phase5-nutrient-detail-settle/, "Nutrient detail changes should use a settled transition");
   assert.match(css, /grid-template-rows: 0fr/, "Nutrient detail shells should collapse without removing layout in one frame");
   assert.match(css, /scroll-margin-top: calc\(--header-height|var\(--header-height\)/, "Nutrient rows should reserve space below the sticky header when aligned");
-  assert.match(css, /\.micronutrient-shell \.atlas-mobile-list[\s\S]*overflow-anchor: none/, "Nutrient hand-offs should not be moved by native scroll anchoring");
+  assert.match(css, /\.micronutrient-shell \.atlas-mobile-list[\s\S]*overflow-anchor: auto/, "The nutrient list should keep native scroll anchoring enabled");
+  assert.match(css, /\.micronutrient-shell \.atlas-mobile-item\.is-active[\s\S]*overflow-anchor: auto/, "The active nutrient should become the stable scroll anchor");
+  assert.match(css, /\.micronutrient-shell \.atlas-mobile-detail-shell[\s\S]*overflow-anchor: none/, "Changing detail content should be excluded from anchor selection");
 });
 
 test("Phase 6 keeps evidence, contact, and typography connected", async () => {
