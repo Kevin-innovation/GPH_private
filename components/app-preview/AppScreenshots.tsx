@@ -68,7 +68,7 @@ export function AppScreenshots() {
                 width={screen.width}
                 height={screen.height}
                 loading="lazy"
-                sizes="(max-width: 900px) 34vw, 20vw"
+                sizes="(max-width: 900px) 32vw, 220px"
               />
             </div>
           ))}

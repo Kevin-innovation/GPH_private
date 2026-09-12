@@ -40,7 +40,15 @@ function NutrientIcon({ nutrient }: { nutrient: Nutrient }) {
   );
 }
 
-function NutrientVisual({ nutrient, className }: { nutrient: Nutrient; className: string }) {
+function NutrientVisual({
+  nutrient,
+  className,
+  sizes,
+}: {
+  nutrient: Nutrient;
+  className: string;
+  sizes: string;
+}) {
   return (
     <Image
       className={className}
@@ -48,6 +56,7 @@ function NutrientVisual({ nutrient, className }: { nutrient: Nutrient; className
       alt=""
       width={512}
       height={512}
+      sizes={sizes}
     />
   );
 }
@@ -97,7 +106,11 @@ function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
           <span>{nutrient.category === "vitamin" ? "Vitamin" : "Mineral"}</span>
         </div>
         <div className="atlas-detail-visual">
-          <NutrientVisual nutrient={nutrient} className="atlas-detail-image" />
+          <NutrientVisual
+            nutrient={nutrient}
+            className="atlas-detail-image"
+            sizes="(max-width: 900px) 220px, 280px"
+          />
         </div>
         <div className="atlas-detail-sticky-copy">
           <div className="atlas-detail-title">
@@ -164,7 +177,11 @@ function MobileNutrientList({
             >
               <span className="atlas-mobile-index">0{index + 1}</span>
               <div className="atlas-mobile-thumb">
-                <NutrientVisual nutrient={nutrient} className="atlas-mobile-thumb-image" />
+                <NutrientVisual
+                  nutrient={nutrient}
+                  className="atlas-mobile-thumb-image"
+                  sizes="(max-width: 560px) 56px, 76px"
+                />
               </div>
               <div className="atlas-mobile-trigger-copy">
                 <span className="atlas-card-type">{nutrient.category}</span>
@@ -180,7 +197,11 @@ function MobileNutrientList({
               <div className="atlas-mobile-detail" id={detailId}>
                 <div className="atlas-mobile-detail-head">
                   <div className="atlas-mobile-detail-visual">
-                    <NutrientVisual nutrient={nutrient} className="atlas-mobile-detail-image" />
+                    <NutrientVisual
+                      nutrient={nutrient}
+                      className="atlas-mobile-detail-image"
+                      sizes="(max-width: 560px) 84px, (max-width: 900px) 104px, 176px"
+                    />
                   </div>
                   <div className="atlas-mobile-detail-copy">
                     <div className="atlas-detail-title">
@@ -379,7 +400,11 @@ export function NutrientAtlas() {
               >
                 <span className="atlas-card-index">0{index + 1}</span>
                 <div className="atlas-card-visual">
-                  <NutrientVisual nutrient={nutrient} className="atlas-card-image" />
+                  <NutrientVisual
+                    nutrient={nutrient}
+                    className="atlas-card-image"
+                    sizes="78px"
+                  />
                 </div>
                 <span className="atlas-card-type">{nutrient.category}</span>
                 <strong>{orphanSafeText(nutrient.name)}</strong>

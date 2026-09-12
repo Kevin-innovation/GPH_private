@@ -327,6 +327,8 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       const pointer = new THREE.Vector2();
       const labelPoint = new THREE.Vector3();
       const hitWorldPoint = new THREE.Vector3();
+      let mountWidth = 1;
+      let mountHeight = 1;
 
       const positionCapitalLabel = () => {
         const activeEntry = markerEntries.find(({ country }) => country.id === focusedIdRef.current);
@@ -343,9 +345,8 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
         }
 
         labelPoint.project(camera);
-        const bounds = mount.getBoundingClientRect();
-        capitalLabel.style.left = `${(labelPoint.x * 0.5 + 0.5) * bounds.width}px`;
-        capitalLabel.style.top = `${(-labelPoint.y * 0.5 + 0.5) * bounds.height}px`;
+        capitalLabel.style.left = `${(labelPoint.x * 0.5 + 0.5) * mountWidth}px`;
+        capitalLabel.style.top = `${(-labelPoint.y * 0.5 + 0.5) * mountHeight}px`;
         capitalLabel.classList.add("is-visible");
       };
 
@@ -474,11 +475,11 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
 
       const resize = () => {
         const bounds = mount.getBoundingClientRect();
-        const width = Math.max(1, bounds.width);
-        const height = Math.max(1, bounds.height);
-        camera.aspect = width / height;
+        mountWidth = Math.max(1, bounds.width);
+        mountHeight = Math.max(1, bounds.height);
+        camera.aspect = mountWidth / mountHeight;
         camera.updateProjectionMatrix();
-        renderer?.setSize(width, height, false);
+        renderer?.setSize(mountWidth, mountHeight, false);
         render();
       };
 

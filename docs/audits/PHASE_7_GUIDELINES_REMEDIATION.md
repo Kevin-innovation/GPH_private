@@ -114,6 +114,7 @@
 - Phase 7R-2 — 콘텐츠 시맨틱과 출처 데이터: 완료
 - Phase 7R-3 — 상태 복원과 스크롤 인터랙션: 완료
 - Phase 7R-4 — 반응형 타이포그래피와 조작 영역: 완료
-- 다음 구현 페이즈: **Phase 7R-5 — 미디어·폰트·런타임 성능**
+- Phase 7R-5 — 미디어·폰트·런타임 성능: 완료
+- 다음 구현 페이즈: **Phase 8 — 전체 회귀·배포 게이트**
 
-완료 기록: [`docs/audits/PHASE_7R_1_ACCESSIBILITY.md`](PHASE_7R_1_ACCESSIBILITY.md), [`docs/audits/PHASE_7R_2_CONTENT_SEMANTICS.md`](PHASE_7R_2_CONTENT_SEMANTICS.md), [`docs/audits/PHASE_7R_3_STATE_AND_SCROLL.md`](PHASE_7R_3_STATE_AND_SCROLL.md), [`docs/audits/PHASE_7R_4_RESPONSIVE_CONTROLS.md`](PHASE_7R_4_RESPONSIVE_CONTROLS.md)
+완료 기록: [`docs/audits/PHASE_7R_1_ACCESSIBILITY.md`](PHASE_7R_1_ACCESSIBILITY.md), [`docs/audits/PHASE_7R_2_CONTENT_SEMANTICS.md`](PHASE_7R_2_CONTENT_SEMANTICS.md), [`docs/audits/PHASE_7R_3_STATE_AND_SCROLL.md`](PHASE_7R_3_STATE_AND_SCROLL.md), [`docs/audits/PHASE_7R_4_RESPONSIVE_CONTROLS.md`](PHASE_7R_4_RESPONSIVE_CONTROLS.md), [`docs/audits/PHASE_7R_5_PERFORMANCE.md`](PHASE_7R_5_PERFORMANCE.md)

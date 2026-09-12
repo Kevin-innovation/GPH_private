@@ -222,7 +222,10 @@ test("Phase 6 keeps evidence, contact, and typography connected", async () => {
   assert.match(sources, /eyebrow="Evidence Base"/, "Evidence Base label should match the route name");
   assert.match(lensPage, /RelatedPages/, "How the Lens Works should expose its next lens paths");
   assert.match(layout, /globals\.css/, "The root layout should load the shared typography stylesheet");
-  assert.match(css, /api\.fontshare\.com\/v2\/css\?f\[\]=satoshi/, "Typography should load Satoshi from Fontshare");
+  assert.match(layout, /rel="preconnect" href="https:\/\/api\.fontshare\.com"/, "Fontshare API should be preconnected");
+  assert.match(layout, /rel="preconnect" href="https:\/\/cdn\.fontshare\.com"/, "Fontshare CDN should be preconnected");
+  assert.match(layout, /rel="stylesheet"[\s\S]*api\.fontshare\.com\/v2\/css\?f\[\]=satoshi/, "Typography should load Satoshi from Fontshare");
+  assert.doesNotMatch(css, /@import url\("https:\/\/api\.fontshare\.com/, "Fontshare should not wait behind a CSS import");
   assert.match(css, /body > main\.route-main\s*\{\s*flex: 1 0 auto;/, "short routes should keep the footer at the viewport floor");
   assert.match(css, /h1,\s*h2\s*\{\s*font-weight: 700 !important;/, "display headings should not render as hairline text");
 });
@@ -348,4 +351,24 @@ test("Phase 7R-4 keeps responsive text and interaction targets usable", async ()
   assert.match(css, /\.page-hero-intro > \*,[\s\S]*?max-width:\s*min\(var\(--reading-width\), 100%\);/, "wide shells should cap prose at the reading measure");
   assert.match(css, /\.page-hero-inner,[\s\S]*?\.atlas-card-grid \{\s*min-width:\s*0;/, "grid and flex shells should be allowed to shrink at narrow widths");
   assert.match(css, /button,\s*a,\s*summary\s*\{\s*touch-action:\s*manipulation;/, "touch controls should avoid the double-tap delay");
+});
+
+test("Phase 7R-5 budgets media requests and caches globe layout bounds", async () => {
+  const nutrientAtlas = await readProjectFile("components/micronutrients/NutrientAtlas.tsx");
+  const appScreenshots = await readProjectFile("components/app-preview/AppScreenshots.tsx");
+  const country = await readProjectFile("components/global-lens/CountrySpotlight.tsx");
+  const layout = await readProjectFile("app/layout.tsx");
+
+  assert.match(nutrientAtlas, /sizes="\(max-width: 560px\) 56px, 76px"/, "nutrient thumbnails should request their rendered width");
+  assert.match(nutrientAtlas, /sizes="\(max-width: 900px\) 220px, 280px"/, "the selected nutrient visual should use a bounded image request");
+  assert.match(appScreenshots, /sizes="\(max-width: 900px\) 32vw, 220px"/, "app screens should not request a desktop-sized image on mobile");
+  assert.match(layout, /rel="preconnect" href="https:\/\/api\.fontshare\.com"/);
+  assert.match(layout, /rel="stylesheet"[\s\S]*display=swap/);
+  assert.match(country, /let mountWidth = 1;\s*let mountHeight = 1;/, "globe label positioning should keep a cached mount size");
+  assert.match(country, /mountWidth = Math\.max\(1, bounds\.width\)/, "the cached bounds should update from ResizeObserver");
+  assert.doesNotMatch(
+    country,
+    /labelPoint\.project\(camera\);\s*const bounds = mount\.getBoundingClientRect\(\)/,
+    "capital label animation should not force a layout read every frame",
+  );
 });
