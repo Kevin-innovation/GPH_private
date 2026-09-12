@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://global-lens-gamma.vercel.app";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gph-lens.vercel.app";
 const paths = [
   "/",
   "/about/mission",

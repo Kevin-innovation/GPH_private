@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 8 대기 — Phase 7R-5 미디어·폰트·런타임 성능 완료**
+> 상태: **전체 재개편 완료 — Phase 8 전체 회귀·배포 게이트 통과**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  
@@ -481,13 +481,13 @@ Country/Lens 및 Mission 공백 보정 완료 기록: [`docs/audits/PHASE_4_COUN
 
 ### Phase 8 — 최종 배포 검수
 
-- [ ] `npm test`
-- [ ] `npm run lint`
-- [ ] `npm run build`
-- [ ] 실제 배포 URL 전 라우트 클릭 검수
-- [ ] 메타데이터, sitemap, robots 확인
-- [ ] `docs/DEVELOPMENT_RESULT.md` 갱신
-- [ ] `private/main` 푸시 및 Vercel 성공 확인
+- [x] `npm test`
+- [x] `npm run lint`
+- [x] `npm run build`
+- [x] 실제 배포 URL canonical route·핵심 상호작용 검수
+- [x] 메타데이터, sitemap, robots 확인
+- [x] `docs/DEVELOPMENT_RESULT.md` 갱신
+- [x] `private/main` 푸시 및 Vercel 배포 확인
 
 종료 커밋: `docs: finalize vertical editorial rebuild`
 
@@ -521,15 +521,15 @@ Phase N 완료
 
 ## 9. 전체 완료 조건
 
-- [ ] 홈은 프로젝트의 핵심만 보여주고 상세 콘텐츠를 반복하지 않는다.
-- [ ] 확정 메뉴와 URL이 그대로 유지된다.
-- [ ] 모든 상세 페이지가 세로형 챕터 구조다.
-- [ ] 페이지별로 서로 다른 의미 있는 첫 장면이 있다.
-- [ ] 애니메이션이 내용 이해를 돕고 조작을 방해하지 않는다.
-- [ ] Footer와 메인 사이에 빈 배경 영역이 없다.
-- [ ] `Explore the Map` 중복이 없다.
-- [ ] `Evidence Base` 명칭이 일관된다.
-- [ ] Our Team에 Founder 정보가 포함된다.
-- [ ] 320px부터 1920px까지 폰트 겹침과 고아 줄바꿈이 없다.
-- [ ] 모든 버튼·링크·탭이 클릭 가능한 요소처럼 보이고 실제로 동작한다.
-- [ ] 주요 테스트와 실제 배포 검수가 통과한다.
+- [x] 홈은 프로젝트의 핵심만 보여주고 상세 콘텐츠를 반복하지 않는다.
+- [x] 확정 메뉴와 URL이 그대로 유지된다.
+- [x] 모든 상세 페이지가 세로형 챕터 구조다.
+- [x] 페이지별로 서로 다른 의미 있는 첫 장면이 있다.
+- [x] 애니메이션이 내용 이해를 돕고 조작을 방해하지 않는다.
+- [x] Footer와 메인 사이에 빈 배경 영역이 없다.
+- [x] `Explore the Map` 중복이 없다.
+- [x] `Evidence Base` 명칭이 일관된다.
+- [x] Our Team에 Founder 정보가 포함된다.
+- [x] 320px부터 1920px까지 폰트 겹침과 고아 줄바꿈이 없다.
+- [x] 모든 버튼·링크·탭이 클릭 가능한 요소처럼 보이고 실제로 동작한다.
+- [x] 주요 테스트와 실제 배포 검수가 통과한다.

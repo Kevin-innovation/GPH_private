@@ -1,6 +1,6 @@
 # 개발 결과 — Global Public Health Lens
 
-작성일: 2026-08-20
+작성일: 2026-09-12
 
 ## 구현 기능
 
@@ -13,6 +13,8 @@
 - `GPH Lens: Nutrition` 앱 프리뷰와 Coming Soon 상태
 - 기관 출처 8종, 건강 고지, 연락 폼, honeypot, 클라이언트 검증, 성공·오류 상태
 - SEO 메타데이터, Open Graph 이미지, favicon, sitemap, robots
+- 세로형 에디토리얼 라우트 10개, route-level interactive lens, URL 상태 복원
+- 이미지 `sizes`, Fontshare preconnect, WebGL mount bounds cache, reduced-motion fallback
 
 ## 주요 파일 구조
 
@@ -40,11 +42,12 @@
 
 ## 검증 및 실행
 
+- `npm test` 통과 (production build 포함, 17 tests)
 - `npm run lint` 통과
-- `npm run build` 통과
-- 로컬 라우트 응답 확인
+- `git diff --check` 통과
+- 인앱 브라우저·배포 URL에서 canonical route와 핵심 상호작용 확인
 - 반응형 기준: 320 / 375 / 768 / 1024 / 1440 / 1920px
 
 ## 배포
 
-Sites 비공개 배포 완료: https://gphl-lens.alsrbalsrjs.chatgpt.site
+Vercel 배포 확인: https://gph-lens.vercel.app/

@@ -372,3 +372,29 @@ test("Phase 7R-5 budgets media requests and caches globe layout bounds", async (
     "capital label animation should not force a layout read every frame",
   );
 });
+
+test("Phase 8 keeps deployment metadata and motion safety contracts", async () => {
+  const sitemap = await readProjectFile("app/sitemap.ts");
+  const robots = await readProjectFile("app/robots.ts");
+  const css = await readProjectFile("app/globals.css");
+  const canonicalRoutes = [
+    "/",
+    "/about/mission",
+    "/about/team",
+    "/country-spotlight",
+    "/lens/micronutrients",
+    "/lens/how-it-works",
+    "/lens/solutions",
+    "/nutrition-app",
+    "/evidence-base",
+    "/contact",
+  ];
+
+  assert.match(sitemap, /https:\/\/gph-lens\.vercel\.app/, "sitemap should default to the deployed canonical host");
+  assert.match(robots, /https:\/\/gph-lens\.vercel\.app/, "robots should default to the deployed canonical host");
+  assert.match(robots, /sitemap: `\$\{siteUrl\}\/sitemap\.xml`/, "robots should expose the deployed sitemap");
+  for (const route of canonicalRoutes) assert.match(sitemap, new RegExp(`"${route.replaceAll("/", "\\/")}"`));
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/, "motion should have a reduced-motion variant");
+  assert.doesNotMatch(css, /transition:\s*all\b/, "interactive transitions should list explicit properties");
+  assert.match(css, /body \{[^}]*overflow-x:\s*clip/, "the page shell should prevent accidental horizontal scrollbars");
+});

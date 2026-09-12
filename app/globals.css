@@ -3438,6 +3438,16 @@ details .lens-step {
   }
 }
 
+/* Keep the selected atlas card highlight inside the viewport when a medium
+   desktop shell is already close to the page gutter. Wide layouts can retain
+   the editorial overhang; 901–1300px layouts cannot without creating a page
+   scrollbar when the active arrow receives its hover/focus nudge. */
+@media (min-width: 901px) and (max-width: 1300px) {
+  .micronutrient-shell .atlas-card.is-active {
+    margin-inline: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-three-visual::before {
     filter: blur(10px);
