@@ -20,6 +20,7 @@ const countryZoom: Record<string, number> = {
   france: 3.85,
   "united-states": 6.65,
 };
+type CountryUrlMode = "push" | "replace";
 
 function formatReviewedDate(value: string) {
   return new Intl.DateTimeFormat("en-GB", {
@@ -28,6 +29,36 @@ function formatReviewedDate(value: string) {
     year: "numeric",
     timeZone: "UTC",
   }).format(new Date(`${value}T00:00:00Z`));
+}
+
+function readCountryUrlState() {
+  if (typeof window === "undefined") {
+    return { selectedId: countrySpotlights[0].id, isZoomed: false };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const requestedCountry = countrySpotlights.find((country) => country.id === params.get("country"));
+  return {
+    selectedId: requestedCountry?.id ?? countrySpotlights[0].id,
+    isZoomed: params.get("zoom") === "1",
+  };
+}
+
+function writeCountryUrl(selectedId: string, isZoomed: boolean, mode: CountryUrlMode) {
+  if (typeof window === "undefined") return;
+
+  const url = new URL(window.location.href);
+  if (selectedId === countrySpotlights[0].id && !isZoomed) url.searchParams.delete("country");
+  else url.searchParams.set("country", selectedId);
+
+  if (isZoomed) url.searchParams.set("zoom", "1");
+  else url.searchParams.delete("zoom");
+
+  const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+  if (nextUrl === `${window.location.pathname}${window.location.search}${window.location.hash}`) return;
+
+  const method = mode === "push" ? "pushState" : "replaceState";
+  window.history[method]({ ...window.history.state, countrySpotlight: { selectedId, isZoomed } }, "", nextUrl);
 }
 
 function latLonToVector3(THREE: ThreeModule, latitude: number, longitude: number, radius = globeRadius) {
@@ -109,6 +140,7 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
   const previousFocusRequestRef = useRef(focusRequest);
   const previousOverviewRequestRef = useRef(overviewRequest);
   const focusedIdRef = useRef<string | null>(null);
+  const pendingGlobeActionRef = useRef<{ type: "focus"; countryId: string } | { type: "overview" } | null>(null);
   const [globeStatus, setGlobeStatus] = useState<"waiting" | "loading" | "ready" | "unavailable">("waiting");
 
   useEffect(() => {
@@ -435,6 +467,10 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
       focusRef.current = focusCountry;
       overviewRef.current = showOverview;
       updateMarkerSelection(selectedIdRef.current, true);
+      const pendingGlobeAction = pendingGlobeActionRef.current;
+      pendingGlobeActionRef.current = null;
+      if (pendingGlobeAction?.type === "focus") focusCountry(pendingGlobeAction.countryId);
+      if (pendingGlobeAction?.type === "overview") showOverview();
 
       const resize = () => {
         const bounds = mount.getBoundingClientRect();
@@ -570,11 +606,13 @@ function CountryGlobe({ selectedId, focusRequest, overviewRequest, onSelect }: C
     selectedIdRef.current = selectedId;
     if (previousFocusRequestRef.current !== focusRequest) {
       previousFocusRequestRef.current = focusRequest;
-      focusRef.current?.(selectedId);
+      if (focusRef.current) focusRef.current(selectedId);
+      else pendingGlobeActionRef.current = { type: "focus", countryId: selectedId };
     }
     if (previousOverviewRequestRef.current !== overviewRequest) {
       previousOverviewRequestRef.current = overviewRequest;
-      overviewRef.current?.();
+      if (overviewRef.current) overviewRef.current();
+      else pendingGlobeActionRef.current = { type: "overview" };
     }
   }, [focusRequest, overviewRequest, selectedId]);
 
@@ -601,19 +639,56 @@ export function CountrySpotlightSection() {
   const [overviewRequest, setOverviewRequest] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const countryButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const selectedIdRef = useRef(countrySpotlights[0].id);
+  const isZoomedRef = useRef(false);
+  const isUrlRestoredRef = useRef(false);
   const selectedCountry = countrySpotlights.find((country) => country.id === selectedId) ?? countrySpotlights[0];
   const reviewedAt = selectedCountry.sources.reduce(
     (latest, source) => (source.reviewedAt > latest ? source.reviewedAt : latest),
     selectedCountry.sources[0]?.reviewedAt ?? "",
   );
-  const selectCountry = (countryId: string) => {
+  const applyUrlState = () => {
+    const nextState = readCountryUrlState();
+    const selectedChanged = selectedIdRef.current !== nextState.selectedId;
+    const zoomChanged = isZoomedRef.current !== nextState.isZoomed;
+
+    selectedIdRef.current = nextState.selectedId;
+    isZoomedRef.current = nextState.isZoomed;
+    setSelectedId(nextState.selectedId);
+    setIsZoomed(nextState.isZoomed);
+    if (nextState.isZoomed && (selectedChanged || zoomChanged)) {
+      setFocusRequest((request) => request + 1);
+    } else if (!nextState.isZoomed && (selectedChanged || zoomChanged)) {
+      setOverviewRequest((request) => request + 1);
+    }
+    isUrlRestoredRef.current = true;
+  };
+
+  useEffect(() => {
+    const restoreFrame = window.requestAnimationFrame(applyUrlState);
+    const handlePopState = () => applyUrlState();
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.cancelAnimationFrame(restoreFrame);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  const selectCountry = (countryId: string, mode: CountryUrlMode = "push") => {
+    if (!countrySpotlights.some((country) => country.id === countryId)) return;
+
+    selectedIdRef.current = countryId;
+    isZoomedRef.current = true;
     setSelectedId(countryId);
     setIsZoomed(true);
     setFocusRequest((request) => request + 1);
+    if (isUrlRestoredRef.current) writeCountryUrl(countryId, true, mode);
   };
   const showFullGlobe = () => {
+    isZoomedRef.current = false;
     setIsZoomed(false);
     setOverviewRequest((request) => request + 1);
+    if (isUrlRestoredRef.current) writeCountryUrl(selectedIdRef.current, false, "push");
   };
   const focusCountryAt = (index: number) => {
     const normalizedIndex = (index + countrySpotlights.length) % countrySpotlights.length;
@@ -747,6 +822,9 @@ export function CountrySpotlightSection() {
 
         <p className="country-spotlight-note">
           Illustrative starting points — the country profiles will expand as reviewed content and local sources are added.
+        </p>
+        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          Selected country: {orphanSafeText(selectedCountry.name)}{isZoomed ? " (focused)" : " (overview)"}
         </p>
       </div>
     </SectionShell>

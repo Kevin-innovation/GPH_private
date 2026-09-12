@@ -314,3 +314,21 @@ test("Phase 7R-2 gives Evidence Base semantic table and localized review date", 
   assert.match(externalLink, /noopener noreferrer/);
   assert.match(externalLink, /opens in a new tab/);
 });
+
+test("Phase 7R-3 restores interactive selections from URL state", async () => {
+  const micronutrients = await readProjectFile("components/micronutrients/NutrientAtlas.tsx");
+  const country = await readProjectFile("components/global-lens/CountrySpotlight.tsx");
+
+  assert.match(micronutrients, /params\.get\("filter"\)/);
+  assert.match(micronutrients, /params\.get\("nutrient"\)/);
+  assert.match(micronutrients, /addEventListener\("popstate"/);
+  assert.match(micronutrients, /window\.history\[method\]/);
+  assert.match(micronutrients, /Selected nutrient:/);
+  assert.doesNotMatch(micronutrients, /className="atlas-detail" aria-live=/, "nutrient detail should not announce its full body on every selection");
+
+  assert.match(country, /params\.get\("country"\)/);
+  assert.match(country, /params\.get\("zoom"\)/);
+  assert.match(country, /addEventListener\("popstate"/);
+  assert.match(country, /window\.history\[method\]/);
+  assert.match(country, /Selected country:/);
+});

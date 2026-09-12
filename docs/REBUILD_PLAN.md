@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 7R-3 대기 — Phase 7R-2 콘텐츠 시맨틱·출처 데이터 완료**
+> 상태: **Phase 7R-4 대기 — Phase 7R-3 상태 복원·스크롤 인터랙션 완료**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  

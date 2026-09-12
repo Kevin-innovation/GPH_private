@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { nutrients } from "@/content/nutrients";
 import type { Nutrient } from "@/content/types";
@@ -8,6 +8,7 @@ import { ExternalLink } from "@/components/ui/ExternalLink";
 import { orphanSafeText } from "@/components/ui/orphanSafeText";
 
 type Filter = "all" | Nutrient["category"];
+type AtlasUrlMode = "push" | "replace";
 
 const nutrientMarks: Record<string, string> = {
   "vitamin-a": "A",
@@ -51,9 +52,45 @@ function NutrientVisual({ nutrient, className }: { nutrient: Nutrient; className
   );
 }
 
+function readAtlasUrlState() {
+  if (typeof window === "undefined") {
+    return { filter: "all" as Filter, activeSlug: nutrients[0].slug };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const requestedFilter = params.get("filter");
+  const filter: Filter = requestedFilter === "vitamin" || requestedFilter === "mineral" ? requestedFilter : "all";
+  const requestedNutrient = nutrients.find((nutrient) => nutrient.slug === params.get("nutrient"));
+  const fallbackNutrient = filter === "all"
+    ? nutrients[0]
+    : nutrients.find((nutrient) => nutrient.category === filter) ?? nutrients[0];
+  const activeNutrient = requestedNutrient && (filter === "all" || requestedNutrient.category === filter)
+    ? requestedNutrient
+    : fallbackNutrient;
+
+  return { filter, activeSlug: activeNutrient.slug };
+}
+
+function writeAtlasUrl(filter: Filter, activeSlug: string, mode: AtlasUrlMode) {
+  if (typeof window === "undefined") return;
+
+  const url = new URL(window.location.href);
+  if (filter === "all") url.searchParams.delete("filter");
+  else url.searchParams.set("filter", filter);
+
+  if (filter === "all" && activeSlug === nutrients[0].slug) url.searchParams.delete("nutrient");
+  else url.searchParams.set("nutrient", activeSlug);
+
+  const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+  if (nextUrl === `${window.location.pathname}${window.location.search}${window.location.hash}`) return;
+
+  const method = mode === "push" ? "pushState" : "replaceState";
+  window.history[method]({ ...window.history.state, atlas: { filter, activeSlug } }, "", nextUrl);
+}
+
 function NutrientDetail({ nutrient }: { nutrient: Nutrient }) {
   return (
-    <aside className="atlas-detail" aria-live="polite">
+    <aside className="atlas-detail">
       <div className="atlas-detail-sticky-visual">
         <div className="atlas-detail-topline">
           <span>Selected nutrient</span>
@@ -140,7 +177,7 @@ function MobileNutrientList({
             </button>
 
             {isActive ? (
-              <div className="atlas-mobile-detail" id={detailId} aria-live="polite">
+              <div className="atlas-mobile-detail" id={detailId}>
                 <div className="atlas-mobile-detail-head">
                   <div className="atlas-mobile-detail-visual">
                     <NutrientVisual nutrient={nutrient} className="atlas-mobile-detail-image" />
@@ -189,17 +226,45 @@ function MobileNutrientList({
 export function NutrientAtlas() {
   const [filter, setFilter] = useState<Filter>("all");
   const [activeSlug, setActiveSlug] = useState(nutrients[0].slug);
+  const [isUrlRestored, setIsUrlRestored] = useState(false);
   const activeSlugRef = useRef(nutrients[0].slug);
+  const isUrlRestoredRef = useRef(false);
   const cardGridRef = useRef<HTMLDivElement>(null);
   const visibleNutrients = filter === "all" ? nutrients : nutrients.filter((nutrient) => nutrient.category === filter);
   const activeNutrient = nutrients.find((nutrient) => nutrient.slug === activeSlug) ?? nutrients[0];
 
-  const selectNutrient = (nextSlug: string) => {
-    activeSlugRef.current = nextSlug;
-    setActiveSlug((currentSlug) => (currentSlug === nextSlug ? currentSlug : nextSlug));
+  const applyUrlState = () => {
+    const nextState = readAtlasUrlState();
+    activeSlugRef.current = nextState.activeSlug;
+    setFilter(nextState.filter);
+    setActiveSlug(nextState.activeSlug);
+    isUrlRestoredRef.current = true;
+    setIsUrlRestored(true);
   };
 
   useEffect(() => {
+    const restoreFrame = window.requestAnimationFrame(applyUrlState);
+    const handlePopState = () => applyUrlState();
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.cancelAnimationFrame(restoreFrame);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  const selectNutrient = useCallback((nextSlug: string, mode: AtlasUrlMode = "push") => {
+    const nextNutrient = nutrients.find((nutrient) => nutrient.slug === nextSlug);
+    if (!nextNutrient) return;
+
+    const changed = activeSlugRef.current !== nextSlug;
+    activeSlugRef.current = nextSlug;
+    if (changed) setActiveSlug(nextSlug);
+    if (changed && isUrlRestoredRef.current) writeAtlasUrl(filter, nextSlug, mode);
+  }, [filter]);
+
+  useEffect(() => {
+    if (!isUrlRestored) return;
+
     // Mobile is a reading surface: selection changes by tap, not by the
     // scroll position. This keeps the featured detail from changing while a
     // reader is trying to read a nutrient card.
@@ -245,7 +310,7 @@ export function NutrientAtlas() {
       // the reading anchor. This prevents tiny scroll deltas and content
       // reflow from flipping the detail panel back and forth at card edges.
       if (currentCard && currentDistance - nextDistance < 24) return;
-      selectNutrient(nextSlug);
+      selectNutrient(nextSlug, "replace");
     };
 
     const requestSync = () => {
@@ -260,14 +325,19 @@ export function NutrientAtlas() {
       window.removeEventListener("resize", requestSync);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [filter]);
+  }, [filter, isUrlRestored, selectNutrient]);
 
   const selectFilter = (nextFilter: Filter) => {
+    const currentNutrient = nutrients.find((nutrient) => nutrient.slug === activeSlugRef.current) ?? nutrients[0];
+    const nextNutrient = nextFilter !== "all" && currentNutrient.category !== nextFilter
+      ? nutrients.find((nutrient) => nutrient.category === nextFilter) ?? currentNutrient
+      : currentNutrient;
+    const changed = filter !== nextFilter || activeSlugRef.current !== nextNutrient.slug;
+
     setFilter(nextFilter);
-    if (nextFilter !== "all" && activeNutrient.category !== nextFilter) {
-      const firstMatch = nutrients.find((nutrient) => nutrient.category === nextFilter);
-      if (firstMatch) selectNutrient(firstMatch.slug);
-    }
+    activeSlugRef.current = nextNutrient.slug;
+    setActiveSlug(nextNutrient.slug);
+    if (changed && isUrlRestoredRef.current) writeAtlasUrl(nextFilter, nextNutrient.slug, "push");
   };
 
   return (
@@ -325,6 +395,9 @@ export function NutrientAtlas() {
         activeSlug={activeNutrient.slug}
         onSelect={selectNutrient}
       />
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        Selected nutrient: {orphanSafeText(activeNutrient.name)}
+      </p>
     </div>
   );
 }
