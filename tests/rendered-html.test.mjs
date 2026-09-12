@@ -300,3 +300,17 @@ test("Phase 7R-1 keeps route headings and navigation semantics accessible", asyn
     assert.match(source, /<h1\b/, `${path} should use a route-level h1`);
   }
 });
+
+test("Phase 7R-2 gives Evidence Base semantic table and localized review date", async () => {
+  const sources = await readProjectFile("components/sources/SourcesSection.tsx");
+  const externalLink = await readProjectFile("components/ui/ExternalLink.tsx");
+
+  assert.match(sources, /<caption className="sr-only">Evidence sources by organization<\/caption>/);
+  assert.match(sources, /<thead>[\s\S]*scope="col"[\s\S]*Organization[\s\S]*<\/thead>/);
+  assert.match(sources, /<time dateTime=\{siteConfig\.lastReviewedAt\}>\{formatReviewedDate\(siteConfig\.lastReviewedAt\)\}<\/time>/);
+  assert.match(sources, /<time dateTime=\{source\.reviewedAt\}>\{formatReviewedDate\(source\.reviewedAt\)\}<\/time>/);
+  assert.match(sources, /Intl\.DateTimeFormat\("en-GB"/);
+  assert.match(externalLink, /target="_blank"/);
+  assert.match(externalLink, /noopener noreferrer/);
+  assert.match(externalLink, /opens in a new tab/);
+});

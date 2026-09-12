@@ -108,8 +108,10 @@
 - `docs/DEVELOPMENT_RESULT.md`와 `docs/REBUILD_PLAN.md`의 상태를 갱신한다.
 - `private/main` 푸시와 Vercel 배포 성공을 확인한 뒤에만 전체 작업을 완료로 보고한다.
 
-## 다음 실행
+## 진행 상태
 
-Phase 7R-1은 완료되었다. 다음 구현 페이즈는 **Phase 7R-2 — 콘텐츠 시맨틱과 출처 데이터**다.
+- Phase 7R-1 — 접근성 셸과 제목 계층: 완료
+- Phase 7R-2 — 콘텐츠 시맨틱과 출처 데이터: 완료
+- 다음 구현 페이즈: **Phase 7R-3 — 상태 복원과 스크롤 인터랙션**
 
-완료 기록: [`docs/audits/PHASE_7R_1_ACCESSIBILITY.md`](PHASE_7R_1_ACCESSIBILITY.md)
+완료 기록: [`docs/audits/PHASE_7R_1_ACCESSIBILITY.md`](PHASE_7R_1_ACCESSIBILITY.md), [`docs/audits/PHASE_7R_2_CONTENT_SEMANTICS.md`](PHASE_7R_2_CONTENT_SEMANTICS.md)

@@ -21,6 +21,15 @@ const sourceGroups = sources.reduce(
   [] as Array<{ organization: string; sources: typeof sources }>,
 );
 
+function formatReviewedDate(value: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${value}T00:00:00Z`));
+}
+
 export function SourcesSection() {
   return (
     <SectionShell id="sources" surface="white" labelledBy="sources-title" className="sources-section">
@@ -33,11 +42,21 @@ export function SourcesSection() {
         />
         <div className="source-list">
           <table className="source-table">
+            <caption className="sr-only">Evidence sources by organization</caption>
             <colgroup>
               <col className="source-col-index" />
               <col className="source-col-organization" />
               <col />
+              <col className="source-col-reviewed" />
             </colgroup>
+            <thead>
+              <tr>
+                <th className="source-table-heading" scope="col" role="columnheader">No.</th>
+                <th className="source-table-heading" scope="col" role="columnheader">Organization</th>
+                <th className="source-table-heading" scope="col" role="columnheader">Source</th>
+                <th className="source-table-heading" scope="col" role="columnheader">Last reviewed</th>
+              </tr>
+            </thead>
             <tbody>
               {sourceGroups.map((group, groupIndex) =>
                 group.sources.map((source, sourceIndex) => (
@@ -55,12 +74,17 @@ export function SourcesSection() {
                     <td>
                       <ExternalLink href={source.url}>{orphanSafeText(source.title)}</ExternalLink>
                     </td>
+                    <td className="source-reviewed">
+                      <time dateTime={source.reviewedAt}>{formatReviewedDate(source.reviewedAt)}</time>
+                    </td>
                   </tr>
                 )),
               )}
             </tbody>
           </table>
-          <p className="review-date">Content links last reviewed {siteConfig.lastReviewedAt}.</p>
+          <p className="review-date">
+            Content links last reviewed <time dateTime={siteConfig.lastReviewedAt}>{formatReviewedDate(siteConfig.lastReviewedAt)}</time>.
+          </p>
         </div>
       </div>
     </SectionShell>

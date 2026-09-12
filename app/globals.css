@@ -1792,7 +1792,9 @@ details[open] .summary-mark { transform: rotate(45deg); }
 }
 .source-col-index { width: 32px; }
 .source-col-organization { width: 36%; }
+.source-col-reviewed { width: 124px; }
 .source-table tr { border-bottom: 1px solid var(--color-hairline); }
+.source-table thead tr { border-bottom: 1px solid var(--color-hairline); }
 .source-table th,
 .source-table td {
   padding: 15px 0;
@@ -1802,7 +1804,22 @@ details[open] .summary-mark { transform: rotate(45deg); }
   font-weight: 400;
   line-height: 1.45;
 }
+.source-table thead .source-table-heading {
+  padding: 0 0 10px;
+  color: rgba(23, 37, 46, 0.58);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
 .source-table td { padding-left: clamp(24px, 3vw, 44px); }
+.source-table .source-reviewed {
+  padding-left: clamp(20px, 2.5vw, 36px);
+  color: rgba(23, 37, 46, 0.68);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
 .source-table .row-index {
   display: table-cell;
   min-width: 0;
@@ -1836,9 +1853,12 @@ details[open] .summary-mark { transform: rotate(45deg); }
 @media (max-width: 560px) {
   .source-col-index { width: 30px; }
   .source-col-organization { width: 34%; }
+  .source-col-reviewed { width: 96px; }
   .source-table th,
   .source-table td { padding: 13px 0; font-size: 0.78rem; }
+  .source-table thead .source-table-heading { padding-bottom: 8px; font-size: 0.62rem; }
   .source-table td { padding-left: 14px; }
+  .source-table .source-reviewed { padding-left: 10px; font-size: 0.7rem; }
   .source-table .source-organization { padding-right: 10px; }
 }
 
