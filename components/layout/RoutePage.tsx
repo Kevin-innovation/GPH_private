@@ -15,13 +15,13 @@ export function RoutePage({
         Skip to content
       </a>
       <Header />
-      <main id="main-content" className="route-main route-frame">
-        <div className="page-width route-breadcrumb" aria-label="Breadcrumb">
+      <main id="main-content" className="route-main route-frame" tabIndex={-1}>
+        <nav className="page-width route-breadcrumb" aria-label="Breadcrumb">
           {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a href="/">Brand / Home</a>
           <span aria-hidden="true">/</span>
-          <span>{breadcrumb}</span>
-        </div>
+          <span aria-current="page">{breadcrumb}</span>
+        </nav>
         {children}
       </main>
       <Footer />

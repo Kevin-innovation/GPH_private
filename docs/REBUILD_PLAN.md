@@ -1,7 +1,7 @@
 # Global Public Health Lens — Vertical Editorial Rebuild Plan
 
 > 작성일: 2026-09-11  
-> 상태: **Phase 7 진행 중 — 타이포그래피·인터랙션·코드 네이티브 비주얼·영양소 스크롤 모션 slice 완료**
+> 상태: **Phase 7R-2 대기 — Phase 7R-1 접근성 셸·제목 계층 완료**
 > 적용 저장소: `Kevin-innovation/GPH_private`의 `main`  
 > 배포 확인 URL: `https://gph-lens.vercel.app/`  
 > 레이아웃 참고 자료: `/Users/mk/Downloads/pangeaseed` 로컬 미러  
@@ -490,6 +490,19 @@ Country/Lens 및 Mission 공백 보정 완료 기록: [`docs/audits/PHASE_4_COUN
 - [ ] `private/main` 푸시 및 Vercel 성공 확인
 
 종료 커밋: `docs: finalize vertical editorial rebuild`
+
+### Phase 7R 보정 페이즈 (Phase 7 QA 재분할)
+
+Phase 7의 미완료 QA 체크와 전 라우트 `web-design-guidelines` 감사 결과를 구현 단위로 재분할했다. 최종 배포(기존 Phase 8)는 아래 보정 페이즈가 모두 끝난 뒤에만 진행한다.
+
+- **Phase 7R-1 — 접근성 셸과 제목 계층**: route별 `h1`, skip-link focus target, Breadcrumb/Footer landmark, desktop menu semantics, mobile dialog/inert, `:focus-visible`
+- **Phase 7R-2 — 콘텐츠 시맨틱과 출처 데이터**: Evidence table caption/header/scope, localized `<time>`, 외부 링크 목적과 보안 속성
+- **Phase 7R-3 — 상태 복원과 스크롤 인터랙션**: nutrient/country URL state, concise live status, 빠른 양방향 스크롤 settle·anchor·수동 선택 충돌 제거
+- **Phase 7R-4 — 반응형 타이포그래피와 조작 영역**: 44px target, 작은 label 보정, 6개 기준 폭의 줄바꿈·overflow·대비 검수
+- **Phase 7R-5 — 미디어·폰트·런타임 성능**: image `sizes`, Fontshare preconnect, marker bounds cache, Three.js/asset budget 결정
+- **기존 Phase 8 — 전체 회귀·배포 게이트**: 전 라우트·기준 폭·키보드/touch/motion 검수, test/lint/build, `private/main` 및 Vercel 확인
+
+상세 실행계획: [`docs/audits/PHASE_7_GUIDELINES_REMEDIATION.md`](audits/PHASE_7_GUIDELINES_REMEDIATION.md)
 
 ## 8. 페이즈 완료 보고 형식
 

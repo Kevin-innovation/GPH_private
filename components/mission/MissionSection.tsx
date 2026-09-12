@@ -84,9 +84,9 @@ export function MissionSection() {
       <div className="page-width mission-grid mission-stage">
         <div className="mission-heading-column">
           <Eyebrow>Our mission</Eyebrow>
-          <h2 id="about-title">
+          <h1 id="about-title">
             Health is shaped by more than <span className="no-orphan">individual choices.</span>
-          </h2>
+          </h1>
           {/* .mission-prompt is a two-column grid whose ::before draws the rule.
               The sentence has to be a single grid item, otherwise the trailing
               no-orphan span becomes a third item and drops to its own row. */}

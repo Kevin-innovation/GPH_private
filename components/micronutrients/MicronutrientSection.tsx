@@ -12,6 +12,7 @@ export function MicronutrientSection() {
               eyebrow="Our first applied lens"
               title={<>Nutrition is one lens in a much <span className="no-orphan">bigger picture.</span></>}
               id="micronutrients-title"
+              level="h1"
             />
           </div>
           <div className="micronutrient-intro-copy">

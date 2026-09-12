@@ -29,6 +29,7 @@ export function SourcesSection() {
           eyebrow="Evidence Base"
           title={<>Sources behind <span className="no-orphan">the lens.</span></>}
           id="sources-title"
+          level="h1"
         />
         <div className="source-list">
           <table className="source-table">

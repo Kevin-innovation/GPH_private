@@ -263,3 +263,40 @@ test("Phase 7 makes typography and action targets unmistakable", async () => {
   assert.match(css, /@keyframes phase7-section-visual-reveal/, "section visuals should reveal as a background atmosphere");
   assert.match(css, /\.section-visual::after\s*\{[\s\S]*linear-gradient\(90deg/, "section visuals should fade into the content background");
 });
+
+test("Phase 7R-1 keeps route headings and navigation semantics accessible", async () => {
+  const routePage = await readProjectFile("components/layout/RoutePage.tsx");
+  const home = await readProjectFile("app/page.tsx");
+  const header = await readProjectFile("components/layout/Header.tsx");
+  const footer = await readProjectFile("components/layout/Footer.tsx");
+  const sectionHeading = await readProjectFile("components/ui/SectionHeading.tsx");
+  const topLevelSections = [
+    "components/contact/ContactSection.tsx",
+    "components/global-lens/SolutionsPageSection.tsx",
+    "components/global-lens/GlobalLensSection.tsx",
+    "components/global-lens/CountrySpotlight.tsx",
+    "components/sources/SourcesSection.tsx",
+    "components/micronutrients/MicronutrientSection.tsx",
+  ];
+
+  assert.match(routePage, /<main id="main-content" className="route-main route-frame" tabIndex=\{-1\}>/);
+  assert.match(routePage, /<nav className="page-width route-breadcrumb" aria-label="Breadcrumb">/);
+  assert.match(home, /<main id="main-content" tabIndex=\{-1\}>/);
+  assert.match(footer, /<nav className="footer-links" aria-label="Explore">/);
+  assert.match(header, /role="dialog"/);
+  assert.match(header, /aria-modal="true"/);
+  assert.match(header, /aria-labelledby="mobile-navigation-title"/);
+  assert.match(header, /node\.inert = true/);
+  assert.doesNotMatch(header, /aria-haspopup="menu"/);
+  assert.match(sectionHeading, /level = "h2"/);
+
+  for (const path of topLevelSections) {
+    const source = await readProjectFile(path);
+    assert.match(source, /level="h1"|<h1\s/, `${path} should expose a route-level h1`);
+  }
+
+  for (const path of ["components/mission/MissionSection.tsx", "components/founder/FounderSection.tsx", "components/app-preview/NutritionAppPreview.tsx"]) {
+    const source = await readProjectFile(path);
+    assert.match(source, /<h1\b/, `${path} should use a route-level h1`);
+  }
+});

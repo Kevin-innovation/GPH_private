@@ -16,7 +16,7 @@ export function NutritionAppPreview() {
       <div className="page-width app-grid">
         <div className="app-copy">
           <Eyebrow>First tool · Nutrition</Eyebrow>
-          <h2 id="app-title">Explore one public-health lens through <span className="no-orphan">everyday food.</span></h2>
+          <h1 id="app-title">Explore one public-health lens through <span className="no-orphan">everyday food.</span></h1>
           <p>Use a 240-food catalog to see 13 micronutrients respond and learn how personal patterns connect to a wider public-health context. Guest data stays in your browser — <span className="no-orphan">no install or account.</span></p>
           <AppWorkflow />
           <div className="feature-line">

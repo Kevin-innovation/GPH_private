@@ -24,7 +24,7 @@ export function FounderSection() {
           <span className="founder-mark" aria-hidden="true">
             {founder.initials}
           </span>
-          <h2 id="founder-title">{founder.name}</h2>
+          <h1 id="founder-title">{founder.name}</h1>
           <p className="founder-role">{founder.role}</p>
           <p className="founder-affiliation">{founder.affiliation}</p>
 

@@ -51,14 +51,14 @@ export function Footer() {
           ) : null}
         </div>
 
-        <div className="footer-links">
+        <nav className="footer-links" aria-label="Explore">
           <Eyebrow>Explore</Eyebrow>
           {exploreLinks.map((link) => (
             <a key={link.href} href={link.href}>
               {link.label}
             </a>
           ))}
-        </div>
+        </nav>
 
         <div className="footer-links">
           <Eyebrow>Boundaries</Eyebrow>

@@ -14,6 +14,7 @@ export function GlobalLensSection() {
             title={<>One health issue. Three <span className="no-orphan">levels of action.</span></>}
             intro={<>Using iron as a worked example, follow one question from the body to community conditions and <span className="no-orphan">public-health systems.</span></>}
             id="global-lens-title"
+            level="h1"
           />
         </div>
         <div className="global-lens-hero">

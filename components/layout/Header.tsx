@@ -77,6 +77,27 @@ export function Header() {
   }, [mobileOpen]);
 
   useEffect(() => {
+    const backgroundNodes = Array.from(document.querySelectorAll<HTMLElement>("body > main, body > footer"));
+
+    backgroundNodes.forEach((node) => {
+      if (mobileOpen) {
+        node.setAttribute("aria-hidden", "true");
+        node.inert = true;
+      } else {
+        node.removeAttribute("aria-hidden");
+        node.inert = false;
+      }
+    });
+
+    return () => {
+      backgroundNodes.forEach((node) => {
+        node.removeAttribute("aria-hidden");
+        node.inert = false;
+      });
+    };
+  }, [mobileOpen]);
+
+  useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
       if (!navRef.current?.contains(event.target as Node)) setOpenGroup(null);
     };
@@ -173,7 +194,6 @@ export function Header() {
                   className="nav-disclosure"
                   aria-expanded={isOpen}
                   aria-controls={menuId}
-                  aria-haspopup="menu"
                   onClick={() => setOpenGroup(isOpen ? null : item.label)}
                 >
                   {item.label}
@@ -216,7 +236,17 @@ export function Header() {
       </div>
 
       {mobileOpen ? (
-        <div ref={mobileNavRef} className="mobile-nav" id="mobile-navigation">
+        <div
+          ref={mobileNavRef}
+          className="mobile-nav"
+          id="mobile-navigation"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mobile-navigation-title"
+        >
+          <h2 id="mobile-navigation-title" className="sr-only">
+            Navigation menu
+          </h2>
           <nav aria-label="Mobile navigation">
             {navigation.map((item, index) => {
               if (!isGroup(item)) {

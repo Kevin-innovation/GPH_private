@@ -15,6 +15,7 @@ export function SolutionsPageSection() {
             title={<>Health changes when <span className="no-orphan">conditions change.</span></>}
             intro={<>Explore practical public-health responses across food, services, environments, policy, and <span className="no-orphan">accountability.</span></>}
             id="solutions-page-title"
+            level="h1"
           />
         </div>
         <SolutionsList />

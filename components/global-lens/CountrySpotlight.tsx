@@ -642,6 +642,7 @@ export function CountrySpotlightSection() {
             title="The same health question looks different in every place."
             intro="Nutrition is one entry point. Explore how geography, environment, inequality, policy, and access to care change the public-health picture from country to country."
             id="country-spotlight-title"
+            level="h1"
           />
         </div>
 

@@ -16,6 +16,7 @@ export function ContactSection() {
             eyebrow="Join the conversation"
             title={<>Questions, feedback, <span className="no-orphan">or collaboration?</span></>}
             id="contact-title"
+            level="h1"
           />
           <p>{orphanSafeText(legal.contactNotice)}</p>
           {hasEmail ? <p className="contact-email">{siteConfig.email}</p> : null}
