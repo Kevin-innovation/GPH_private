@@ -253,7 +253,8 @@ function MobileNutrientList({
       // lets the current panel finish its close/open transition before the
       // next destination is considered, so rapid scrolling never produces an
       // open/close/open flicker.
-      if (pendingSlugRef.current === null || pendingDirection !== direction) {
+      const boundaryCatchUpChanged = shouldCatchUpToBoundary && pendingSlugRef.current !== targetSlug;
+      if (pendingSlugRef.current === null || pendingDirection !== direction || boundaryCatchUpChanged) {
         pendingSlugRef.current = targetSlug;
         if (settleTimer !== null) {
           window.clearTimeout(settleTimer);
