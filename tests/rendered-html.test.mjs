@@ -202,11 +202,11 @@ test("Phase 5 lens content uses vertical lists and connected handoffs", async ()
   assert.match(micronutrients, /rootMargin: "-42% 0px -42% 0px"/, "Micronutrient auto-expansion should use a stable viewport reading band");
   assert.match(micronutrients, /autoSuppressedUntilRef/, "Manual nutrient toggles should not be overridden by layout-triggered observer callbacks");
   assert.match(micronutrients, /waitForInputAfterHandoff = false/, "A new scroll gesture should resume the nutrient hand-off sequence");
-  assert.match(micronutrients, /settleDelay = 360/, "Scroll-driven nutrient selection should wait for a quiet reading window");
+  assert.match(micronutrients, /settleDelay = 180/, "Scroll-driven nutrient selection should respond after a short quiet reading window");
   assert.match(micronutrients, /currentDistance - targetDistance < 32/, "Nutrient focus should use hysteresis at row boundaries");
   assert.match(micronutrients, /atlas-mobile-detail-shell/, "Nutrient details should keep a transition shell to avoid layout jumps");
-  assert.match(micronutrients, /autoAlignSlugRef/, "Scroll hand-offs should track the detail head being aligned");
-  assert.match(micronutrients, /behavior: "instant"/, "Detail-head alignment should bypass global smooth-scroll queuing");
+  assert.match(micronutrients, /lastAutoSelectScrollYRef/, "Scroll hand-offs should remember the reader position without moving it");
+  assert.doesNotMatch(micronutrients, /window\.scrollTo\(\{ top: window\.scrollY/, "Nutrient hand-offs should not pull the page upward while a detail opens");
   assert.match(css, /\.micronutrient-shell \.atlas-mobile-item\.is-reveal-visible/, "Micronutrient rows should animate into view without hiding by default");
   assert.match(css, /phase5-nutrient-detail-in/, "The active nutrient detail should enter with a smooth scroll-linked transition");
   assert.match(css, /phase5-nutrient-detail-settle/, "Nutrient detail changes should use a settled transition");

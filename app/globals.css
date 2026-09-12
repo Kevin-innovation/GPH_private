@@ -7399,10 +7399,10 @@ textarea {
 }
 
 /* The active nutrient detail is inserted into the reading flow as the
-   accordion advances. A short upward fade makes that content change feel
-   continuous during both downward and upward scrolling. */
+   accordion advances. It enters from just above the trigger so the detail
+   grows downward instead of appearing to lift upward during a scroll. */
 @keyframes phase5-nutrient-detail-in {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(-12px); }
   to { opacity: 1; transform: none; }
 }
 
@@ -7670,7 +7670,7 @@ textarea {
 @keyframes phase5-nutrient-detail-settle {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(-12px);
   }
   to {
     opacity: 1;
