@@ -7399,10 +7399,10 @@ textarea {
 }
 
 /* The active nutrient detail is inserted into the reading flow as the
-   accordion advances. It enters from just above the trigger so the detail
-   grows downward instead of appearing to lift upward during a scroll. */
+   accordion advances. It settles from a small lower offset so the visual
+   arrives at the top of the detail before the copy follows it downward. */
 @keyframes phase5-nutrient-detail-in {
-  from { opacity: 0; transform: translateY(-12px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
 }
 
@@ -7670,7 +7670,7 @@ textarea {
 @keyframes phase5-nutrient-detail-settle {
   from {
     opacity: 0;
-    transform: translateY(-12px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -7732,6 +7732,10 @@ textarea {
   overflow-anchor: none;
 }
 
+.micronutrient-shell .atlas-mobile-item {
+  scroll-margin-top: calc(var(--header-height) + 20px);
+}
+
 .micronutrient-shell .atlas-mobile-detail-shell {
   display: grid;
   grid-template-rows: 0fr;
@@ -7749,7 +7753,7 @@ textarea {
   min-height: 0;
   overflow: hidden;
   opacity: 0;
-  transform: translateY(-10px);
+  transform: translateY(10px);
   transition: opacity 360ms ease, transform 560ms cubic-bezier(0.22, 1, 0.36, 1), padding 560ms cubic-bezier(0.22, 1, 0.36, 1), border-color 560ms ease;
 }
 

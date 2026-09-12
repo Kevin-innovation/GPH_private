@@ -129,6 +129,11 @@ function MobileNutrientList({
   const onAutoSelectRef = useRef(onAutoSelect);
   const autoSuppressedUntilRef = useRef(0);
   const lastAutoSelectScrollYRef = useRef(0);
+  const inputVersionRef = useRef(0);
+  const autoSelectionInputVersionRef = useRef(0);
+  const autoAlignSlugRef = useRef<string | null>(null);
+  const programmaticAlignmentRef = useRef(false);
+  const alignmentFallbackTimerRef = useRef<number | null>(null);
   const revealKey = visibleNutrients.map((nutrient) => nutrient.slug).join("|");
 
   useEffect(() => {
@@ -181,12 +186,14 @@ function MobileNutrientList({
     let frame = 0;
     let settleTimer: number | null = null;
     let scrollVersion = 0;
+    let scrollEndVersion = -1;
+    let gestureActive = false;
     const pendingSlugRef = { current: null as string | null };
     let waitForInputAfterHandoff = false;
     // React to a settled reading position quickly, then let the CSS shell
     // take its time opening downward. Keeping these two timings separate
     // prevents a sluggish hand-off without making the detail feel abrupt.
-    const settleDelay = 180;
+    const settleDelay = 220;
     const handoffDuration = 480;
     const getTargetTrigger = () => {
       const activationLine = Math.min(window.innerHeight * 0.52, window.innerHeight - 140);
@@ -265,7 +272,8 @@ function MobileNutrientList({
       const scheduledScrollVersion = scrollVersion;
       settleTimer = window.setTimeout(() => {
         settleTimer = null;
-        if (scheduledScrollVersion !== scrollVersion) {
+        const settledByScrollEnd = scrollEndVersion === scrollVersion;
+        if (scheduledScrollVersion !== scrollVersion && !settledByScrollEnd) {
           // The reader is still moving. Keep the pending adjacent row, but
           // wait for a quiet reading window before starting its transition.
           requestSync();
@@ -284,6 +292,8 @@ function MobileNutrientList({
           const now = performance.now();
           autoSuppressedUntilRef.current = now + handoffDuration;
           lastAutoSelectScrollYRef.current = window.scrollY;
+          autoSelectionInputVersionRef.current = inputVersionRef.current;
+          autoAlignSlugRef.current = nextSlug;
           waitForInputAfterHandoff = true;
           onAutoSelectRef.current(nextSlug);
         }
@@ -292,6 +302,7 @@ function MobileNutrientList({
 
     const syncFromScroll = () => {
       frame = 0;
+      if (programmaticAlignmentRef.current) return;
       if (performance.now() < autoSuppressedUntilRef.current) return;
       if (waitForInputAfterHandoff) {
         // Do not chain another hand-off merely because the expanding panel
@@ -332,6 +343,7 @@ function MobileNutrientList({
     // jumps several rows with a trackpad.
     const handleScroll = () => {
       scrollVersion += 1;
+      scrollEndVersion = -1;
       requestSync();
     };
 
@@ -344,6 +356,13 @@ function MobileNutrientList({
     // authoritative for a short handoff window. User input still requests a
     // fresh sync, but never interrupts a transition that is already running.
     const resumeAutoSelection = () => {
+      inputVersionRef.current += 1;
+      gestureActive = true;
+      programmaticAlignmentRef.current = false;
+      if (alignmentFallbackTimerRef.current !== null) {
+        window.clearTimeout(alignmentFallbackTimerRef.current);
+        alignmentFallbackTimerRef.current = null;
+      }
       // A real gesture is the explicit hand-off signal after an automatic
       // reveal. Clear the guard so a new row can be scheduled promptly; the
       // panel itself still opens through the CSS height transition below.
@@ -352,7 +371,24 @@ function MobileNutrientList({
       requestSync();
     };
     const resumeAfterScrollEnd = () => {
-      autoSuppressedUntilRef.current = 0;
+      scrollEndVersion = scrollVersion;
+      const userGestureEnded = gestureActive;
+      gestureActive = false;
+      if (programmaticAlignmentRef.current) {
+        programmaticAlignmentRef.current = false;
+        lastAutoSelectScrollYRef.current = window.scrollY;
+        autoSuppressedUntilRef.current = performance.now() + 120;
+        if (alignmentFallbackTimerRef.current !== null) {
+          window.clearTimeout(alignmentFallbackTimerRef.current);
+          alignmentFallbackTimerRef.current = null;
+        }
+        requestSync();
+        return;
+      }
+      // `scrollend` can also follow a layout-driven scroll caused by the
+      // expanding grid row. Only a real gesture may end the hand-off guard;
+      // otherwise that reflow would immediately chain into another nutrient.
+      if (userGestureEnded) autoSuppressedUntilRef.current = 0;
       requestSync();
     };
     window.addEventListener("wheel", resumeAutoSelection, { passive: true });
@@ -379,9 +415,99 @@ function MobileNutrientList({
       window.removeEventListener("scrollend", resumeAfterScrollEnd);
       if (frame) window.cancelAnimationFrame(frame);
       cancelPendingSelection();
+      if (alignmentFallbackTimerRef.current !== null) {
+        window.clearTimeout(alignmentFallbackTimerRef.current);
+        alignmentFallbackTimerRef.current = null;
+      }
       observer?.disconnect();
     };
   }, [revealKey]);
+
+  // The header remains visible while the reading list moves underneath it.
+  // Once an automatic hand-off has finished, correct only the clipped case:
+  // a single smooth scroll puts the new detail head below the header's safe
+  // edge. This is deliberately delayed until the shell transition settles,
+  // so layout reflow never fights the reader's gesture frame by frame.
+  useEffect(() => {
+    const slug = autoAlignSlugRef.current;
+    if (!slug || slug !== expandedSlug) return;
+
+    autoAlignSlugRef.current = null;
+    const list = listRef.current;
+    if (!list) return;
+
+    const shell = list.querySelector<HTMLElement>(
+      `.atlas-mobile-item[data-nutrient-slug="${slug}"] .atlas-mobile-detail-shell`,
+    );
+    const inputVersion = autoSelectionInputVersionRef.current;
+    let completed = false;
+    let scheduleTimer: number | null = null;
+    let frame = 0;
+
+    const finishAlignment = () => {
+      if (!programmaticAlignmentRef.current) return;
+      programmaticAlignmentRef.current = false;
+      lastAutoSelectScrollYRef.current = window.scrollY;
+      autoSuppressedUntilRef.current = performance.now() + 120;
+      if (alignmentFallbackTimerRef.current !== null) {
+        window.clearTimeout(alignmentFallbackTimerRef.current);
+        alignmentFallbackTimerRef.current = null;
+      }
+    };
+
+    const alignIfClipped = () => {
+      if (completed || inputVersionRef.current !== inputVersion) return;
+      completed = true;
+
+      const detailHead = shell?.querySelector<HTMLElement>(".atlas-mobile-detail-head");
+      if (!detailHead) return;
+
+      const header = document.querySelector<HTMLElement>(".site-header");
+      const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
+      const safeTop = Math.max(headerBottom, 0) + 20;
+      const rect = detailHead.getBoundingClientRect();
+      // Only correct a detail that is actually crossing the header. If a
+      // fast gesture moved the whole panel off-screen, leave the user's
+      // reading position alone instead of pulling the page backwards.
+      if (rect.bottom <= safeTop || rect.top >= safeTop) return;
+
+      const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+      const targetTop = Math.min(
+        maxScroll,
+        Math.max(0, window.scrollY + rect.top - safeTop),
+      );
+      if (Math.abs(targetTop - window.scrollY) < 4) return;
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      programmaticAlignmentRef.current = true;
+      autoSuppressedUntilRef.current = performance.now() + 1200;
+      window.scrollTo({ top: targetTop, behavior: reduceMotion ? "auto" : "smooth" });
+      alignmentFallbackTimerRef.current = window.setTimeout(finishAlignment, reduceMotion ? 80 : 1200);
+    };
+
+    const scheduleAlignment = () => {
+      if (scheduleTimer !== null) window.clearTimeout(scheduleTimer);
+      scheduleTimer = window.setTimeout(() => {
+        scheduleTimer = null;
+        frame = window.requestAnimationFrame(alignIfClipped);
+      }, 32);
+    };
+
+    const handleTransitionEnd = (event: TransitionEvent) => {
+      if (event.target === shell && event.propertyName === "grid-template-rows") scheduleAlignment();
+    };
+
+    shell?.addEventListener("transitionend", handleTransitionEnd);
+    // Fallback for browsers that do not emit a transition event for an
+    // interpolated 0fr → 1fr grid track.
+    scheduleTimer = window.setTimeout(scheduleAlignment, 640);
+
+    return () => {
+      shell?.removeEventListener("transitionend", handleTransitionEnd);
+      if (scheduleTimer !== null) window.clearTimeout(scheduleTimer);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [expandedSlug]);
 
   return (
     <div ref={listRef} className="atlas-mobile-list" aria-label="Nutrients to explore">
